@@ -5,12 +5,11 @@
 @import './tokens/colors.css';
 @import './tokens/typography.css';
 
-/* 1rem = 10px */
-html {
-  font-size: 62.5%;
-}
-
 @layer base {
+  html {
+    font-size: 62.5%;
+  }
+
   *,
   *::before,
   *::after {

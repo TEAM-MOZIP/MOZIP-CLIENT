@@ -3,7 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 const navItemClass = ({ isActive }: { isActive: boolean }) =>
   [
     'cursor-pointer font-pretendard text-nav text-black transition-colors',
-    isActive && 'font-semibold',
+    isActive && 'font-semibold underline decoration-1 underline-offset-4',
   ]
     .filter(Boolean)
     .join(' ');
@@ -21,7 +21,7 @@ const Header = () => {
 
         <span className="flex-1" aria-hidden />
 
-        <nav className="inline-flex shrink-0 items-center gap-58">
+        <nav className="inline-flex shrink-0 items-center gap-[5.8rem]">
           <NavLink to="/" end className={navItemClass}>
             홈
           </NavLink>
