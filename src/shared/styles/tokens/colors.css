@@ -1,0 +1,35 @@
+/**
+ * 1) Palette — Figma Grayscale / Primary
+ * 2) Semantic — Color Usage (팔레트 토큰 참조)
+ */
+
+/* Palette */
+@theme {
+  --color-white: #ffffff;
+  --color-gray-100: #f4f4f4;
+  --color-gray-200: #ebebeb;
+  --color-gray-300: #ebebeb;
+  --color-gray-400: #bebebe;
+  --color-gray-500: #8b8b8b;
+  --color-gray-600: #5b5b5b;
+  --color-gray-700: #3d3d3d;
+  --color-gray-800: #252525;
+  --color-black: #171717;
+
+  --color-primary: #fff360;
+  --color-primary-sub-1: #fff797;
+  --color-primary-sub-2: #fffabc;
+}
+
+@theme inline {
+  /* Text (Caption 색상 → text-gray-500) */
+  --color-title: var(--color-gray-700);
+  --color-body: var(--color-gray-600);
+
+  /* Background — gray 100 / white */
+  --color-background-muted: var(--color-gray-100);
+  --color-background-default: var(--color-white);
+
+  /* Disabled */
+  --color-disabled: var(--color-gray-400);
+}

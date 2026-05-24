@@ -1,0 +1,80 @@
+/**
+ * Figma Typography
+ * 사용: className="text-hero" (size / weight / line-height / letter-spacing 한 번에 적용)
+ */
+@theme {
+  --font-pretendard:
+    'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+
+  /* hero — size 50, semibold, 150%, -4% */
+  --text-hero: 5rem;
+  --text-hero--line-height: 1.5;
+  --text-hero--letter-spacing: -0.04em;
+  --text-hero--font-weight: 600;
+
+  /* heading-1 — 38, semibold, 150%, -4% */
+  --text-heading-1: 3.8rem;
+  --text-heading-1--line-height: 1.5;
+  --text-heading-1--letter-spacing: -0.04em;
+  --text-heading-1--font-weight: 600;
+
+  /* heading-2 — 28 */
+  --text-heading-2: 2.8rem;
+  --text-heading-2--line-height: 1.5;
+  --text-heading-2--letter-spacing: -0.04em;
+  --text-heading-2--font-weight: 600;
+
+  /* heading-3 — 22 */
+  --text-heading-3: 2.2rem;
+  --text-heading-3--line-height: 1.5;
+  --text-heading-3--letter-spacing: -0.04em;
+  --text-heading-3--font-weight: 600;
+
+  /* heading-4 — 18, -2% */
+  --text-heading-4: 1.8rem;
+  --text-heading-4--line-height: 1.5;
+  --text-heading-4--letter-spacing: -0.02em;
+  --text-heading-4--font-weight: 600;
+
+  /* body-1 — 20, regular */
+  --text-body-1: 2rem;
+  --text-body-1--line-height: 1.5;
+  --text-body-1--letter-spacing: -0.02em;
+  --text-body-1--font-weight: 400;
+
+  /* body-2 — 18 */
+  --text-body-2: 1.8rem;
+  --text-body-2--line-height: 1.5;
+  --text-body-2--letter-spacing: -0.02em;
+  --text-body-2--font-weight: 400;
+
+  /* body-3 — 16 */
+  --text-body-3: 1.6rem;
+  --text-body-3--line-height: 1.5;
+  --text-body-3--letter-spacing: -0.02em;
+  --text-body-3--font-weight: 400;
+
+  /* caption — 14, regular */
+  --text-caption: 1.4rem;
+  --text-caption--line-height: 1.5;
+  --text-caption--letter-spacing: -0.02em;
+  --text-caption--font-weight: 400;
+
+  /* button-1 — 18, semibold */
+  --text-button-1: 1.8rem;
+  --text-button-1--line-height: 1.5;
+  --text-button-1--letter-spacing: -0.02em;
+  --text-button-1--font-weight: 600;
+
+  /* button-2 — 16 */
+  --text-button-2: 1.6rem;
+  --text-button-2--line-height: 1.5;
+  --text-button-2--letter-spacing: -0.02em;
+  --text-button-2--font-weight: 600;
+
+  /* tag — 14, semibold */
+  --text-tag: 1.4rem;
+  --text-tag--line-height: 1.5;
+  --text-tag--letter-spacing: -0.02em;
+  --text-tag--font-weight: 600;
+}
