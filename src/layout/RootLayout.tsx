@@ -1,9 +1,10 @@
 import { Outlet } from 'react-router-dom';
+import Header from '@shared/components/header/Header';
 
 const RootLayout = () => {
   return (
     <>
-      {/* 공통 헤더/네비게이션 영역 */}
+      <Header />
       <main>
         <Outlet />
       </main>
