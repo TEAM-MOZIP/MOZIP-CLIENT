@@ -77,4 +77,9 @@
   --text-tag--line-height: 1.5;
   --text-tag--letter-spacing: -0.02em;
   --text-tag--font-weight: 600;
+
+  /* nav — 24, medium, normal */
+  --text-nav: 2.4rem;
+  --text-nav--line-height: normal;
+  --text-nav--font-weight: 500;
 }
