@@ -26,7 +26,7 @@ const FilterChip = ({
       className={[
         'inline-flex cursor-pointer items-center justify-center gap-[0.6rem] rounded-full border px-[1.2rem] py-[0.6rem] text-caption transition-colors',
         selected
-          ? 'border-primary bg-primary text-title'
+          ? 'border-primary-sub-2 bg-primary-sub-2 text-title'
           : 'border-gray-200 bg-white text-body hover:border-gray-400',
       ].join(' ')}
     >

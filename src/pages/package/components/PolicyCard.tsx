@@ -1,5 +1,31 @@
 import type { PolicyItem } from '@pages/package/types';
 
+const ROUND_STAR_PATH =
+  'M11.48 3.499a.562.562 0 0 1 1.04 0l1.965 4.677a.563.563 0 0 0 .475.31h5.092c.483 0 .684.618.294.88l-4.12 3.224a.563.563 0 0 0-.182.88l1.57 4.826a.562.562 0 0 1-.86.627l-4.116-3.225a.563.563 0 0 0-.694 0l-4.116 3.225a.562.562 0 0 1-.86-.627l1.57-4.826a.563.563 0 0 0-.182-.88l-4.12-3.224a.562.562 0 0 1 .294-.88h5.092a.563.563 0 0 0 .475-.31l1.965-4.677z';
+
+type BookmarkStarIconProps = {
+  filled: boolean;
+};
+
+const BookmarkStarIcon = ({ filled }: BookmarkStarIconProps) => (
+  <svg
+    className="size-[2.2rem]"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden
+  >
+    <path
+      d={ROUND_STAR_PATH}
+      fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 type PolicyCardProps = PolicyItem & {
   onBookmarkClick?: () => void;
   onClick?: () => void;
@@ -55,7 +81,7 @@ const PolicyCard = ({
           }}
           className="shrink-0 cursor-pointer text-title"
         >
-          {bookmarked ? '★' : '☆'}
+          <BookmarkStarIcon filled={bookmarked} />
         </button>
       </div>
 
