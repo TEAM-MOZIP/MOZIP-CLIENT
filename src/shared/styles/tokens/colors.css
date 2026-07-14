@@ -19,6 +19,21 @@
   --color-primary: #fff360;
   --color-primary-sub-1: #fff797;
   --color-primary-sub-2: #fffabc;
+
+  /* Home hero — white → primary-sub-2 (단일 구간) */
+  --background-image-hero-gradient: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fffabc 100%
+  );
+
+  /* Home 상단 영역 — white → yellow → white (스크롤 시 시안) */
+  --background-image-home-gradient: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fffabc 42%,
+    #ffffff 78%
+  );
 }
 
 @theme inline {
