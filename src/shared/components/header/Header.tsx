@@ -4,13 +4,12 @@ import HeaderActions from '@shared/components/header/HeaderActions';
 
 const navItemClass = ({ isActive }: { isActive: boolean }) =>
   [
-    'cursor-pointer font-pretendard text-body-1 font-medium text-black transition-colors',
-    isActive && 'font-semibold underline decoration-1 underline-offset-4',
-  ]
-    .filter(Boolean)
-    .join(' ');
+    'cursor-pointer font-pretendard text-body-1 text-black transition-colors border-b-[3px]',
+    isActive ? 'border-primary !font-bold' : 'border-transparent font-normal',
+  ].join(' ');
 
-const navLabelClass = 'font-pretendard text-body-1 font-medium text-black';
+const navLabelClass =
+  'font-pretendard text-body-1 font-normal text-black border-b-[3px] border-transparent';
 
 const Header = () => {
   return (
@@ -29,10 +28,7 @@ const Header = () => {
           />
         </Link>
 
-        <nav className="inline-flex items-center justify-self-center gap-[5.8rem]">
-          <NavLink to="/" end className={navItemClass}>
-            홈
-          </NavLink>
+        <nav className="inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] mr-[2rem]">
           <NavLink to="/package" className={navItemClass}>
             정책 모음
           </NavLink>
