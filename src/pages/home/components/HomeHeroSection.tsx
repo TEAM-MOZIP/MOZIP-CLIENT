@@ -19,20 +19,30 @@ const HomeHeroSection = () => {
   });
 
   return (
-    <section className="relative flex min-h-[calc(100dvh-8.1rem)] w-full flex-col overflow-hidden">
-      <div className="flex flex-1 flex-col justify-start px-16 pt-[10rem]">
+    <section className="bg-hero-gradient relative flex min-h-[calc(100dvh-8.1rem)] w-full flex-col overflow-hidden py-[15rem]">
+      <style>{`
+        @keyframes mozip-typing-cursor-blink {
+          50% {
+            opacity: 0;
+          }
+        }
+      `}</style>
+
+      <div className="flex flex-1 flex-col justify-start px-16">
         <h1
           className="text-center text-heading-1 text-title"
           aria-label={HERO_COPY}
         >
           {displayedText}
-          {!isComplete && (
-            <span
-              className="ml-[0.2rem] inline-block w-[0.12em] animate-pulse bg-current align-middle"
-              style={{ height: '0.9em' }}
-              aria-hidden
-            />
-          )}
+          <span
+            className={`ml-[0.3em] inline-block w-[0.1em] bg-current align-middle transition-opacity duration-1000 ease-out ${
+              isComplete
+                ? 'opacity-0'
+                : 'animate-[mozip-typing-cursor-blink_1s_steps(2,start)_infinite] opacity-100'
+            }`}
+            style={{ height: '1em' }}
+            aria-hidden
+          />
         </h1>
       </div>
 
@@ -40,7 +50,7 @@ const HomeHeroSection = () => {
         src={heroWatermark}
         alt=""
         aria-hidden
-        className="block w-full shrink-0 pb-[15rem]"
+        className="block w-full shrink-0"
         draggable={false}
       />
     </section>

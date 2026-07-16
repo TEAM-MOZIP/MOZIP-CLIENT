@@ -28,7 +28,7 @@ const Header = () => {
           />
         </Link>
 
-        <nav className="inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] mr-[2rem]">
+        <nav className="inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] mx-[2rem]">
           <NavLink to="/package" className={navItemClass}>
             정책 모음
           </NavLink>
