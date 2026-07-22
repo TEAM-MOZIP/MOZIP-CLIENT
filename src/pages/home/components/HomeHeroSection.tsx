@@ -30,12 +30,12 @@ const HomeHeroSection = () => {
 
       <div className="flex flex-1 flex-col justify-start px-16">
         <h1
-          className="text-center text-heading-1 text-title"
+          className="text-center text-[3.3rem] font-semibold text-title"
           aria-label={HERO_COPY}
         >
           {displayedText}
           <span
-            className={`ml-[0.3em] inline-block w-[0.1em] bg-current align-middle transition-opacity duration-1000 ease-out ${
+            className={`ml-[0.2em] inline-block w-[0.1em] bg-current align-middle transition-opacity duration-1000 ease-out ${
               isComplete
                 ? 'opacity-0'
                 : 'animate-[mozip-typing-cursor-blink_1s_steps(2,start)_infinite] opacity-100'
