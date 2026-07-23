@@ -28,12 +28,14 @@ const Header = () => {
           />
         </Link>
 
-        <nav className="inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] mx-[2rem]">
+        <nav className="hidden min-[944px]:inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] pl-[2rem]">
           <NavLink to="/package" className={navItemClass}>
             정책 모음
           </NavLink>
           <span className={navLabelClass}>챗봇</span>
-          <span className={navLabelClass}>마이페이지</span>
+          <NavLink to="/mypage" className={navItemClass}>
+            마이페이지
+          </NavLink>
         </nav>
 
         <HeaderActions />

@@ -39,7 +39,7 @@ const HeaderActions = () => {
   };
 
   return (
-    <div className="flex min-w-max shrink-0 items-center justify-self-end gap-[1.6rem]">
+    <div className="col-start-3 hidden min-[600px]:flex min-w-max shrink-0 items-center justify-self-end gap-[1.6rem] pl-[2rem]">
       <label className="relative shrink-0">
         <span className="sr-only">검색</span>
         <input
