@@ -35,7 +35,7 @@ const PolicyListSection = ({
       <div className="mx-auto w-full px-16">
         <h2 className="text-heading-2 text-title">정책 목록</h2>
 
-        <div className="mt-[2.4rem] flex gap-[3.2rem]">
+        <div className="mt-[2.4rem] flex items-start gap-[3.2rem]">
           <FilterSidebar groups={filterGroups} />
 
           <div className="min-w-0 flex-1">

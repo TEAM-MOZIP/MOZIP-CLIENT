@@ -8,7 +8,7 @@
   --color-white: #ffffff;
   --color-gray-100: #f4f4f4;
   --color-gray-200: #ebebeb;
-  --color-gray-300: #ebebeb;
+  --color-gray-300: #d7d7d7;
   --color-gray-400: #bebebe;
   --color-gray-500: #8b8b8b;
   --color-gray-600: #5b5b5b;
@@ -19,6 +19,21 @@
   --color-primary: #fff360;
   --color-primary-sub-1: #fff797;
   --color-primary-sub-2: #fffabc;
+
+  /* Home hero — white → primary-sub-2 (단일 구간) */
+  --background-image-hero-gradient: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fffabc 100%
+  );
+
+  /* Home 상단 영역 — white → yellow → white (스크롤 시 시안) */
+  --background-image-home-gradient: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fffabc 42%,
+    #ffffff 78%
+  );
 }
 
 @theme inline {
