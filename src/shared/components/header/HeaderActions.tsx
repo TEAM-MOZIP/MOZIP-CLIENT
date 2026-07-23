@@ -59,7 +59,7 @@ const HeaderActions = () => {
 
       <button
         type="button"
-        aria-label="마이페이지"
+        aria-label="프로필"
         className="flex size-[4rem] cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white"
       >
         <img
