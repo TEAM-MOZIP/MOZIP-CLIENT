@@ -20,6 +20,8 @@
   --color-primary-sub-1: #fff797;
   --color-primary-sub-2: #fffabc;
 
+  --color-point: #f74e4e;
+
   /* Home hero — white → primary-sub-2 (단일 구간) */
   --background-image-hero-gradient: linear-gradient(
     180deg,

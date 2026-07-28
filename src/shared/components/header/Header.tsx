@@ -14,7 +14,7 @@ const navLabelClass =
 const Header = () => {
   return (
     <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-200 bg-white">
-      <div className="grid h-[81px] w-full grid-cols-[1fr_auto_1fr] items-center px-16 py-[1.2rem]">
+      <div className="grid h-[81px] w-full grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center px-16 py-[1.2rem]">
         <Link
           to="/"
           className="justify-self-start shrink-0 cursor-pointer"
@@ -28,12 +28,14 @@ const Header = () => {
           />
         </Link>
 
-        <nav className="inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] mx-[2rem]">
+        <nav className="hidden min-[944px]:inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] pl-[2rem]">
           <NavLink to="/package" className={navItemClass}>
             정책 모음
           </NavLink>
           <span className={navLabelClass}>챗봇</span>
-          <span className={navLabelClass}>마이페이지</span>
+          <NavLink to="/mypage" className={navItemClass}>
+            마이페이지
+          </NavLink>
         </nav>
 
         <HeaderActions />
