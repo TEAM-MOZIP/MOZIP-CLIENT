@@ -53,6 +53,7 @@ const LoginPage = () => {
         </p>
 
         <form
+          noValidate
           onSubmit={handleSubmit}
           className="mt-[8rem] flex w-full flex-col gap-[2.4rem]"
         >
