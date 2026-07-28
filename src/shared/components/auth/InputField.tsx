@@ -1,41 +1,20 @@
 import { useId, useState, type ComponentProps } from 'react';
 import eyeIcon from '@shared/assets/icons/eye.svg';
 import eyeOffIcon from '@shared/assets/icons/eye-off.svg';
+import {
+  getAuthFieldValidationError,
+  type AuthFieldValidation,
+} from '@shared/utils/authValidation';
 
 type InputFieldType = 'email' | 'text' | 'password';
-type InputFieldValidation = 'email' | 'passwordMatch';
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type InputFieldProps = {
   label: string;
   type?: InputFieldType;
-  validate?: InputFieldValidation;
+  validate?: AuthFieldValidation;
   compareValue?: string;
   errorMessage?: string;
 } & Omit<ComponentProps<'input'>, 'type'>;
-
-const getValidationError = (
-  validate: InputFieldValidation | undefined,
-  value: string,
-  compareValue?: string
-): string | undefined => {
-  if (!validate || !value) return undefined;
-
-  if (validate === 'email' && !EMAIL_REGEX.test(value)) {
-    return '올바른 이메일 형식을 입력해주세요';
-  }
-
-  if (
-    validate === 'passwordMatch' &&
-    compareValue !== undefined &&
-    value !== compareValue
-  ) {
-    return '비밀번호가 일치하지 않습니다';
-  }
-
-  return undefined;
-};
 
 const InputField = ({
   label,
@@ -59,7 +38,7 @@ const InputField = ({
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
 
   const validationError = touched
-    ? getValidationError(validate, String(value ?? ''), compareValue)
+    ? getAuthFieldValidationError(validate, String(value ?? ''), compareValue)
     : undefined;
 
   const error = errorMessage ?? validationError;
