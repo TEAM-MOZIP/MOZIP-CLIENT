@@ -10,7 +10,7 @@ const FilterSidebar = ({ groups }: FilterSidebarProps) => {
   const [selected, setSelected] = useState<Record<string, string>>({
     age: 'all',
     category: 'all',
-    region: 'seoul',
+    region: 'all',
   });
 
   const handleSelect = (groupId: string, optionId: string) => {
