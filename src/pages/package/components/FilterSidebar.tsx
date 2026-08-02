@@ -8,6 +8,7 @@ type FilterSidebarProps = {
 
 const FilterSidebar = ({ groups }: FilterSidebarProps) => {
   const [selected, setSelected] = useState<Record<string, string>>({
+    status: 'all',
     age: 'all',
     category: 'all',
     region: 'all',
