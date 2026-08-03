@@ -86,14 +86,14 @@ const PolicyListSection = ({
                   aria-haspopup="menu"
                   aria-expanded={isSortOpen}
                   onClick={() => setIsSortOpen((prev) => !prev)}
-                  className="flex cursor-pointer items-center gap-[0.8rem] text-body-2 text-title font-medium"
+                  className="flex cursor-pointer items-center gap-[0.8rem] text-body-3 text-title font-medium"
                 >
                   {selectedSortLabel}
                   <img
                     src={arrowDownIcon}
                     alt=""
                     aria-hidden
-                    className="h-[0.8rem] w-[1.4rem]"
+                    className="h-[0.6rem] w-[1.2rem]"
                   />
                 </button>
 
