@@ -132,7 +132,18 @@ export const FILTER_GROUPS: FilterGroup[] = [
   },
 ];
 
-export const POLICY_ITEMS: PolicyItem[] = [
+type PolicyItemBase = Omit<
+  PolicyItem,
+  | 'introduction'
+  | 'supportContents'
+  | 'eligibility'
+  | 'documents'
+  | 'notes'
+  | 'contactName'
+  | 'contactPhone'
+>;
+
+const POLICY_ITEMS_BASE: PolicyItemBase[] = [
   {
     id: '1',
     age: '전체',
@@ -258,13 +269,13 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '13',
-    age: '만 25~29세',
+    age: '만 19~24세',
     category: '주거',
-    region: '강서구',
-    title: '월세 특별지원 (청년)',
+    region: '강남구',
+    title: '청년 월세 특별지원',
     dDay: 28,
-    organization: '서울특별시',
-    period: '2026. 04. 01. 오전 09:00 ~ 2026. 10. 31. 오후 06:00',
+    organization: '강남구청 청년정책과',
+    period: '2026.07.01 ~ 2026.08.18',
   },
   {
     id: '14',
@@ -438,5 +449,66 @@ export const POLICY_ITEMS: PolicyItem[] = [
     period: '2026. 05. 11. 오전 09:00 ~ 2026. 06. 28. 오후 06:00',
   },
 ];
+
+const buildPolicyDetail = (
+  item: PolicyItemBase
+): Pick<
+  PolicyItem,
+  | 'introduction'
+  | 'supportContents'
+  | 'eligibility'
+  | 'documents'
+  | 'notes'
+  | 'contactName'
+  | 'contactPhone'
+> => {
+  if (item.id === '13') {
+    return {
+      introduction:
+        '청년의 주거비 부담 완화를 위해 월세를 지원하는 정책입니다.',
+      supportContents: [
+        '월 최대 20만원 지원',
+        '최대 12개월 지원',
+        '계좌로 지급',
+      ],
+      eligibility: ['만 19~24세', '강남구 거주', '무주택 청년'],
+      documents: ['주민등록등본', '임대차계약서', '소득 증빙 서류'],
+      notes: [
+        '예산 소진 시 조기 마감될 수 있습니다.',
+        '중복 지원 여부를 확인해 주세요.',
+      ],
+      contactName: '강남구청 청년정책과',
+      contactPhone: '02-1234-5678',
+    };
+  }
+
+  const ageLabel = item.age === '전체' ? '연령 제한 없음' : item.age;
+
+  return {
+    introduction: `${item.title}은(는) ${item.category} 분야 지원을 위한 정책입니다.`,
+    supportContents: [
+      `${item.category} 관련 지원 제공`,
+      '최대 12개월 지원',
+      '지정 계좌로 지급',
+    ],
+    eligibility: [
+      ageLabel,
+      item.region === '전체' ? '거주 지역 제한 없음' : `${item.region} 거주`,
+      `${item.category} 분야 지원 요건 충족자`,
+    ],
+    documents: ['주민등록등본', '신분증 사본', '소득 증빙 서류'],
+    notes: [
+      '예산 소진 시 조기 마감될 수 있습니다.',
+      '중복 지원 여부를 확인해 주세요.',
+    ],
+    contactName: `${item.organization} 담당 부서`,
+    contactPhone: '02-1234-5678',
+  };
+};
+
+export const POLICY_ITEMS: PolicyItem[] = POLICY_ITEMS_BASE.map((item) => ({
+  ...item,
+  ...buildPolicyDetail(item),
+}));
 
 export const TOTAL_POLICY_COUNT = 1320;

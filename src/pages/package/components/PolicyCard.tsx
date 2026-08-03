@@ -1,13 +1,8 @@
 import type { PolicyItem } from '@pages/package/types';
+import { TAG_STYLES } from '@pages/package/constants/tagStyles';
 import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
 import bookmarkFilledIcon from '@shared/assets/icons/bookmark-filled.svg';
 import shareIcon from '@shared/assets/icons/share.svg';
-
-const TAG_STYLES = {
-  age: { border: '#FFF360', background: '#FFFABC' },
-  category: { border: '#8CE29C', background: '#DDFAD4' },
-  region: { border: '#97C4FF', background: '#D7EAFF' },
-} as const;
 
 type PolicyCardProps = PolicyItem & {
   onBookmarkClick?: () => void;
@@ -36,7 +31,9 @@ const PolicyCard = ({
     <div
       className={[
         'flex min-w-0 flex-col overflow-hidden rounded-[1rem] border border-gray-400 bg-white p-[2rem] gap-[2rem]',
-        onClick ? 'cursor-pointer hover:bg-gray-50' : '',
+        onClick
+          ? 'cursor-pointer transition-colors duration-300 hover:bg-[#FFFDE5]'
+          : '',
       ].join(' ')}
       onClick={onClick}
       onKeyDown={

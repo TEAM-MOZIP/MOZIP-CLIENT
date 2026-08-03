@@ -92,4 +92,11 @@ export type PolicyItem = {
   organization: string;
   period: string;
   bookmarked?: boolean;
+  introduction: string;
+  supportContents: string[];
+  eligibility: string[];
+  documents: string[];
+  notes: string[];
+  contactName: string;
+  contactPhone: string;
 };

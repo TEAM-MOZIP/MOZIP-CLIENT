@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import FilterSidebar from '@pages/package/components/FilterSidebar';
 import PolicyCard from '@pages/package/components/PolicyCard';
+import PolicyDetailModal from '@pages/package/components/PolicyDetailModal';
 import type { FilterGroup, PolicyItem } from '@pages/package/types';
 import arrowDownIcon from '@shared/assets/icons/arrow-down.svg';
 
@@ -25,9 +26,13 @@ const PolicyListSection = ({
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(
     () => new Set(policies.filter((p) => p.bookmarked).map((p) => p.id))
   );
+  const [selectedPolicyId, setSelectedPolicyId] = useState<string | null>(null);
   const [sort, setSort] = useState<SortValue>('latest');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
+
+  const selectedPolicy =
+    policies.find((policy) => policy.id === selectedPolicyId) ?? null;
 
   const selectedSortLabel =
     SORT_OPTIONS.find((option) => option.value === sort)?.label ?? '최신순';
@@ -130,12 +135,22 @@ const PolicyListSection = ({
                   {...policy}
                   bookmarked={bookmarkedIds.has(policy.id)}
                   onBookmarkClick={() => toggleBookmark(policy.id)}
+                  onClick={() => setSelectedPolicyId(policy.id)}
                 />
               ))}
             </div>
           </div>
         </div>
       </div>
+
+      {selectedPolicy && (
+        <PolicyDetailModal
+          policy={selectedPolicy}
+          bookmarked={bookmarkedIds.has(selectedPolicy.id)}
+          onClose={() => setSelectedPolicyId(null)}
+          onBookmarkClick={() => toggleBookmark(selectedPolicy.id)}
+        />
+      )}
     </section>
   );
 };
