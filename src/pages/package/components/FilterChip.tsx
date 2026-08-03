@@ -1,10 +1,20 @@
 import type { FilterStatusDot } from '@pages/package/types';
 
+export type FilterChipVariant = 'status' | 'age' | 'category' | 'region';
+
 type FilterChipProps = {
   label: string;
   selected?: boolean;
+  variant?: FilterChipVariant;
   statusDot?: FilterStatusDot;
   onClick?: () => void;
+};
+
+const SELECTED_CLASS: Record<FilterChipVariant, string> = {
+  status: 'border-gray-300 bg-gray-200 font-semibold text-gray-700',
+  age: 'border-[#FFF360] bg-[#FFFABC] font-semibold text-gray-700',
+  category: 'border-[#8CE29C] bg-[#DDFAD4] font-semibold text-gray-700',
+  region: 'border-[#97C4FF] bg-[#D7EAFF] font-semibold text-gray-700',
 };
 
 const STATUS_DOT_CLASS: Record<FilterStatusDot, string> = {
@@ -16,6 +26,7 @@ const STATUS_DOT_CLASS: Record<FilterStatusDot, string> = {
 const FilterChip = ({
   label,
   selected = false,
+  variant = 'status',
   statusDot,
   onClick,
 }: FilterChipProps) => {
@@ -26,13 +37,13 @@ const FilterChip = ({
       className={[
         'inline-flex cursor-pointer items-center justify-center gap-[0.6rem] rounded-full border px-[1.2rem] py-[0.6rem] text-caption transition-colors',
         selected
-          ? 'border-primary-sub-2 bg-primary-sub-2 text-title'
-          : 'border-gray-200 bg-white text-body hover:border-gray-400',
+          ? SELECTED_CLASS[variant]
+          : 'border-gray-200 bg-white font-medium text-gray-600 hover:border-gray-400',
       ].join(' ')}
     >
       {statusDot && (
         <span
-          className={`size-[0.6rem] shrink-0 rounded-full ${STATUS_DOT_CLASS[statusDot]}`}
+          className={`size-[0.8rem] shrink-0 rounded-full ${STATUS_DOT_CLASS[statusDot]}`}
           aria-hidden
         />
       )}
