@@ -15,7 +15,7 @@ import {
 import logo from '@shared/assets/logo.svg';
 import kakaoIcon from '@shared/assets/icons/kakao-icon.svg';
 import checkWhiteIcon from '@shared/assets/icons/check-white.svg';
-import arrowRightIcon from '@shared/assets/icons/arrow-right.svg';
+import arrowRightIcon from '@shared/assets/icons/chevron-right.svg';
 
 type FieldErrors = {
   email?: string;
