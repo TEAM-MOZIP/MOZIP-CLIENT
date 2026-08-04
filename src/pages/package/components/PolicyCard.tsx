@@ -1,51 +1,39 @@
 import type { PolicyItem } from '@pages/package/types';
-
-const ROUND_STAR_PATH =
-  'M11.48 3.499a.562.562 0 0 1 1.04 0l1.965 4.677a.563.563 0 0 0 .475.31h5.092c.483 0 .684.618.294.88l-4.12 3.224a.563.563 0 0 0-.182.88l1.57 4.826a.562.562 0 0 1-.86.627l-4.116-3.225a.563.563 0 0 0-.694 0l-4.116 3.225a.562.562 0 0 1-.86-.627l1.57-4.826a.563.563 0 0 0-.182-.88l-4.12-3.224a.562.562 0 0 1 .294-.88h5.092a.563.563 0 0 0 .475-.31l1.965-4.677z';
-
-type BookmarkStarIconProps = {
-  filled: boolean;
-};
-
-const BookmarkStarIcon = ({ filled }: BookmarkStarIconProps) => (
-  <svg
-    className="size-[2.2rem]"
-    viewBox="0 0 24 24"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden
-  >
-    <path
-      d={ROUND_STAR_PATH}
-      fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+import { TAG_STYLES } from '@pages/package/constants/tagStyles';
+import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
+import bookmarkFilledIcon from '@shared/assets/icons/bookmark-filled.svg';
+import shareIcon from '@shared/assets/icons/share.svg';
 
 type PolicyCardProps = PolicyItem & {
   onBookmarkClick?: () => void;
+  onShareClick?: () => void;
   onClick?: () => void;
 };
 
 const PolicyCard = ({
-  tags,
+  age,
+  category,
+  region,
   title,
   dDay,
-  organization,
-  period,
   bookmarked = false,
   onBookmarkClick,
+  onShareClick,
   onClick,
 }: PolicyCardProps) => {
+  const tags = [
+    { kind: 'age' as const, label: age },
+    { kind: 'category' as const, label: category },
+    { kind: 'region' as const, label: region },
+  ];
+
   return (
     <div
       className={[
-        'flex flex-col rounded-[1.2rem] border border-gray-200 bg-white p-8',
-        onClick ? 'cursor-pointer hover:border-gray-400' : '',
+        'flex min-w-0 flex-col overflow-hidden rounded-[1rem] border border-gray-400 bg-white p-[2rem] gap-[2rem]',
+        onClick
+          ? 'cursor-pointer transition-colors duration-300 hover:bg-[#FFFDE5]'
+          : '',
       ].join(' ')}
       onClick={onClick}
       onKeyDown={
@@ -61,39 +49,61 @@ const PolicyCard = ({
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      <div className="flex items-start justify-between gap-[1.2rem]">
-        <div className="flex flex-wrap gap-[0.6rem]">
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-primary-sub-2 px-4 py-[0.4rem] text-caption text-title"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+      <div className="flex items-center justify-between gap-[1rem]">
+        <span className="text-body-2 font-medium text-point">D-{dDay}</span>
         <button
           type="button"
           aria-label={bookmarked ? '북마크 해제' : '북마크'}
+          aria-pressed={bookmarked}
           onClick={(e) => {
             e.stopPropagation();
             onBookmarkClick?.();
           }}
-          className="shrink-0 cursor-pointer text-title"
+          className="shrink-0 cursor-pointer"
         >
-          <BookmarkStarIcon filled={bookmarked} />
+          <img
+            src={bookmarked ? bookmarkFilledIcon : bookmarkIcon}
+            alt=""
+            aria-hidden
+            className="size-[2.4rem]"
+          />
         </button>
       </div>
 
-      <div className="mt-[1.2rem] flex items-start gap-[0.8rem]">
-        <h3 className="text-body-1 text-title">{title}</h3>
-        <span className="shrink-0 text-body-3 font-semibold text-red-500">
-          D-{dDay}
-        </span>
-      </div>
+      <h3 className="text-body-1 font-bold text-title truncate" title={title}>
+        {title}
+      </h3>
 
-      <p className="mt-[1.2rem] text-body-3 text-body">🏛 {organization}</p>
-      <p className="mt-[0.4rem] text-caption text-gray-500">{period}</p>
+      <div className="flex min-w-0 items-center justify-between gap-[1rem]">
+        <div className="flex min-w-0 flex-nowrap gap-[1rem] overflow-hidden">
+          {tags.map(({ kind, label }) => {
+            const style = TAG_STYLES[kind];
+            return (
+              <span
+                key={kind}
+                className="shrink-0 whitespace-nowrap rounded-[0.8rem] border px-[1rem] py-[0.2rem] font-semibold text-body-3 text-title"
+                style={{
+                  borderColor: style.border,
+                  backgroundColor: style.background,
+                }}
+              >
+                {label}
+              </span>
+            );
+          })}
+        </div>
+        <button
+          type="button"
+          aria-label="공유"
+          onClick={(e) => {
+            e.stopPropagation();
+            onShareClick?.();
+          }}
+          className="shrink-0 cursor-pointer"
+        >
+          <img src={shareIcon} alt="" aria-hidden className="size-[2.4rem]" />
+        </button>
+      </div>
     </div>
   );
 };

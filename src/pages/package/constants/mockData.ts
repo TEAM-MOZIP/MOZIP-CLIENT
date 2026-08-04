@@ -1,95 +1,154 @@
 import type {
   FilterGroup,
+  FilterStatusDot,
   PackageItem,
   PolicyItem,
 } from '@pages/package/types';
+import {
+  POLICY_STATUSES,
+  POLICY_AGES,
+  POLICY_CATEGORIES,
+  POLICY_REGIONS,
+} from '@pages/package/types';
+import emojiBag from '@shared/assets/images/package/emoji-1-bag.png';
+import emojiHouse from '@shared/assets/images/package/emoji-2-house.png';
+import emojiEdu from '@shared/assets/images/package/emoji-3-edu.png';
+import emojiSprout from '@shared/assets/images/package/emoji-4-sprout.png';
 
 export const PACKAGE_ITEMS: PackageItem[] = [
   {
     id: 'job-seeker',
-    icon: '💼',
+    icon: emojiBag,
     title: '취업 준비생',
-    description: '취업 준비에 필요한 지원 정책을 한곳에 모았어요.',
+    description: '이력서 지원부터 면접비, 취업 장려금까지 한 번에 알아보세요.',
     policyCount: 42,
   },
   {
     id: 'solo-youth',
-    icon: '🏠',
+    icon: emojiHouse,
     title: '자취 청년',
-    description: '주거·생활비 지원 등 자취생을 위한 혜택을 확인해 보세요.',
+    description:
+      '월세 · 전세 지원부터 공공임대 입주 정보, 공과금, 생활비까지 한 번에 알아보세요.',
     policyCount: 38,
   },
   {
     id: 'university',
-    icon: '🎓',
-    title: '대학 생활',
-    description: '장학금, 교육비, 생활 지원 등 대학생 맞춤 정책이에요.',
+    icon: emojiEdu,
+    title: '대학생',
+    description:
+      '장학금, 각종 교육비 · 자격증 비용, 생활 지원 정책 모음입니다.',
     policyCount: 35,
   },
   {
     id: 'early-career',
-    icon: '🌱',
+    icon: emojiSprout,
     title: '사회 초년생',
-    description:
-      '직장 적응·주거·생활비 등 사회 초년생 맞춤 혜택을 확인해 보세요.',
+    description: '첫 직장 적응을 돕는 복지, 저축, 경력 지원 정책 모음입니다.',
     policyCount: 40,
   },
 ];
+
+const STATUS_OPTION_IDS = ['all', 'open', 'closing', 'scheduled'] as const;
+const STATUS_DOTS: Record<string, FilterStatusDot | undefined> = {
+  open: 'green',
+  closing: 'red',
+  scheduled: 'blue',
+};
+const AGE_OPTION_IDS = ['all', '19-24', '25-29', '30-34', '60+'] as const;
+const CATEGORY_OPTION_IDS = [
+  'all',
+  'employment',
+  'education',
+  'housing',
+  'finance',
+  'medical',
+  'culture',
+] as const;
+const REGION_OPTION_IDS = [
+  'all',
+  'gangnam',
+  'gangdong',
+  'gangbuk',
+  'gangseo',
+  'gwanak',
+  'gwangjin',
+  'guro',
+  'geumcheon',
+  'nowon',
+  'dobong',
+  'dongdaemun',
+  'dongjak',
+  'mapo',
+  'seodaemun',
+  'seocho',
+  'seongdong',
+  'seongbuk',
+  'songpa',
+  'yangcheon',
+  'yeongdeungpo',
+  'yongsan',
+  'eunpyeong',
+  'jongno',
+  'jung',
+  'jungnang',
+] as const;
 
 export const FILTER_GROUPS: FilterGroup[] = [
   {
     id: 'status',
     title: '상태',
-    options: [
-      { id: 'open', label: '접수 중', statusDot: 'green' },
-      { id: 'closing', label: '마감 임박', statusDot: 'red' },
-      { id: 'scheduled', label: '예정', statusDot: 'blue' },
-    ],
+    options: POLICY_STATUSES.map((label, index) => {
+      const id = STATUS_OPTION_IDS[index];
+      return {
+        id,
+        label,
+        statusDot: STATUS_DOTS[id],
+      };
+    }),
   },
   {
     id: 'age',
     title: '연령',
-    options: [
-      { id: 'all', label: '전체' },
-      { id: '19-24', label: '만 19~24세' },
-      { id: '25-29', label: '만 25~29세' },
-      { id: '30-34', label: '만 30~34세' },
-    ],
+    options: POLICY_AGES.map((label, index) => ({
+      id: AGE_OPTION_IDS[index],
+      label,
+    })),
   },
   {
     id: 'category',
     title: '카테고리',
-    options: [
-      { id: 'all', label: '전체' },
-      { id: 'housing', label: '주거' },
-      { id: 'employment', label: '취업' },
-      { id: 'education', label: '교육' },
-      { id: 'welfare', label: '복지' },
-    ],
+    options: POLICY_CATEGORIES.map((label, index) => ({
+      id: CATEGORY_OPTION_IDS[index],
+      label,
+    })),
   },
   {
     id: 'region',
     title: '지역',
-    options: [
-      { id: 'seoul', label: '서울 전체' },
-      { id: 'gangnam', label: '강남구' },
-      { id: 'gangdong', label: '강동구' },
-      { id: 'gangbuk', label: '강북구' },
-      { id: 'gangseo', label: '강서구' },
-      { id: 'gwanak', label: '관악구' },
-      { id: 'gwangjin', label: '광진구' },
-      { id: 'guro', label: '구로구' },
-      { id: 'nowon', label: '노원구' },
-      { id: 'dobong', label: '도봉구' },
-      { id: 'dongdaemun', label: '동대문구' },
-    ],
+    options: POLICY_REGIONS.map((label, index) => ({
+      id: REGION_OPTION_IDS[index],
+      label,
+    })),
   },
 ];
 
-export const POLICY_ITEMS: PolicyItem[] = [
+type PolicyItemBase = Omit<
+  PolicyItem,
+  | 'introduction'
+  | 'supportContents'
+  | 'eligibility'
+  | 'documents'
+  | 'notes'
+  | 'contactName'
+  | 'contactPhone'
+>;
+
+const POLICY_ITEMS_BASE: PolicyItemBase[] = [
   {
     id: '1',
-    tags: ['전연령', '주거', '서울 전체'],
+    age: '전체',
+    category: '주거',
+    region: '전체',
     title: '기초생활보장 생계급여',
     dDay: 14,
     organization: '보건복지부',
@@ -98,7 +157,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '2',
-    tags: ['만 25~29세', '취업', '서울 전체'],
+    age: '만 25~29세',
+    category: '취업·창업',
+    region: '전체',
     title: '구직활동 지원금',
     dDay: 7,
     organization: '고용노동부',
@@ -107,7 +168,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '3',
-    tags: ['영유아 가정', '복지', '강남구'],
+    age: '전체',
+    category: '교육',
+    region: '강남구',
     title: '아이돌봄 서비스 바우처',
     dDay: 21,
     organization: '서울특별시',
@@ -115,7 +178,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '4',
-    tags: ['만 65세 이상', '복지', '노원구'],
+    age: '60대 이상',
+    category: '취업·창업',
+    region: '노원구',
     title: '노인 일자리 사업 참여',
     dDay: 3,
     organization: '서울특별시',
@@ -123,7 +188,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '5',
-    tags: ['소상공인', '취업', '서울 전체'],
+    age: '전체',
+    category: '금융',
+    region: '전체',
     title: '소상공인 경영안정 자금 융자',
     dDay: 30,
     organization: '중소벤처기업부',
@@ -131,7 +198,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '6',
-    tags: ['만 19~24세', '교육', '관악구'],
+    age: '만 19~24세',
+    category: '교육',
+    region: '관악구',
     title: '대학생 학습 장려금',
     dDay: 12,
     organization: '교육부',
@@ -139,7 +208,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '7',
-    tags: ['장애인', '복지', '서울 전체'],
+    age: '전체',
+    category: '의료',
+    region: '전체',
     title: '장애인 활동지원 서비스',
     dDay: 18,
     organization: '보건복지부',
@@ -147,7 +218,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '8',
-    tags: ['임신·출산', '복지', '마포구'],
+    age: '전체',
+    category: '의료',
+    region: '마포구',
     title: '출산·양육 일시지원금',
     dDay: 25,
     organization: '보건복지부',
@@ -156,7 +229,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '9',
-    tags: ['만 30~34세', '취업', '구로구'],
+    age: '만 30~34세',
+    category: '취업·창업',
+    region: '구로구',
     title: '경력 전환 직업훈련 지원',
     dDay: 9,
     organization: '고용노동부',
@@ -164,7 +239,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '10',
-    tags: ['1인 가구', '주거', '동대문구'],
+    age: '전체',
+    category: '주거',
+    region: '동대문구',
     title: '주거급여 및 주거비 지원',
     dDay: 16,
     organization: '국토교통부',
@@ -172,7 +249,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '11',
-    tags: ['전연령', '교육', '서울 전체'],
+    age: '전체',
+    category: '교육',
+    region: '전체',
     title: '평생학습 바우처',
     dDay: 22,
     organization: '교육부',
@@ -180,7 +259,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '12',
-    tags: ['다문화 가정', '복지', '강북구'],
+    age: '전체',
+    category: '문화',
+    region: '강북구',
     title: '다문화가족 통·번역 서비스',
     dDay: 5,
     organization: '법무부',
@@ -188,15 +269,19 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '13',
-    tags: ['만 25~29세', '주거', '강서구'],
-    title: '월세 특별지원 (청년)',
+    age: '만 19~24세',
+    category: '주거',
+    region: '강남구',
+    title: '청년 월세 특별지원',
     dDay: 28,
-    organization: '서울특별시',
-    period: '2026. 04. 01. 오전 09:00 ~ 2026. 10. 31. 오후 06:00',
+    organization: '강남구청 청년정책과',
+    period: '2026.07.01 ~ 2026.08.18',
   },
   {
     id: '14',
-    tags: ['신혼부부', '주거', '서울 전체'],
+    age: '전체',
+    category: '주거',
+    region: '전체',
     title: '신혼부부 전세자금 대출',
     dDay: 11,
     organization: 'LH한국토지주택공사',
@@ -204,7 +289,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '15',
-    tags: ['농어업인', '복지', '강동구'],
+    age: '전체',
+    category: '금융',
+    region: '강동구',
     title: '농어업인 수당 및 재해 지원',
     dDay: 8,
     organization: '농림축산식품부',
@@ -212,7 +299,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '16',
-    tags: ['만 19~24세', '취업', '광진구'],
+    age: '만 19~24세',
+    category: '취업·창업',
+    region: '광진구',
     title: '인턴십 참여 지원',
     dDay: 19,
     organization: '서울특별시',
@@ -221,7 +310,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '17',
-    tags: ['전연령', '복지', '서울 전체'],
+    age: '전체',
+    category: '금융',
+    region: '전체',
     title: '에너지 바우처 (전기·가스)',
     dDay: 35,
     organization: '산업통상자원부',
@@ -229,7 +320,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '18',
-    tags: ['자영업', '취업', '서울 전체'],
+    age: '전체',
+    category: '취업·창업',
+    region: '전체',
     title: '소득 감소 소상공인 버팀목',
     dDay: 6,
     organization: '서울특별시',
@@ -237,7 +330,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '19',
-    tags: ['저소득층', '복지', '성동구'],
+    age: '전체',
+    category: '의료',
+    region: '성동구',
     title: '긴급복지 생계·의료 지원',
     dDay: 13,
     organization: '보건복지부',
@@ -245,7 +340,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '20',
-    tags: ['만 50세 이상', '교육', '서울 전체'],
+    age: '전체',
+    category: '교육',
+    region: '전체',
     title: '중장년 내일센터 직업교육',
     dDay: 24,
     organization: '고용노동부',
@@ -253,7 +350,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '21',
-    tags: ['전연령', '주거', '도봉구'],
+    age: '전체',
+    category: '주거',
+    region: '도봉구',
     title: '공공임대주택 입주자 모집',
     dDay: 17,
     organization: '서울주택도시공사',
@@ -261,7 +360,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '22',
-    tags: ['보훈대상', '복지', '서울 전체'],
+    age: '전체',
+    category: '의료',
+    region: '전체',
     title: '국가유공자 의료비 지원',
     dDay: 27,
     organization: '국가보훈부',
@@ -269,7 +370,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '23',
-    tags: ['전연령', '복지', '서울 전체'],
+    age: '전체',
+    category: '문화',
+    region: '전체',
     title: '문화누리카드 발급',
     dDay: 4,
     organization: '문화체육관광부',
@@ -277,7 +380,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '24',
-    tags: ['만 25~29세', '취업', '강남구'],
+    age: '만 25~29세',
+    category: '취업·창업',
+    region: '강남구',
     title: '면접 정장 대여·구매 지원',
     dDay: 10,
     organization: '서울특별시',
@@ -285,7 +390,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '25',
-    tags: ['한부모 가정', '복지', '노원구'],
+    age: '전체',
+    category: '금융',
+    region: '노원구',
     title: '한부모가족 아동 양육비',
     dDay: 20,
     organization: '보건복지부',
@@ -293,7 +400,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '26',
-    tags: ['만 30~34세', '교육', '구로구'],
+    age: '만 30~34세',
+    category: '교육',
+    region: '구로구',
     title: '직장인 야간 대학원 등록금',
     dDay: 15,
     organization: '교육부',
@@ -301,7 +410,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '27',
-    tags: ['전연령', '취업', '서울 전체'],
+    age: '전체',
+    category: '취업·창업',
+    region: '전체',
     title: '국민취업지원제도',
     dDay: 2,
     organization: '고용노동부',
@@ -309,7 +420,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '28',
-    tags: ['만 19~24세', '교육', '서울 전체'],
+    age: '만 19~24세',
+    category: '교육',
+    region: '전체',
     title: '학자금 이자 환승·상환 지원',
     dDay: 32,
     organization: '한국장학재단',
@@ -317,7 +430,9 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '29',
-    tags: ['반려동물', '복지', '마포구'],
+    age: '전체',
+    category: '의료',
+    region: '마포구',
     title: '반려동물 등록·예방접종 지원',
     dDay: 23,
     organization: '농림축산식품부',
@@ -325,12 +440,75 @@ export const POLICY_ITEMS: PolicyItem[] = [
   },
   {
     id: '30',
-    tags: ['경력단절', '취업', '서울 전체'],
+    age: '전체',
+    category: '취업·창업',
+    region: '전체',
     title: '여성 재취업 컨설팅',
     dDay: 14,
     organization: '여성가족부',
     period: '2026. 05. 11. 오전 09:00 ~ 2026. 06. 28. 오후 06:00',
   },
 ];
+
+const buildPolicyDetail = (
+  item: PolicyItemBase
+): Pick<
+  PolicyItem,
+  | 'introduction'
+  | 'supportContents'
+  | 'eligibility'
+  | 'documents'
+  | 'notes'
+  | 'contactName'
+  | 'contactPhone'
+> => {
+  if (item.id === '13') {
+    return {
+      introduction:
+        '청년의 주거비 부담 완화를 위해 월세를 지원하는 정책입니다.',
+      supportContents: [
+        '월 최대 20만원 지원',
+        '최대 12개월 지원',
+        '계좌로 지급',
+      ],
+      eligibility: ['만 19~24세', '강남구 거주', '무주택 청년'],
+      documents: ['주민등록등본', '임대차계약서', '소득 증빙 서류'],
+      notes: [
+        '예산 소진 시 조기 마감될 수 있습니다.',
+        '중복 지원 여부를 확인해 주세요.',
+      ],
+      contactName: '강남구청 청년정책과',
+      contactPhone: '02-1234-5678',
+    };
+  }
+
+  const ageLabel = item.age === '전체' ? '연령 제한 없음' : item.age;
+
+  return {
+    introduction: `${item.title}은(는) ${item.category} 분야 지원을 위한 정책입니다.`,
+    supportContents: [
+      `${item.category} 관련 지원 제공`,
+      '최대 12개월 지원',
+      '지정 계좌로 지급',
+    ],
+    eligibility: [
+      ageLabel,
+      item.region === '전체' ? '거주 지역 제한 없음' : `${item.region} 거주`,
+      `${item.category} 분야 지원 요건 충족자`,
+    ],
+    documents: ['주민등록등본', '신분증 사본', '소득 증빙 서류'],
+    notes: [
+      '예산 소진 시 조기 마감될 수 있습니다.',
+      '중복 지원 여부를 확인해 주세요.',
+    ],
+    contactName: `${item.organization} 담당 부서`,
+    contactPhone: '02-1234-5678',
+  };
+};
+
+export const POLICY_ITEMS: PolicyItem[] = POLICY_ITEMS_BASE.map((item) => ({
+  ...item,
+  ...buildPolicyDetail(item),
+}));
 
 export const TOTAL_POLICY_COUNT = 1320;
