@@ -8,9 +8,6 @@ const navItemClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? 'border-primary !font-bold' : 'border-transparent font-normal',
   ].join(' ');
 
-const navLabelClass =
-  'font-pretendard text-body-1 font-normal text-black border-b-[3px] border-transparent';
-
 const Header = () => {
   return (
     <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-200 bg-white">
@@ -32,7 +29,9 @@ const Header = () => {
           <NavLink to="/package" className={navItemClass}>
             정책 모음
           </NavLink>
-          <span className={navLabelClass}>챗봇</span>
+          <NavLink to="/chatbot" className={navItemClass}>
+            챗봇
+          </NavLink>
           <NavLink to="/mypage" className={navItemClass}>
             마이페이지
           </NavLink>
