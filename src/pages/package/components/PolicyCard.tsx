@@ -32,7 +32,7 @@ const PolicyCard = ({
       className={[
         'flex min-w-0 flex-col overflow-hidden rounded-[1rem] border border-gray-400 bg-white p-[2rem] gap-[2rem]',
         onClick
-          ? 'cursor-pointer transition-colors duration-300 hover:bg-[#FFFDE5]'
+          ? 'cursor-pointer transition-colors duration-300 hover:bg-primary-sub-3/50'
           : '',
       ].join(' ')}
       onClick={onClick}
