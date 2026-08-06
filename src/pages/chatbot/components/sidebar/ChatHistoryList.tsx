@@ -14,9 +14,11 @@ const ChatHistoryList = ({
   onSelect,
   onMenuClick,
 }: ChatHistoryListProps) => {
+  const sortedItems = [...items].reverse();
+
   return (
     <ul className="flex flex-col gap-[0.8rem]">
-      {items.map((item) => (
+      {sortedItems.map((item) => (
         <ChatHistoryItem
           key={item.id}
           title={item.title}
