@@ -14,7 +14,7 @@ const ChatActions = ({
 }: ChatActionsProps) => {
   if (collapsed) {
     return (
-      <div className="flex flex-col items-center gap-[0.8rem]">
+      <div className="flex flex-col items-start gap-[0.8rem]">
         <button
           type="button"
           onClick={onNewChat}
