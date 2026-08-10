@@ -1,4 +1,5 @@
 export type ChatHistory = {
   id: string;
   title: string;
+  timestamp: string;
 };
