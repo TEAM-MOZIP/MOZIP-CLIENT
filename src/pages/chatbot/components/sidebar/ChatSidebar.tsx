@@ -9,6 +9,7 @@ import { MOCK_CHAT_HISTORY } from '@pages/chatbot/constants/mockChatHistory';
 type ChatSidebarProps = {
   defaultOpen?: boolean;
   histories?: ChatHistory[];
+  activeChatId?: string | null;
   onNewChat?: () => void;
   onSearch?: () => void;
   onSelectChat?: (id: string) => void;
@@ -17,16 +18,19 @@ type ChatSidebarProps = {
 const ChatSidebar = ({
   defaultOpen = true,
   histories = MOCK_CHAT_HISTORY,
+  activeChatId = null,
   onNewChat,
   onSearch,
   onSelectChat,
 }: ChatSidebarProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
-  const [activeId, setActiveId] = useState<string | null>(null);
 
   const handleSelectChat = (id: string) => {
-    setActiveId(id);
     onSelectChat?.(id);
+  };
+
+  const handleNewChat = () => {
+    onNewChat?.();
   };
 
   const handleToggle = () => {
@@ -60,7 +64,11 @@ const ChatSidebar = ({
         </button>
 
         <div className="mt-[2.4rem]">
-          <ChatActions collapsed onNewChat={onNewChat} onSearch={onSearch} />
+          <ChatActions
+            collapsed
+            onNewChat={handleNewChat}
+            onSearch={onSearch}
+          />
         </div>
       </aside>
     );
@@ -90,14 +98,14 @@ const ChatSidebar = ({
       </div>
 
       <div className="mt-[2.4rem]">
-        <ChatActions onNewChat={onNewChat} onSearch={onSearch} />
+        <ChatActions onNewChat={handleNewChat} onSearch={onSearch} />
       </div>
 
       <div className="mt-[1.8rem] flex min-h-0 flex-1 flex-col border-t border-gray-200">
         <div className="min-h-0 flex-1 overflow-y-auto pt-[1.8rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <ChatHistoryList
             items={histories}
-            activeId={activeId}
+            activeId={activeChatId}
             onSelect={handleSelectChat}
           />
         </div>
