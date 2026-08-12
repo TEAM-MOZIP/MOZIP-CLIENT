@@ -3,7 +3,7 @@ import FilterSidebar from '@pages/package/components/FilterSidebar';
 import PolicyCard from '@pages/package/components/PolicyCard';
 import PolicyDetailModal from '@pages/package/components/PolicyDetailModal';
 import type { FilterGroup, PolicyItem } from '@pages/package/types';
-import arrowDownIcon from '@shared/assets/icons/arrow-down.svg';
+import arrowDownIcon from '@shared/assets/icons/chevron-down.svg';
 
 const SORT_OPTIONS = [
   { value: 'latest', label: '최신순' },

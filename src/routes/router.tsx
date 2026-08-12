@@ -5,6 +5,7 @@ import LoginPage from '@pages/login/LoginPage';
 import SignupPage from '@pages/signup/SignupPage';
 import MyPage from '@pages/mypage/MyPage';
 import PackagePage from '@pages/package/PackagePage';
+import ChatbotPage from '@pages/chatbot/ChatbotPage';
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: 'package',
         element: <PackagePage />,
+      },
+      {
+        path: 'chatbot',
+        element: <ChatbotPage />,
       },
     ],
   },
