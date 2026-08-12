@@ -26,3 +26,16 @@ export const MOCK_CHAT_MESSAGES: ChatMessage[] = [
 ];
 
 export const MOCK_ASSISTANT_REPLY = 'Mozip AI 테스트 답변입니다.';
+
+export const MOCK_FLOATING_CHAT_MESSAGES: ChatMessage[] = [
+  {
+    id: 'f1',
+    role: 'user',
+    content: '테스트 질문입니다.',
+  },
+  {
+    id: 'f2',
+    role: 'assistant',
+    content: '테스트 답변입니다.',
+  },
+];
