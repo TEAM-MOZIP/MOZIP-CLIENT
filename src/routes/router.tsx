@@ -6,6 +6,7 @@ import SignupPage from '@pages/signup/SignupPage';
 import MyPage from '@pages/mypage/MyPage';
 import PackagePage from '@pages/package/PackagePage';
 import ChatbotPage from '@pages/chatbot/ChatbotPage';
+import OnboardingPage from '@pages/onboarding/OnboardingPage';
 
 const router = createBrowserRouter([
   {
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: 'chatbot',
         element: <ChatbotPage />,
+      },
+      {
+        path: 'onboarding',
+        element: <OnboardingPage />,
       },
     ],
   },
