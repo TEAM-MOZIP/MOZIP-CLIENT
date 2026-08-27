@@ -20,6 +20,10 @@ export type RefreshTokenResponse = AuthTokens & {
   isNewUser: boolean;
 };
 
+export type LogoutRequest = {
+  refreshToken: string;
+};
+
 export type ApiErrorBody = {
   code: string;
   message: string;
