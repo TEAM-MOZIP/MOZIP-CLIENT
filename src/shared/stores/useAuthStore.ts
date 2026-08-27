@@ -6,10 +6,11 @@ type AuthState = {
   accessToken: string | null;
   refreshToken: string | null;
   accessTokenExpiresIn: number | null;
-  isLoggedIn: boolean;
   setTokens: (tokens: AuthTokens) => void;
   clearAuth: () => void;
 };
+
+export const selectIsLoggedIn = (state: AuthState) => !!state.accessToken;
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -17,20 +18,17 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       accessTokenExpiresIn: null,
-      isLoggedIn: false,
       setTokens: ({ accessToken, refreshToken, accessTokenExpiresIn }) =>
         set({
           accessToken,
           refreshToken,
           accessTokenExpiresIn,
-          isLoggedIn: true,
         }),
       clearAuth: () =>
         set({
           accessToken: null,
           refreshToken: null,
           accessTokenExpiresIn: null,
-          isLoggedIn: false,
         }),
     }),
     {
@@ -39,7 +37,6 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         accessTokenExpiresIn: state.accessTokenExpiresIn,
-        isLoggedIn: state.isLoggedIn,
       }),
     }
   )
