@@ -7,6 +7,7 @@ import MyPage from '@pages/mypage/MyPage';
 import PackagePage from '@pages/package/PackagePage';
 import ChatbotPage from '@pages/chatbot/ChatbotPage';
 import OnboardingPage from '@pages/onboarding/OnboardingPage';
+import KakaoOAuthCallback from '@pages/login/hooks/KakaoOAuthCallback';
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
         element: <OnboardingPage />,
       },
     ],
+  },
+  {
+    path: '/oauth/kakao/callback',
+    element: <KakaoOAuthCallback />,
   },
 ]);
 
