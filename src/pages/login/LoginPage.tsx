@@ -1,16 +1,21 @@
 import { useState, type SubmitEventHandler } from 'react';
 import { Link } from 'react-router-dom';
+
 import InputField from '@shared/components/auth/InputField';
 import Button from '@shared/components/auth/Button';
+
 import {
   getAuthFieldValidationError,
   getEmailSubmitError,
   getPasswordSubmitError,
 } from '@shared/utils/authValidation';
+
 import logo from '@shared/assets/logo.svg';
 import kakaoIcon from '@shared/assets/icons/kakao-icon.svg';
 import checkWhiteIcon from '@shared/assets/icons/check-white.svg';
 import arrowRightIcon from '@shared/assets/icons/chevron-right.svg';
+
+import { redirectToKakaoLogin } from '@pages/login/hooks/useKakaoLogin';
 
 type FieldErrors = {
   email?: string;
@@ -134,6 +139,7 @@ const LoginPage = () => {
             <Button
               type="button"
               variant="kakao"
+              onClick={redirectToKakaoLogin}
               leftIcon={
                 <img
                   src={kakaoIcon}

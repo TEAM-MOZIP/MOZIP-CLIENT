@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import searchIcon from '@shared/assets/icons/search.svg';
 import deleteIcon from '@shared/assets/icons/delete.svg';
 import bellIcon from '@shared/assets/icons/bell.svg';
 import personIcon from '@shared/assets/icons/person.svg';
 import defaultProfileIcon from '@shared/assets/icons/default-profile.svg';
 
+import { postLogout } from '@pages/login/apis/authApi';
+import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
+
 // temporary state for UI development
 const MOCK_NICKNAME = '닉네임';
 
 const HeaderActions = () => {
   const [query, setQuery] = useState('');
-
-  // temporary state for UI development
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isLoggedIn = useAuthStore(selectIsLoggedIn);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
@@ -33,9 +36,19 @@ const HeaderActions = () => {
     return () => document.removeEventListener('mousedown', handlePointerDown);
   }, [isProfileOpen]);
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    setIsProfileOpen(false);
+  const handleLogout = async () => {
+    const refreshToken = useAuthStore.getState().refreshToken;
+
+    try {
+      if (refreshToken) {
+        await postLogout({ refreshToken });
+      }
+    } catch {
+      // API 요청 실패 시에도 로컬 로그아웃은 진행
+    } finally {
+      clearAuth();
+      setIsProfileOpen(false);
+    }
   };
 
   return (
