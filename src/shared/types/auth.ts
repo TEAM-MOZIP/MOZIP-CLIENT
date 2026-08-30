@@ -1,28 +1,18 @@
-export type AuthTokens = {
-  accessToken: string;
-  refreshToken: string;
-  accessTokenExpiresIn: number;
-};
+import type {
+  KakaoLoginRequest,
+  RefreshTokenRequest,
+  TokenResponse,
+} from '@shared/apis/generated/Api';
 
-export type KakaoLoginRequest = {
-  code: string;
-};
+export type { KakaoLoginRequest, RefreshTokenRequest, TokenResponse };
 
-export type KakaoLoginResponse = AuthTokens & {
-  isNewUser: boolean;
-};
+export type AuthTokens = Required<
+  Pick<TokenResponse, 'accessToken' | 'refreshToken' | 'accessTokenExpiresIn'>
+>;
 
-export type RefreshTokenRequest = {
-  refreshToken: string;
-};
-
-export type RefreshTokenResponse = AuthTokens & {
-  isNewUser: boolean;
-};
-
-export type LogoutRequest = {
-  refreshToken: string;
-};
+export type KakaoLoginResponse = Required<TokenResponse>;
+export type RefreshTokenResponse = Required<TokenResponse>;
+export type LogoutRequest = RefreshTokenRequest;
 
 export type ApiErrorBody = {
   code: string;
