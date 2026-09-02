@@ -112,9 +112,9 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
       <div className="relative min-h-0 flex-1">
         <div
           ref={scrollRef}
-          className="h-full overflow-y-auto px-[2rem] pt-[2rem] pb-[7.2rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="h-full overflow-y-auto px-[2.2rem] pt-[1.6rem] pb-[8.4rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <MessageList messages={messages} className="gap-[2rem]" compact />
+          <MessageList messages={messages} className="gap-[2.4rem]" compact />
         </div>
 
         <footer className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-b from-white/50 to-white px-[2rem] pb-[2rem]">
