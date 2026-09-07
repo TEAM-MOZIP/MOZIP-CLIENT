@@ -1,15 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import ChatLogo from '@shared/components/chatbot/ChatLogo';
 import MessageInput from '@shared/components/chatbot/MessageInput';
 import MessageList from '@shared/components/chatbot/MessageList';
-import type { ChatMessage } from '@pages/chatbot/types/chat';
+import { useChatSession } from '@pages/chatbot/hooks/useChatSession';
 import fullScreenIcon from '@shared/assets/icons/full-screen.svg';
 import deleteIcon from '@shared/assets/icons/delete.svg';
-import {
-  MOCK_ASSISTANT_REPLY,
-  MOCK_FLOATING_CHAT_MESSAGES,
-} from '@pages/chatbot/constants/mockChatMessages';
 
 type ChatFloatingPanelProps = {
   onClose: () => void;
@@ -17,31 +13,14 @@ type ChatFloatingPanelProps = {
 };
 
 const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(
-    MOCK_FLOATING_CHAT_MESSAGES
-  );
+  const { messages, sendMessage, isSending } = useChatSession();
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const handleSendMessage = (content: string) => {
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content,
-    };
-    const assistantMessage: ChatMessage = {
-      id: `assistant-${Date.now() + 1}`,
-      role: 'assistant',
-      content: MOCK_ASSISTANT_REPLY,
-    };
-
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
-  };
 
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages]);
+  }, [messages, isSending]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -114,12 +93,17 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
           ref={scrollRef}
           className="h-full overflow-y-auto px-[2.2rem] pt-[1.6rem] pb-[8.4rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <MessageList messages={messages} className="gap-[2.4rem]" compact />
+          <MessageList
+            messages={messages}
+            className="gap-[2.4rem]"
+            compact
+            isSending={isSending}
+          />
         </div>
 
         <footer className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-b from-white/50 to-white px-[2rem] pb-[2rem]">
           <div className="pointer-events-auto">
-            <MessageInput onSubmit={handleSendMessage} compact />
+            <MessageInput onSubmit={sendMessage} compact disabled={isSending} />
           </div>
         </footer>
       </div>
