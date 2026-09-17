@@ -1,50 +1,51 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  DEFAULT_AGE,
-  LAST_QUESTION_STEP,
-  MAX_AGE,
-  MIN_AGE,
-} from '@pages/onboarding/constants/onboarding';
-import { getSituationIds } from '@pages/onboarding/constants/situations';
+import { LAST_QUESTION_STEP } from '@pages/onboarding/constants/onboarding';
 import {
   ONBOARDING_STEP,
+  type EmploymentStatus,
   type Gender,
+  type HouseholdType,
+  type IncomeType,
   type OnboardingAnswers,
   type OnboardingStep,
 } from '@pages/onboarding/types/onboarding';
-import { getAgeGroup } from '@pages/onboarding/utils/getAgeGroup';
 
 const INITIAL_ANSWERS: OnboardingAnswers = {
-  age: DEFAULT_AGE,
+  birthDate: null,
   gender: null,
-  district: null,
-  situations: [],
+  regionId: null,
+  employmentStatus: null,
+  householdType: null,
+  incomeType: null,
+  incomeValue: null,
   interests: [],
 };
-
-const clampAge = (age: number) => Math.min(MAX_AGE, Math.max(MIN_AGE, age));
 
 const toggleItem = (items: string[], id: string) =>
   items.includes(id) ? items.filter((item) => item !== id) : [...items, id];
 
-export const useOnboarding = () => {
+export const useOnboarding = (
+  onComplete: (answers: OnboardingAnswers) => void
+) => {
   const navigate = useNavigate();
   const [step, setStep] = useState<OnboardingStep>(ONBOARDING_STEP.intro);
   const [answers, setAnswers] = useState<OnboardingAnswers>(INITIAL_ANSWERS);
 
-  const ageGroup = useMemo(() => getAgeGroup(answers.age), [answers.age]);
-
   const canGoNext = useMemo(() => {
     switch (step) {
-      case ONBOARDING_STEP.age:
-        return true;
+      case ONBOARDING_STEP.birthDate:
+        return answers.birthDate !== null;
       case ONBOARDING_STEP.gender:
         return answers.gender !== null;
       case ONBOARDING_STEP.residence:
-        return answers.district !== null;
-      case ONBOARDING_STEP.situation:
-        return answers.situations.length > 0;
+        return answers.regionId !== null;
+      case ONBOARDING_STEP.employmentStatus:
+        return answers.employmentStatus !== null;
+      case ONBOARDING_STEP.householdType:
+        return answers.householdType !== null;
+      case ONBOARDING_STEP.income:
+        return answers.incomeType !== null && answers.incomeValue !== null;
       case ONBOARDING_STEP.interest:
         return answers.interests.length > 0;
       default:
@@ -52,45 +53,30 @@ export const useOnboarding = () => {
     }
   }, [answers, step]);
 
-  const complete = useCallback(() => {
-    navigate('/');
-  }, [navigate]);
-
   const goNext = useCallback(() => {
     if (step >= LAST_QUESTION_STEP) {
-      complete();
+      onComplete(answers);
       return;
     }
 
     setStep((prev) => (prev + 1) as OnboardingStep);
-  }, [complete, step]);
+  }, [answers, onComplete, step]);
 
   const goPrev = useCallback(() => {
-    if (step <= ONBOARDING_STEP.age) return;
+    if (step <= ONBOARDING_STEP.birthDate) return;
     setStep((prev) => (prev - 1) as OnboardingStep);
   }, [step]);
 
   const start = useCallback(() => {
-    setStep(ONBOARDING_STEP.age);
+    setStep(ONBOARDING_STEP.birthDate);
   }, []);
 
   const skipAll = useCallback(() => {
     navigate('/');
   }, [navigate]);
 
-  const setAge = useCallback((age: number) => {
-    const nextAge = clampAge(age);
-
-    setAnswers((prev) => {
-      const nextGroup = getAgeGroup(nextAge);
-      const validIds = new Set(getSituationIds(nextGroup));
-
-      return {
-        ...prev,
-        age: nextAge,
-        situations: prev.situations.filter((id) => validIds.has(id)),
-      };
-    });
+  const setBirthDate = useCallback((birthDate: string) => {
+    setAnswers((prev) => ({ ...prev, birthDate }));
   }, []);
 
   const setGender = useCallback((gender: Gender) => {
@@ -100,18 +86,42 @@ export const useOnboarding = () => {
     }));
   }, []);
 
-  const setDistrict = useCallback((district: string) => {
+  const setRegionId = useCallback((regionId: number) => {
     setAnswers((prev) => ({
       ...prev,
-      district: prev.district === district ? null : district,
+      regionId: prev.regionId === regionId ? null : regionId,
     }));
   }, []);
 
-  const toggleSituation = useCallback((id: string) => {
+  const setEmploymentStatus = useCallback(
+    (employmentStatus: EmploymentStatus) => {
+      setAnswers((prev) => ({
+        ...prev,
+        employmentStatus:
+          prev.employmentStatus === employmentStatus ? null : employmentStatus,
+      }));
+    },
+    []
+  );
+
+  const setHouseholdType = useCallback((householdType: HouseholdType) => {
     setAnswers((prev) => ({
       ...prev,
-      situations: toggleItem(prev.situations, id),
+      householdType:
+        prev.householdType === householdType ? null : householdType,
     }));
+  }, []);
+
+  const setIncomeType = useCallback((incomeType: IncomeType) => {
+    setAnswers((prev) => ({
+      ...prev,
+      incomeType: prev.incomeType === incomeType ? null : incomeType,
+      incomeValue: null,
+    }));
+  }, []);
+
+  const setIncomeValue = useCallback((incomeValue: number | null) => {
+    setAnswers((prev) => ({ ...prev, incomeValue }));
   }, []);
 
   const toggleInterest = useCallback((id: string) => {
@@ -124,17 +134,18 @@ export const useOnboarding = () => {
   return {
     step,
     answers,
-    ageGroup,
     canGoNext,
     start,
     skipAll,
     goNext,
     goPrev,
-    skip: goNext,
-    setAge,
+    setBirthDate,
     setGender,
-    setDistrict,
-    toggleSituation,
+    setRegionId,
+    setEmploymentStatus,
+    setHouseholdType,
+    setIncomeType,
+    setIncomeValue,
     toggleInterest,
   };
 };
