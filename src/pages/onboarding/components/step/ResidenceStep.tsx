@@ -2,19 +2,27 @@ import { useMemo, useState } from 'react';
 import searchIcon from '@shared/assets/icons/search.svg';
 import deleteIcon from '@shared/assets/icons/delete.svg';
 import SelectionChip from '@pages/onboarding/components/SelectionChip';
-import { getVisibleDistricts } from '@pages/onboarding/utils/getVisibleDistricts';
+import { getVisibleRegions } from '@pages/onboarding/utils/getVisibleRegions';
+import type { RegionResponse } from '@pages/onboarding/types/onboarding';
 
 type ResidenceStepProps = {
-  value: string | null;
-  onChange: (district: string) => void;
+  regions: RegionResponse[];
+  isLoading: boolean;
+  value: number | null;
+  onChange: (regionId: number) => void;
 };
 
-const ResidenceStep = ({ value, onChange }: ResidenceStepProps) => {
+const ResidenceStep = ({
+  regions,
+  isLoading,
+  value,
+  onChange,
+}: ResidenceStepProps) => {
   const [query, setQuery] = useState('');
 
-  const districts = useMemo(
-    () => getVisibleDistricts(query, value),
-    [query, value]
+  const visibleRegions = useMemo(
+    () => getVisibleRegions(regions, query, value),
+    [regions, query, value]
   );
 
   return (
@@ -54,13 +62,17 @@ const ResidenceStep = ({ value, onChange }: ResidenceStepProps) => {
       </label>
 
       <div className="mt-[4rem] flex flex-wrap justify-center gap-[2rem_2.4rem]">
-        {districts.length > 0 ? (
-          districts.map((district) => (
+        {isLoading ? (
+          <p className="text-body-3 text-gray-500">
+            지역 목록을 불러오는 중이에요.
+          </p>
+        ) : visibleRegions.length > 0 ? (
+          visibleRegions.map((region) => (
             <SelectionChip
-              key={district}
-              label={district}
-              selected={value === district}
-              onClick={() => onChange(district)}
+              key={region.id}
+              label={region.name}
+              selected={value === region.id}
+              onClick={() => onChange(region.id)}
             />
           ))
         ) : (
