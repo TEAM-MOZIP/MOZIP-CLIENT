@@ -4,7 +4,6 @@ import ChatActions from '@pages/chatbot/components/sidebar/ChatActions';
 import ChatHistoryList from '@pages/chatbot/components/sidebar/ChatHistoryList';
 import type { ChatHistory } from '@pages/chatbot/types/chat';
 import sidebarIcon from '@shared/assets/icons/sidebar.svg';
-import { MOCK_CHAT_HISTORY } from '@pages/chatbot/constants/mockChatHistory';
 
 type ChatSidebarProps = {
   defaultOpen?: boolean;
@@ -17,7 +16,7 @@ type ChatSidebarProps = {
 
 const ChatSidebar = ({
   defaultOpen = true,
-  histories = MOCK_CHAT_HISTORY,
+  histories = [],
   activeChatId = null,
   onNewChat,
   onSearch,
@@ -101,15 +100,17 @@ const ChatSidebar = ({
         <ChatActions onNewChat={handleNewChat} onSearch={onSearch} />
       </div>
 
-      <div className="mt-[1.8rem] flex min-h-0 flex-1 flex-col border-t border-gray-200">
-        <div className="min-h-0 flex-1 overflow-y-auto pt-[1.8rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <ChatHistoryList
-            items={histories}
-            activeId={activeChatId}
-            onSelect={handleSelectChat}
-          />
+      {histories.length > 0 && (
+        <div className="mt-[1.8rem] flex min-h-0 flex-1 flex-col border-t border-gray-200">
+          <div className="min-h-0 flex-1 overflow-y-auto pt-[1.8rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <ChatHistoryList
+              items={histories}
+              activeId={activeChatId}
+              onSelect={handleSelectChat}
+            />
+          </div>
         </div>
-      </div>
+      )}
     </aside>
   );
 };

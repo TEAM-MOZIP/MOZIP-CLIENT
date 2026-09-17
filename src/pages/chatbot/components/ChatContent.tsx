@@ -9,6 +9,7 @@ type ChatContentProps = {
   isSearchOpen?: boolean;
   histories?: ChatHistory[];
   messages?: ChatMessage[];
+  isSending?: boolean;
   onSelectChat?: (id: string) => void;
   onCloseSearch?: () => void;
   onSendMessage?: (message: string) => void;
@@ -18,6 +19,7 @@ const ChatContent = ({
   isSearchOpen = false,
   histories = [],
   messages = [],
+  isSending = false,
   onSelectChat,
   onCloseSearch,
   onSendMessage,
@@ -28,12 +30,12 @@ const ChatContent = ({
   useEffect(() => {
     if (!hasMessages || !scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, hasMessages]);
+  }, [messages, hasMessages, isSending]);
 
   return (
     <div className="relative h-full w-full">
       {!hasMessages ? (
-        <ChatEmptyState onSubmit={onSendMessage} />
+        <ChatEmptyState onSubmit={onSendMessage} disabled={isSending} />
       ) : (
         <div className="relative h-full w-full bg-white">
           <div
@@ -42,7 +44,7 @@ const ChatContent = ({
           >
             <div className="mx-auto flex min-h-full w-full max-w-[80rem] flex-col">
               <div className="flex-1">
-                <MessageList messages={messages} />
+                <MessageList messages={messages} isSending={isSending} />
               </div>
               <p className="mt-auto pt-[2.4rem] text-center text-caption text-gray-400">
                 답변에 오류가 있을 수 있으니 중요한 정보는 다시 확인해 주세요.
@@ -52,7 +54,7 @@ const ChatContent = ({
 
           <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-b from-white/50 to-white px-[4rem] pb-[2.8rem]">
             <div className="pointer-events-auto mx-auto w-full max-w-[80rem]">
-              <MessageInput onSubmit={onSendMessage} />
+              <MessageInput onSubmit={onSendMessage} disabled={isSending} />
             </div>
           </div>
         </div>

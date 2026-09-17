@@ -1,15 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import ChatLogo from '@shared/components/chatbot/ChatLogo';
 import MessageInput from '@shared/components/chatbot/MessageInput';
 import MessageList from '@shared/components/chatbot/MessageList';
-import type { ChatMessage } from '@pages/chatbot/types/chat';
+import { useChatSession } from '@pages/chatbot/hooks/useChatSession';
+import { useChatPanelStore } from '@shared/stores/useChatPanelStore';
 import fullScreenIcon from '@shared/assets/icons/full-screen.svg';
 import deleteIcon from '@shared/assets/icons/delete.svg';
-import {
-  MOCK_ASSISTANT_REPLY,
-  MOCK_FLOATING_CHAT_MESSAGES,
-} from '@pages/chatbot/constants/mockChatMessages';
 
 type ChatFloatingPanelProps = {
   onClose: () => void;
@@ -17,34 +14,39 @@ type ChatFloatingPanelProps = {
 };
 
 const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(
-    MOCK_FLOATING_CHAT_MESSAGES
+  const { messages, sendMessage, isSending } = useChatSession();
+  const pendingMessage = useChatPanelStore((state) => state.pendingMessage);
+  const clearPendingMessage = useChatPanelStore(
+    (state) => state.clearPendingMessage
   );
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const handleSendMessage = (content: string) => {
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content,
-    };
-    const assistantMessage: ChatMessage = {
-      id: `assistant-${Date.now() + 1}`,
-      role: 'assistant',
-      content: MOCK_ASSISTANT_REPLY,
-    };
-
-    setMessages((prev) => [...prev, userMessage, assistantMessage]);
-  };
-
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages]);
+  }, [messages, isSending]);
+
+  useEffect(() => {
+    const message = useChatPanelStore.getState().pendingMessage;
+    if (!message || isSending) return;
+
+    clearPendingMessage();
+    sendMessage(message);
+  }, [pendingMessage, isSending, sendMessage, clearPendingMessage]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node | null;
+      if (
+        target instanceof Element &&
+        (target.closest('[data-selection-popover="true"]') ||
+          target.closest('[data-chat-floating="true"]') ||
+          target.closest('[data-chat-coexist="true"]'))
+      ) {
+        return;
+      }
+
       if (
         panelRef.current &&
         !panelRef.current.contains(event.target as Node)
@@ -54,15 +56,18 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      onClose();
     };
 
     document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown, true);
 
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [onClose]);
 
@@ -72,7 +77,8 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
       role="dialog"
       aria-modal="true"
       aria-label="Mozip AI"
-      className="fixed right-[4rem] bottom-[12rem] z-[101] flex h-[50rem] w-[38rem] flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-[0_0.8rem_2.4rem_rgba(0,0,0,0.12)]"
+      data-chat-floating="true"
+      className="fixed right-[4rem] bottom-[12rem] z-[200] flex h-[50rem] w-[38rem] flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-[0_0.8rem_2.4rem_rgba(0,0,0,0.12)]"
     >
       <header className="flex shrink-0 items-center justify-between border-b border-gray-200 px-[2rem] py-[1.6rem]">
         <ChatLogo size="sm" />
@@ -112,14 +118,19 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
       <div className="relative min-h-0 flex-1">
         <div
           ref={scrollRef}
-          className="h-full overflow-y-auto px-[2rem] pt-[2rem] pb-[7.2rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="h-full overflow-y-auto px-[2.2rem] pt-[1.6rem] pb-[8.4rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          <MessageList messages={messages} className="gap-[2rem]" compact />
+          <MessageList
+            messages={messages}
+            className="gap-[2.4rem]"
+            compact
+            isSending={isSending}
+          />
         </div>
 
         <footer className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-b from-white/50 to-white px-[2rem] pb-[2rem]">
           <div className="pointer-events-auto">
-            <MessageInput onSubmit={handleSendMessage} compact />
+            <MessageInput onSubmit={sendMessage} compact disabled={isSending} />
           </div>
         </footer>
       </div>

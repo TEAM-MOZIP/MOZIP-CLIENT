@@ -3,9 +3,13 @@ import heroWatermark from '@shared/assets/hero-watermark.svg';
 
 type ChatEmptyStateProps = {
   onSubmit?: (message: string) => void;
+  disabled?: boolean;
 };
 
-const ChatEmptyState = ({ onSubmit }: ChatEmptyStateProps) => {
+const ChatEmptyState = ({
+  onSubmit,
+  disabled = false,
+}: ChatEmptyStateProps) => {
   return (
     <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-white bg-gradient-to-b from-white from-30% to-primary-sub-2/50 px-[4rem]">
       <img
@@ -21,7 +25,7 @@ const ChatEmptyState = ({ onSubmit }: ChatEmptyStateProps) => {
           궁금한 정책을 <span className="font-semibold">MOZIP AI</span>
           에게 물어보세요
         </p>
-        <MessageInput onSubmit={onSubmit} />
+        <MessageInput onSubmit={onSubmit} disabled={disabled} />
       </div>
     </div>
   );

@@ -1,0 +1,67 @@
+import { useState } from 'react';
+import { useSendChatMessage } from '@pages/chatbot/hooks/useSendChatMessage';
+import type { ChatMessage } from '@pages/chatbot/types/chat';
+import { buildChatHistory } from '@pages/chatbot/utils/buildChatHistory';
+import { getChatErrorMessage } from '@pages/chatbot/utils/getChatErrorMessage';
+
+const createMessageId = (role: ChatMessage['role']) =>
+  `${role}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+export const useChatSession = (initialMessages: ChatMessage[] = []) => {
+  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const { mutate, isPending } = useSendChatMessage();
+
+  const sendMessage = (content: string) => {
+    const trimmed = content.trim();
+    if (!trimmed || isPending) return;
+
+    const history = buildChatHistory(messages);
+    const userMessage: ChatMessage = {
+      id: createMessageId('user'),
+      role: 'user',
+      content: trimmed,
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+
+    mutate(
+      { message: trimmed, history },
+      {
+        onSuccess: (data) => {
+          const assistantMessage: ChatMessage = {
+            id: createMessageId('assistant'),
+            role: 'assistant',
+            content:
+              data.reply?.trim() ||
+              '응답을 받지 못했습니다. 잠시 후 다시 시도해 주세요.',
+            matchedPolicies: data.matchedPolicies,
+            unresolvedConditions: data.unresolvedConditions,
+          };
+
+          setMessages((prev) => [...prev, assistantMessage]);
+        },
+        onError: (error) => {
+          const assistantMessage: ChatMessage = {
+            id: createMessageId('assistant'),
+            role: 'assistant',
+            content: getChatErrorMessage(error),
+            isError: true,
+          };
+
+          setMessages((prev) => [...prev, assistantMessage]);
+        },
+      }
+    );
+  };
+
+  const reset = () => {
+    setMessages([]);
+  };
+
+  return {
+    messages,
+    sendMessage,
+    reset,
+    isSending: isPending,
+  };
+};

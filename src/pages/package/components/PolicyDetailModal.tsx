@@ -2,6 +2,8 @@ import { useEffect, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import type { PolicyItem } from '@pages/package/types';
 import { TAG_STYLES } from '@pages/package/constants/tagStyles';
+import TextSelection from '@shared/components/text-selection/TextSelection';
+import { useChatPanelStore } from '@shared/stores/useChatPanelStore';
 import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
 import bookmarkFilledIcon from '@shared/assets/icons/bookmark-filled.svg';
 
@@ -96,7 +98,9 @@ const PolicyDetailModal = ({
     document.body.style.overflow = 'hidden';
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      if (useChatPanelStore.getState().isOpen) return;
+      onClose();
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -108,8 +112,13 @@ const PolicyDetailModal = ({
 
   return createPortal(
     <div
+      data-chat-coexist="true"
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-[2rem]"
-      onClick={onClose}
+      onClick={(event) => {
+        const target = event.target as Element | null;
+        if (target?.closest('[data-chat-floating="true"]')) return;
+        onClose();
+      }}
       role="presentation"
     >
       <div
@@ -119,7 +128,7 @@ const PolicyDetailModal = ({
         className="flex max-h-[85vh] w-full max-w-[68rem] flex-col overflow-hidden rounded-[1.2rem] border border-gray-300 bg-white shadow-[0_0.8rem_2.4rem_rgba(0,0,0,0.2)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="min-h-0 flex-1 overflow-y-auto px-[3.6rem] pt-[4rem] pb-[1.8rem]">
+        <TextSelection className="min-h-0 flex-1 overflow-y-auto px-[3.6rem] pt-[4rem] pb-[1.8rem]">
           <h3
             id="policy-detail-title"
             className="text-heading-3 font-bold text-title"
@@ -150,7 +159,7 @@ const PolicyDetailModal = ({
               {content}
             </DetailSection>
           ))}
-        </div>
+        </TextSelection>
 
         <div className="relative shrink-0 bg-white px-[3.2rem] pt-[1.2rem] pb-[2rem]">
           <div
