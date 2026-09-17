@@ -4,6 +4,7 @@ import ChatLogo from '@shared/components/chatbot/ChatLogo';
 import MessageInput from '@shared/components/chatbot/MessageInput';
 import MessageList from '@shared/components/chatbot/MessageList';
 import { useChatSession } from '@pages/chatbot/hooks/useChatSession';
+import { useChatPanelStore } from '@shared/stores/useChatPanelStore';
 import fullScreenIcon from '@shared/assets/icons/full-screen.svg';
 import deleteIcon from '@shared/assets/icons/delete.svg';
 
@@ -14,6 +15,10 @@ type ChatFloatingPanelProps = {
 
 const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
   const { messages, sendMessage, isSending } = useChatSession();
+  const pendingMessage = useChatPanelStore((state) => state.pendingMessage);
+  const clearPendingMessage = useChatPanelStore(
+    (state) => state.clearPendingMessage
+  );
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -23,7 +28,25 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
   }, [messages, isSending]);
 
   useEffect(() => {
+    const message = useChatPanelStore.getState().pendingMessage;
+    if (!message || isSending) return;
+
+    clearPendingMessage();
+    sendMessage(message);
+  }, [pendingMessage, isSending, sendMessage, clearPendingMessage]);
+
+  useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node | null;
+      if (
+        target instanceof Element &&
+        (target.closest('[data-selection-popover="true"]') ||
+          target.closest('[data-chat-floating="true"]') ||
+          target.closest('[data-chat-coexist="true"]'))
+      ) {
+        return;
+      }
+
       if (
         panelRef.current &&
         !panelRef.current.contains(event.target as Node)
@@ -33,15 +56,18 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
     };
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      onClose();
     };
 
     document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown, true);
 
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [onClose]);
 
@@ -51,7 +77,8 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
       role="dialog"
       aria-modal="true"
       aria-label="Mozip AI"
-      className="fixed right-[4rem] bottom-[12rem] z-[101] flex h-[50rem] w-[38rem] flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-[0_0.8rem_2.4rem_rgba(0,0,0,0.12)]"
+      data-chat-floating="true"
+      className="fixed right-[4rem] bottom-[12rem] z-[200] flex h-[50rem] w-[38rem] flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-[0_0.8rem_2.4rem_rgba(0,0,0,0.12)]"
     >
       <header className="flex shrink-0 items-center justify-between border-b border-gray-200 px-[2rem] py-[1.6rem]">
         <ChatLogo size="sm" />
