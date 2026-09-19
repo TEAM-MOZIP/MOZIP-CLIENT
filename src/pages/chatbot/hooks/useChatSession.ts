@@ -58,9 +58,27 @@ export const useChatSession = (initialMessages: ChatMessage[] = []) => {
     setMessages([]);
   };
 
+  // 이미 응답을 받아온 질문/답변 쌍을 대화 목록에 바로 추가한다 — sendMessage와
+  // 달리 POST /api/chat/messages를 다시 호출하지 않는다.
+  const appendExchange = (question: string, answer: string) => {
+    const userMessage: ChatMessage = {
+      id: createMessageId('user'),
+      role: 'user',
+      content: question,
+    };
+    const assistantMessage: ChatMessage = {
+      id: createMessageId('assistant'),
+      role: 'assistant',
+      content: answer,
+    };
+
+    setMessages((prev) => [...prev, userMessage, assistantMessage]);
+  };
+
   return {
     messages,
     sendMessage,
+    appendExchange,
     reset,
     isSending: isPending,
   };

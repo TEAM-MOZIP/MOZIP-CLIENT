@@ -14,10 +14,14 @@ type ChatFloatingPanelProps = {
 };
 
 const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
-  const { messages, sendMessage, isSending } = useChatSession();
+  const { messages, sendMessage, appendExchange, isSending } = useChatSession();
   const pendingMessage = useChatPanelStore((state) => state.pendingMessage);
+  const pendingExchange = useChatPanelStore((state) => state.pendingExchange);
   const clearPendingMessage = useChatPanelStore(
     (state) => state.clearPendingMessage
+  );
+  const clearPendingExchange = useChatPanelStore(
+    (state) => state.clearPendingExchange
   );
   const panelRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -34,6 +38,14 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
     clearPendingMessage();
     sendMessage(message);
   }, [pendingMessage, isSending, sendMessage, clearPendingMessage]);
+
+  useEffect(() => {
+    const exchange = useChatPanelStore.getState().pendingExchange;
+    if (!exchange) return;
+
+    clearPendingExchange();
+    appendExchange(exchange.question, exchange.answer);
+  }, [pendingExchange, appendExchange, clearPendingExchange]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
