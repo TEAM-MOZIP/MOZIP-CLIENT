@@ -33,3 +33,6 @@ dist-ssr
 
 # ESLint cache
 .eslintcache
+
+# 개인 작업용 문서 (커밋 대상 아님)
+docs/
