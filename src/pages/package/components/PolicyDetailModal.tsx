@@ -2,11 +2,15 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useApplicationGuide } from '@pages/package/hooks/useApplicationGuide';
 import { usePolicyDetail } from '@pages/package/hooks/usePolicyDetail';
+import { useTermExplanation } from '@pages/package/hooks/useTermExplanation';
 import { useToggleBookmark } from '@pages/package/hooks/useToggleBookmark';
 import { getAvailabilityBadge } from '@pages/package/utils/getAvailabilityBadge';
 import { getEligibilitySummary } from '@pages/package/utils/getEligibilitySummary';
 import { formatPolicyPeriod } from '@pages/package/utils/getPolicyPeriod';
-import TextSelection from '@shared/components/text-selection/TextSelection';
+import { getTermExplanationErrorMessage } from '@pages/package/utils/getTermExplanationErrorMessage';
+import TextSelection, {
+  type TextSelectionAskPayload,
+} from '@shared/components/text-selection/TextSelection';
 import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
 import { useChatPanelStore } from '@shared/stores/useChatPanelStore';
 import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
@@ -54,6 +58,8 @@ const PolicyDetailModal = ({
   const { data: detail, isLoading, isError } = usePolicyDetail(policyId);
   const { data: guide } = useApplicationGuide(policyId);
   const { mutate: mutateBookmark } = useToggleBookmark();
+  const { mutateAsync: explainTerm } = useTermExplanation(policyId);
+  const showExchange = useChatPanelStore((state) => state.showExchange);
   const [bookmarkOverride, setBookmarkOverride] = useState<boolean | null>(
     null
   );
@@ -68,6 +74,29 @@ const PolicyDetailModal = ({
       { policyId, bookmarked: next },
       { onError: () => setBookmarkOverride(!next) }
     );
+  };
+
+  const handleAskSubmit = async ({
+    selectedText,
+    context,
+  }: TextSelectionAskPayload) => {
+    const question = `"${selectedText}" 뜻이 뭐예요?`;
+
+    try {
+      const { explanation } = await explainTerm({
+        term: selectedText,
+        context,
+      });
+      showExchange({
+        question,
+        answer: explanation?.trim() || '설명을 가져오지 못했어요.',
+      });
+    } catch (error) {
+      showExchange({
+        question,
+        answer: getTermExplanationErrorMessage(error),
+      });
+    }
   };
 
   useEffect(() => {
@@ -115,7 +144,10 @@ const PolicyDetailModal = ({
           </p>
         ) : (
           <>
-            <TextSelection className="min-h-0 flex-1 overflow-y-auto px-[3.6rem] pt-[4rem] pb-[1.8rem]">
+            <TextSelection
+              className="min-h-0 flex-1 overflow-y-auto px-[3.6rem] pt-[4rem] pb-[1.8rem]"
+              onAskSubmit={handleAskSubmit}
+            >
               <h3
                 id="policy-detail-title"
                 className="text-heading-3 font-bold text-title"

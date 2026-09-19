@@ -8,6 +8,8 @@ import type {
   PolicyDetailResponse,
   PolicyListFilters,
   RegionResponse,
+  TermExplanationRequest,
+  TermExplanationResponse,
 } from '@pages/package/types/package';
 
 export type PolicyPageParams = PolicyListFilters & {
@@ -56,6 +58,17 @@ export const getPolicyDetail = async (policyId: number) => {
 export const getApplicationGuide = async (policyId: number) => {
   const { data } = await axiosInstance.get<ApplicationGuideResponse>(
     ENDPOINTS.POLICIES.APPLICATION_GUIDE(policyId)
+  );
+  return data;
+};
+
+export const postTermExplanation = async (
+  policyId: number,
+  payload: TermExplanationRequest
+) => {
+  const { data } = await axiosInstance.post<TermExplanationResponse>(
+    ENDPOINTS.POLICIES.TERMS_EXPLAIN(policyId),
+    payload
   );
   return data;
 };

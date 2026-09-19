@@ -9,6 +9,8 @@ import type {
   PolicyRecommendationResponse,
   PolicySummaryResponse,
   RegionResponse,
+  TermExplanationRequest,
+  TermExplanationResponse,
 } from '@shared/apis/generated/Api';
 
 export type {
@@ -22,6 +24,8 @@ export type {
   PolicyRecommendationResponse,
   PolicySummaryResponse,
   RegionResponse,
+  TermExplanationRequest,
+  TermExplanationResponse,
 };
 
 export type PolicyAvailability = NonNullable<
