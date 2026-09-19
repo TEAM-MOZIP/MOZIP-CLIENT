@@ -4,7 +4,6 @@ import type {
   ScheduleItem,
 } from '@pages/mypage/types';
 import type { PolicyItem } from '@pages/package/types';
-import { POLICY_ITEMS } from '@pages/package/constants/mockData';
 import employmentIcon from '@shared/assets/images/onboarding/employment.png';
 import educationIcon from '@shared/assets/images/onboarding/education.png';
 import housingIcon from '@shared/assets/images/onboarding/housing.png';
@@ -54,22 +53,31 @@ export const MOCK_SCHEDULES: ScheduleItem[] = [
   },
 ];
 
+const MOCK_BOOKMARK_BASE: Omit<PolicyItem, 'id'> = {
+  age: '만 19~24세',
+  category: '주거',
+  region: '강남구',
+  title: '청년 월세 특별지원',
+  dDay: 14,
+  organization: '강남구청 청년정책과',
+  period: '2026.07.01 ~ 2026.08.18',
+  bookmarked: true,
+  introduction: '청년의 주거비 부담 완화를 위해 월세를 지원하는 정책입니다.',
+  supportContents: ['월 최대 20만원 지원', '최대 12개월 지원', '계좌로 지급'],
+  eligibility: ['만 19~24세', '강남구 거주', '무주택 청년'],
+  documents: ['주민등록등본', '임대차계약서', '소득 증빙 서류'],
+  notes: [
+    '예산 소진 시 조기 마감될 수 있습니다.',
+    '중복 지원 여부를 확인해 주세요.',
+  ],
+  contactName: '강남구청 청년정책과',
+  contactPhone: '02-1234-5678',
+};
+
 export const MOCK_BOOKMARKS: PolicyItem[] = Array.from(
   { length: 6 },
-  (_, i) => {
-    const base =
-      POLICY_ITEMS.find((p) => p.title === '청년 월세 특별지원') ??
-      POLICY_ITEMS[0]!;
-
-    return {
-      ...base,
-      id: `bookmark-${i + 1}`,
-      age: '만 19~24세',
-      category: '주거',
-      region: '강남구',
-      title: '청년 월세 특별지원',
-      dDay: 14,
-      bookmarked: true,
-    };
-  }
+  (_, i) => ({
+    ...MOCK_BOOKMARK_BASE,
+    id: `bookmark-${i + 1}`,
+  })
 );
