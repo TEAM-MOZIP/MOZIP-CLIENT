@@ -58,3 +58,34 @@ export const getMonthMatrix = (year: number, month: number) => {
 
   return weeks;
 };
+
+/** 선택일이 신청 기간에 포함되는지 */
+export const isDateInSchedule = (
+  dateKey: string,
+  startDate: string | null,
+  endDate: string | null
+) => {
+  if (startDate && endDate) {
+    return dateKey >= startDate && dateKey <= endDate;
+  }
+  if (startDate) return dateKey === startDate;
+  if (endDate) return dateKey === endDate;
+  return false;
+};
+
+/** 마감 임박(4) > 접수 중(3) > 예정(2) > 마감(1) */
+const STATUS_PRIORITY: Record<ScheduleStatus, number> = {
+  closing: 4,
+  open: 3,
+  scheduled: 2,
+  closed: 1,
+};
+
+/** 같은 날짜에 일정이 여러 개면 더 높은 우선순위를 가진 상태로 표시 */
+export const pickHigherStatus = (
+  current: ScheduleStatus | undefined,
+  next: ScheduleStatus
+): ScheduleStatus => {
+  if (!current) return next;
+  return STATUS_PRIORITY[next] > STATUS_PRIORITY[current] ? next : current;
+};
