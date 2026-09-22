@@ -2,10 +2,17 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useApplicationGuide } from '@pages/package/hooks/useApplicationGuide';
 import { usePolicyDetail } from '@pages/package/hooks/usePolicyDetail';
+import { usePolicyEvaluation } from '@pages/package/hooks/usePolicyEvaluation';
+import { usePolicySummary } from '@pages/package/hooks/usePolicySummary';
 import { useTermExplanation } from '@pages/package/hooks/useTermExplanation';
 import { useToggleBookmark } from '@pages/package/hooks/useToggleBookmark';
 import { getAvailabilityBadge } from '@pages/package/utils/getAvailabilityBadge';
 import { getEligibilitySummary } from '@pages/package/utils/getEligibilitySummary';
+import {
+  ELIGIBILITY_STATUS_LABELS,
+  getConditionStatusLabel,
+  getConditionTypeLabel,
+} from '@pages/package/utils/getEvaluationLabels';
 import { formatPolicyPeriod } from '@pages/package/utils/getPolicyPeriod';
 import { getTermExplanationErrorMessage } from '@pages/package/utils/getTermExplanationErrorMessage';
 import TextSelection, {
@@ -57,6 +64,8 @@ const PolicyDetailModal = ({
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
   const { data: detail, isLoading, isError } = usePolicyDetail(policyId);
   const { data: guide } = useApplicationGuide(policyId);
+  const { data: aiSummary } = usePolicySummary(policyId);
+  const { data: evaluation } = usePolicyEvaluation(policyId);
   const { mutate: mutateBookmark } = useToggleBookmark();
   const { mutateAsync: explainTerm } = useTermExplanation(policyId);
   const showExchange = useChatPanelStore((state) => state.showExchange);
@@ -166,6 +175,17 @@ const PolicyDetailModal = ({
                 </span>
               </div>
 
+              {aiSummary?.summary && (
+                <div className="mb-[2rem] rounded-[0.8rem] bg-primary-sub-3 px-[1.6rem] py-[1.4rem]">
+                  <p className="text-body-3 font-semibold text-title">
+                    🤖 AI 요약
+                  </p>
+                  <p className="mt-[0.4rem] text-body-3 text-body">
+                    {aiSummary.summary}
+                  </p>
+                </div>
+              )}
+
               <DetailSection title="📌 정책 소개">
                 <TextBlock>
                   {detail.summary ??
@@ -190,6 +210,46 @@ const PolicyDetailModal = ({
                   </p>
                 )}
               </DetailSection>
+
+              {evaluation?.eligibility?.status && (
+                <DetailSection title="🎯 나의 신청 자격">
+                  <div className="flex items-center gap-[0.8rem]">
+                    <span className="shrink-0 whitespace-nowrap rounded-[0.8rem] border border-gray-300 bg-gray-100 px-[1rem] py-[0.2rem] font-semibold text-body-3 text-title">
+                      {
+                        ELIGIBILITY_STATUS_LABELS[evaluation.eligibility.status]
+                          .label
+                      }
+                    </span>
+                    {evaluation.eligibility.overallReason && (
+                      <span className="text-body-3 text-body">
+                        {evaluation.eligibility.overallReason}
+                      </span>
+                    )}
+                  </div>
+
+                  {evaluation.eligibility.conditionResults &&
+                    evaluation.eligibility.conditionResults.length > 0 && (
+                      <ul className="mt-[1.2rem] flex flex-col gap-[0.6rem]">
+                        {evaluation.eligibility.conditionResults.map(
+                          (condition, index) => (
+                            <li
+                              key={`${condition.type}-${index}`}
+                              className="text-body-3 text-body"
+                            >
+                              <span className="font-semibold text-title">
+                                {getConditionTypeLabel(condition.type)} ·{' '}
+                                {getConditionStatusLabel(condition.status)}
+                              </span>
+                              {condition.reason && (
+                                <span> — {condition.reason}</span>
+                              )}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    )}
+                </DetailSection>
+              )}
 
               <DetailSection title="📅 신청 기간">
                 <TextBlock>
