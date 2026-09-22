@@ -1,45 +1,28 @@
 import type { BookmarkResponse } from '@shared/apis/generated/Api';
+import type { PolicyListItem } from '@pages/package/types/package';
 
-export type BookmarkCardItem = {
-  id: string;
-  title: string;
-  dDay: number | null;
-  bookmarked: boolean;
-};
-
+// BookmarkResponse엔 applicationType이 없어서, availability.reason으로
+// 상시모집 여부를 추론한다(pages/package의 dDay/기간 계산 유틸과 호환되도록).
 const ALWAYS_OPEN_REASONS = new Set(['ALWAYS_OPEN', 'ALWAYS_APPLICATION_TYPE']);
-
-const MS_PER_DAY = 1000 * 60 * 60 * 24;
-
-const toStartOfDay = (date: Date) => {
-  const next = new Date(date);
-  next.setHours(0, 0, 0, 0);
-  return next;
-};
-
-export const calcDDay = (
-  applicationEndDate?: string | null,
-  reason?: string | null
-): number | null => {
-  if (reason && ALWAYS_OPEN_REASONS.has(reason)) return null;
-  if (!applicationEndDate) return null;
-
-  const end = toStartOfDay(new Date(applicationEndDate));
-  if (Number.isNaN(end.getTime())) return null;
-
-  const today = toStartOfDay(new Date());
-  return Math.ceil((end.getTime() - today.getTime()) / MS_PER_DAY);
-};
 
 export const mapBookmarkToCardItem = (
   bookmark: BookmarkResponse
-): BookmarkCardItem | null => {
+): PolicyListItem | null => {
   if (bookmark.policyId == null) return null;
 
+  const isAlwaysOpen = Boolean(
+    bookmark.availability?.reason &&
+    ALWAYS_OPEN_REASONS.has(bookmark.availability.reason)
+  );
+
   return {
-    id: String(bookmark.policyId),
+    id: bookmark.policyId,
     title: bookmark.title ?? '',
-    dDay: calcDDay(bookmark.applicationEndDate, bookmark.availability?.reason),
+    organizationName: bookmark.organizationName ?? '',
+    applicationType: isAlwaysOpen ? 'ALWAYS' : 'UNKNOWN',
+    applicationStartDate: bookmark.applicationStartDate ?? null,
+    applicationEndDate: bookmark.applicationEndDate ?? null,
+    availability: bookmark.availability ?? null,
     bookmarked: true,
   };
 };

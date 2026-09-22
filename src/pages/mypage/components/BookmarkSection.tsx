@@ -1,24 +1,22 @@
 import { useState } from 'react';
 import PolicyCard from '@pages/package/components/PolicyCard';
+import type { PolicyListItem } from '@pages/package/types/package';
 import { useGetMyBookmarks } from '@pages/mypage/hooks/useGetMyBookmarks';
 import { useRemoveBookmark } from '@pages/mypage/hooks/useRemoveBookmark';
-import {
-  mapBookmarkToCardItem,
-  type BookmarkCardItem,
-} from '@pages/mypage/utils/mapBookmarkToCard';
+import { mapBookmarkToCardItem } from '@pages/mypage/utils/mapBookmarkToCard';
 
 const BookmarkSection = () => {
   const { data, isLoading } = useGetMyBookmarks();
   const { mutate: removeBookmark } = useRemoveBookmark();
 
-  const bookmarks: BookmarkCardItem[] =
+  const bookmarks: PolicyListItem[] =
     data?.content
       ?.map(mapBookmarkToCardItem)
-      .filter((item): item is BookmarkCardItem => item != null) ?? [];
+      .filter((item): item is PolicyListItem => item != null) ?? [];
 
-  const [removedIds, setRemovedIds] = useState<Set<string>>(new Set());
+  const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
 
-  const toggleBookmark = (id: string) => {
+  const toggleBookmark = (id: number) => {
     if (removedIds.has(id)) return;
 
     setRemovedIds((prev) => new Set(prev).add(id));
@@ -50,8 +48,7 @@ const BookmarkSection = () => {
           {visibleBookmarks.map((item) => (
             <PolicyCard
               key={item.id}
-              title={item.title}
-              dDay={item.dDay}
+              {...item}
               bookmarked={!removedIds.has(item.id)}
               onBookmarkClick={() => toggleBookmark(item.id)}
             />

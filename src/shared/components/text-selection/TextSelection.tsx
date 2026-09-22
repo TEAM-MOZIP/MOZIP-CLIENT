@@ -13,14 +13,14 @@ import { useChatPanelStore } from '@shared/stores/useChatPanelStore';
 
 export type TextSelectionAskPayload = {
   selectedText: string;
-  question: string;
+  context: string;
 };
 
 type TextSelectionProps = {
   children: ReactNode;
   className?: string;
   disabled?: boolean;
-  onAskSubmit?: (payload: TextSelectionAskPayload) => void;
+  onAskSubmit?: (payload: TextSelectionAskPayload) => void | Promise<void>;
   onSelectionChange?: (selectedText: string | null) => void;
 };
 
@@ -33,18 +33,15 @@ type RectLike = {
 
 type SelectionState = {
   text: string;
+  context: string;
   rect: RectLike;
-  highlightRects: RectLike[];
-};
-
-const buildSelectionAskMessage = (selectedText: string, question: string) => {
-  return `"${selectedText.trim()}"\n\n${question.trim()}`;
 };
 
 const POPOVER_GAP = 8;
 const VIEWPORT_PADDING = 12;
-const ACTION_POPOVER_SIZE = { width: 220, height: 40 };
-const INPUT_POPOVER_SIZE = { width: 320, height: 44 };
+const POPOVER_SIZE = { width: 220, height: 40 };
+const CONTEXT_BLOCK_SELECTOR = 'p, li, h1, h2, h3, h4, blockquote, td, div';
+const MAX_CONTEXT_LENGTH = 500;
 
 const toRectLike = (rect: DOMRect): RectLike => ({
   top: rect.top,
@@ -70,6 +67,19 @@ const getRectsFromRange = (
           ? [bounding]
           : [],
   };
+};
+
+// 선택한 용어의 문맥(context)을 얻기 위해 가장 가까운 블록 요소의 텍스트를 사용한다.
+const getContextFromRange = (range: Range, fallback: HTMLElement): string => {
+  const node = range.commonAncestorContainer;
+  const element =
+    node.nodeType === Node.ELEMENT_NODE
+      ? (node as Element)
+      : node.parentElement;
+  const block = element?.closest(CONTEXT_BLOCK_SELECTOR) as HTMLElement | null;
+  const text = (block ?? fallback).textContent ?? '';
+
+  return text.trim().slice(0, MAX_CONTEXT_LENGTH);
 };
 
 const isEditableTarget = (node: Node | null) => {
@@ -117,17 +127,6 @@ const intersectsRect = (a: RectLike, b: RectLike, minOverlap = 1) => {
   const bottom = Math.min(a.top + a.height, b.top + b.height);
   const right = Math.min(a.left + a.width, b.left + b.width);
   return bottom - top >= minOverlap && right - left >= minOverlap;
-};
-
-const clipRectToBounds = (rect: RectLike, clip: RectLike): RectLike | null => {
-  const top = Math.max(rect.top, clip.top);
-  const left = Math.max(rect.left, clip.left);
-  const bottom = Math.min(rect.top + rect.height, clip.top + clip.height);
-  const right = Math.min(rect.left + rect.width, clip.left + clip.width);
-  const width = right - left;
-  const height = bottom - top;
-  if (width <= 0 || height <= 0) return null;
-  return { top, left, width, height };
 };
 
 const getPopoverPosition = (
@@ -196,25 +195,21 @@ const TextSelection = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const isSelectingRef = useRef(false);
   const rangeRef = useRef<Range | null>(null);
-  const isAskingRef = useRef(false);
-  const persistHighlightRef = useRef(false);
 
   const ask = useChatPanelStore((state) => state.ask);
 
   const [selection, setSelection] = useState<SelectionState | null>(null);
-  const [persistHighlight, setPersistHighlight] = useState(false);
   const [isInView, setIsInView] = useState(true);
   const [popoverPosition, setPopoverPosition] =
     useState<SelectionPopoverPosition | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const clearSelectionState = useCallback(() => {
     rangeRef.current = null;
-    isAskingRef.current = false;
-    persistHighlightRef.current = false;
     setSelection(null);
-    setPersistHighlight(false);
     setIsInView(true);
     setPopoverPosition(null);
+    setIsSubmitting(false);
     onSelectionChange?.(null);
   }, [onSelectionChange]);
 
@@ -232,16 +227,7 @@ const TextSelection = ({
 
     const clip = toRectLike(container.getBoundingClientRect());
     const inView = intersectsRect(rect, clip);
-    const popoverSize = isAskingRef.current
-      ? INPUT_POPOVER_SIZE
-      : ACTION_POPOVER_SIZE;
-    const nextPosition = getPopoverPosition(rect, popoverSize, clip);
-
-    const clippedHighlights = highlightRects
-      .map((highlightRect) => clipRectToBounds(highlightRect, clip))
-      .filter(
-        (highlightRect): highlightRect is RectLike => highlightRect !== null
-      );
+    const nextPosition = getPopoverPosition(rect, POPOVER_SIZE, clip);
 
     setIsInView(inView);
     if (nextPosition) {
@@ -254,9 +240,11 @@ const TextSelection = ({
 
       return {
         text: nextText,
+        context:
+          text !== undefined
+            ? getContextFromRange(range, container)
+            : (prev?.context ?? ''),
         rect,
-        highlightRects:
-          clippedHighlights.length > 0 ? clippedHighlights : highlightRects,
       };
     });
 
@@ -284,7 +272,6 @@ const TextSelection = ({
       browserSelection.isCollapsed ||
       browserSelection.rangeCount === 0
     ) {
-      if (persistHighlightRef.current || isAskingRef.current) return;
       clearSelectionState();
       return;
     }
@@ -318,8 +305,6 @@ const TextSelection = ({
     }
 
     rangeRef.current = range;
-    persistHighlightRef.current = false;
-    setPersistHighlight(false);
 
     if (!updateLayoutFromRange(range, text)) {
       clearSelectionState();
@@ -377,18 +362,6 @@ const TextSelection = ({
 
     const handleSelectionChange = () => {
       if (isSelectingRef.current) return;
-
-      if (persistHighlightRef.current || isAskingRef.current) {
-        const browserSelection = window.getSelection();
-        if (
-          !browserSelection ||
-          browserSelection.isCollapsed ||
-          browserSelection.rangeCount === 0
-        ) {
-          return;
-        }
-      }
-
       syncSelection();
     };
 
@@ -414,37 +387,25 @@ const TextSelection = ({
     };
   }, [clearSelectionState, disabled, refreshPersistedRects, syncSelection]);
 
-  const handleAskStart = useCallback(() => {
-    isAskingRef.current = true;
-    persistHighlightRef.current = true;
-    setPersistHighlight(true);
-    refreshPersistedRects();
-  }, [refreshPersistedRects]);
+  const handleSubmit = useCallback(async () => {
+    if (!selection || isSubmitting) return;
 
-  const handleAskCancel = useCallback(() => {
-    isAskingRef.current = false;
-    refreshPersistedRects();
-  }, [refreshPersistedRects]);
+    const payload: TextSelectionAskPayload = {
+      selectedText: selection.text,
+      context: selection.context,
+    };
 
-  const handleSubmit = useCallback(
-    (question: string) => {
-      if (!selection) return;
-
-      const payload = {
-        selectedText: selection.text,
-        question,
-      };
-
+    setIsSubmitting(true);
+    try {
       if (onAskSubmit) {
-        onAskSubmit(payload);
+        await onAskSubmit(payload);
       } else {
-        ask(buildSelectionAskMessage(payload.selectedText, payload.question));
+        ask(payload.selectedText);
       }
-
+    } finally {
       dismissSelection();
-    },
-    [ask, dismissSelection, onAskSubmit, selection]
-  );
+    }
+  }, [ask, dismissSelection, isSubmitting, onAskSubmit, selection]);
 
   const activeSelection = disabled ? null : selection;
   const showOverlay = Boolean(activeSelection && isInView && popoverPosition);
@@ -467,26 +428,9 @@ const TextSelection = ({
             }
             aria-hidden={!showOverlay}
           >
-            {persistHighlight &&
-              activeSelection.highlightRects.map((rect, index) => (
-                <div
-                  key={`${rect.top}-${rect.left}-${rect.width}-${index}`}
-                  aria-hidden
-                  data-selection-highlight="true"
-                  className="pointer-events-none fixed z-[110] bg-primary-sub-2 mix-blend-multiply"
-                  style={{
-                    top: rect.top,
-                    left: rect.left,
-                    width: rect.width,
-                    height: rect.height,
-                  }}
-                />
-              ))}
             <SelectionPopover
-              selectedText={activeSelection.text}
               position={popoverPosition}
-              onAskStart={handleAskStart}
-              onAskCancel={handleAskCancel}
+              isLoading={isSubmitting}
               onSubmit={handleSubmit}
               onDismiss={dismissSelection}
             />
