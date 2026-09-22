@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 
 import searchIcon from '@shared/assets/icons/search.svg';
 import deleteIcon from '@shared/assets/icons/delete.svg';
-import bellIcon from '@shared/assets/icons/bell.svg';
 import personIcon from '@shared/assets/icons/person.svg';
 import defaultProfileIcon from '@shared/assets/icons/default-profile.svg';
 
 import { postLogout } from '@pages/login/apis/authApi';
 import { ME_QUERY_KEY, useGetMe } from '@pages/mypage/hooks/useGetMe';
 import { queryClient } from '@shared/apis/queryClient';
+import NotificationDropdown from '@shared/components/header/NotificationDropdown';
 import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
 
 const HeaderActions = () => {
@@ -18,6 +18,7 @@ const HeaderActions = () => {
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const { data: me } = useGetMe();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const name = me?.nickname ?? '-';
@@ -91,19 +92,13 @@ const HeaderActions = () => {
         )}
       </label>
 
-      <button
-        type="button"
-        aria-label="알림"
-        className="flex size-[4.2rem] shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white"
-      >
-        <img
-          src={bellIcon}
-          alt=""
-          className="h-[2.2rem] w-auto"
-          aria-hidden
-          draggable={false}
-        />
-      </button>
+      <NotificationDropdown
+        isOpen={isNotificationOpen}
+        onOpenChange={(open) => {
+          setIsNotificationOpen(open);
+          if (open) setIsProfileOpen(false);
+        }}
+      />
 
       <div ref={profileRef} className="relative shrink-0">
         <button
@@ -111,7 +106,10 @@ const HeaderActions = () => {
           aria-label="프로필"
           aria-expanded={isProfileOpen}
           aria-haspopup="menu"
-          onClick={() => setIsProfileOpen((prev) => !prev)}
+          onClick={() => {
+            setIsProfileOpen((prev) => !prev);
+            setIsNotificationOpen(false);
+          }}
           className={[
             'flex shrink-0 cursor-pointer items-center justify-center border border-gray-300 transition-colors',
             isLoggedIn
