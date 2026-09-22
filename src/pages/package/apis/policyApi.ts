@@ -6,13 +6,17 @@ import type {
   PageResponsePolicyRecommendationResponse,
   PageResponsePolicySummaryResponse,
   PolicyDetailResponse,
+  PolicyEvaluationResponse,
   PolicyListFilters,
+  PolicySort,
+  PolicySummaryContentResponse,
   RegionResponse,
   TermExplanationRequest,
   TermExplanationResponse,
 } from '@pages/package/types/package';
 
-export type PolicyPageParams = PolicyListFilters & {
+export type PolicyPageParams = Omit<PolicyListFilters, 'sort'> & {
+  sort?: PolicySort;
   page: number;
   size: number;
 };
@@ -20,6 +24,17 @@ export type PolicyPageParams = PolicyListFilters & {
 export const getPolicies = async (params: PolicyPageParams) => {
   const { data } = await axiosInstance.get<PageResponsePolicySummaryResponse>(
     ENDPOINTS.POLICIES.LIST,
+    { params }
+  );
+  return data;
+};
+
+// 인증 불필요, 신청 가능 여부 기준 고정 정렬 — ageGroup/sort 파라미터 미지원
+export const getRecommendedPolicies = async (
+  params: Omit<PolicyPageParams, 'ageGroup' | 'sort'>
+) => {
+  const { data } = await axiosInstance.get<PageResponsePolicySummaryResponse>(
+    ENDPOINTS.POLICIES.RECOMMENDED,
     { params }
   );
   return data;
@@ -58,6 +73,20 @@ export const getPolicyDetail = async (policyId: number) => {
 export const getApplicationGuide = async (policyId: number) => {
   const { data } = await axiosInstance.get<ApplicationGuideResponse>(
     ENDPOINTS.POLICIES.APPLICATION_GUIDE(policyId)
+  );
+  return data;
+};
+
+export const getPolicySummary = async (policyId: number) => {
+  const { data } = await axiosInstance.get<PolicySummaryContentResponse>(
+    ENDPOINTS.POLICIES.SUMMARY(policyId)
+  );
+  return data;
+};
+
+export const getPolicyEvaluation = async (policyId: number) => {
+  const { data } = await axiosInstance.get<PolicyEvaluationResponse>(
+    ENDPOINTS.RECOMMENDATIONS.POLICY_EVALUATION(policyId)
   );
   return data;
 };

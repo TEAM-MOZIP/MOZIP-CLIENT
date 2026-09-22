@@ -2,11 +2,15 @@ import type {
   ApplicationGuideResponse,
   ApplicationGuideStepResponse,
   CategoryResponse,
+  ConditionResult,
+  EligibilityResponse,
   PageResponsePolicyRecommendationResponse,
   PageResponsePolicySummaryResponse,
   PolicyDetailResponse,
   PolicyEligibilityResponse,
+  PolicyEvaluationResponse,
   PolicyRecommendationResponse,
+  PolicySummaryContentResponse,
   PolicySummaryResponse,
   RegionResponse,
   TermExplanationRequest,
@@ -17,11 +21,15 @@ export type {
   ApplicationGuideResponse,
   ApplicationGuideStepResponse,
   CategoryResponse,
+  ConditionResult,
+  EligibilityResponse,
   PageResponsePolicyRecommendationResponse,
   PageResponsePolicySummaryResponse,
   PolicyDetailResponse,
   PolicyEligibilityResponse,
+  PolicyEvaluationResponse,
   PolicyRecommendationResponse,
+  PolicySummaryContentResponse,
   PolicySummaryResponse,
   RegionResponse,
   TermExplanationRequest,
@@ -53,7 +61,11 @@ export type PolicySort =
   | 'applicationEndDate,asc'
   | 'applicationEndDate,desc';
 
-export type PolicyListSource = 'public' | 'personalized';
+// 목록 화면의 정렬 드롭다운에서 고르는 값. 'recommended'는 서버 sort
+// 파라미터가 아니라 GET /api/policies/recommended(고정 정렬)를 쓰라는 신호다.
+export type PolicySortOption = PolicySort | 'recommended';
+
+export type PolicyListSource = 'public' | 'recommended' | 'personalized';
 
 // GET /api/policies(PolicySummaryResponse)와 GET /api/recommendations/policies
 // (PolicyRecommendationResponse) 두 응답 shape을 화면 하나로 그리기 위한 통합 뷰모델.
@@ -73,6 +85,6 @@ export type PolicyListFilters = {
   keyword?: string;
   categoryId?: number;
   regionId?: number;
-  ageGroup?: AgeGroup; // personalized 소스에선 서버가 지원하지 않아 무시됨
-  sort?: PolicySort; // personalized 소스에선 서버가 지원하지 않아 무시됨
+  ageGroup?: AgeGroup; // recommended/personalized 소스에선 서버가 지원하지 않아 무시됨
+  sort?: PolicySortOption; // personalized 소스에선 서버가 지원하지 않아 무시됨
 };
