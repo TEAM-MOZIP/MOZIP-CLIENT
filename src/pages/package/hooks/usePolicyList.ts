@@ -2,6 +2,7 @@ import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import {
   getPersonalizedPolicies,
   getPolicies,
+  getRecommendedPolicies,
 } from '@pages/package/apis/policyApi';
 import type {
   PolicyListFilters,
@@ -55,7 +56,35 @@ const fetchPolicyListPage = async (
     }
   }
 
-  const data = await getPolicies({ ...filters, page, size: PAGE_SIZE });
+  if (filters.sort === 'recommended') {
+    const data = await getRecommendedPolicies({
+      keyword: filters.keyword,
+      categoryId: filters.categoryId,
+      regionId: filters.regionId,
+      page,
+      size: PAGE_SIZE,
+    });
+
+    return {
+      items: (data.content ?? [])
+        .map(fromPolicySummary)
+        .filter((item): item is PolicyListItem => item !== null),
+      page: data.page ?? page,
+      totalPages: data.totalPages ?? 0,
+      totalElements: data.totalElements ?? 0,
+      source: 'recommended',
+    };
+  }
+
+  const data = await getPolicies({
+    keyword: filters.keyword,
+    categoryId: filters.categoryId,
+    regionId: filters.regionId,
+    ageGroup: filters.ageGroup,
+    sort: filters.sort,
+    page,
+    size: PAGE_SIZE,
+  });
 
   return {
     items: (data.content ?? [])

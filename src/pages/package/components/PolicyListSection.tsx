@@ -9,11 +9,12 @@ import type {
   AgeGroup,
   PolicyListFilters,
   PolicyListItem,
-  PolicySort,
+  PolicySortOption,
 } from '@pages/package/types/package';
 import arrowDownIcon from '@shared/assets/icons/chevron-down.svg';
 
-const SORT_OPTIONS: { value: PolicySort; label: string }[] = [
+const SORT_OPTIONS: { value: PolicySortOption; label: string }[] = [
+  { value: 'recommended', label: '추천순' },
   { value: 'createdAt,desc', label: '최신순' },
   { value: 'applicationEndDate,asc', label: '마감 임박 순' },
 ];
@@ -33,7 +34,7 @@ const INITIAL_SELECTION: FilterSelection = {
 const PolicyListSection = () => {
   const [selection, setSelection] =
     useState<FilterSelection>(INITIAL_SELECTION);
-  const [sort, setSort] = useState<PolicySort>('createdAt,desc');
+  const [sort, setSort] = useState<PolicySortOption>('recommended');
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [bookmarkOverrides, setBookmarkOverrides] = useState<
     Record<number, boolean>
@@ -68,13 +69,13 @@ const PolicyListSection = () => {
   const items = pages.flatMap((page) => page.items);
   const totalElements = pages[0]?.totalElements ?? 0;
   const source = pages[0]?.source ?? 'public';
-  const showAgeFilter = source !== 'personalized';
+  const showAgeFilter = source === 'public';
   const showSort = source !== 'personalized';
 
   const filterGroups = usePolicyFilterGroups(showAgeFilter);
 
   const selectedSortLabel =
-    SORT_OPTIONS.find((option) => option.value === sort)?.label ?? '최신순';
+    SORT_OPTIONS.find((option) => option.value === sort)?.label ?? '추천순';
 
   useEffect(() => {
     if (!isSortOpen) return;
