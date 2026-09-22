@@ -10,6 +10,7 @@ import { postLogout } from '@pages/login/apis/authApi';
 import { ME_QUERY_KEY, useGetMe } from '@pages/mypage/hooks/useGetMe';
 import { queryClient } from '@shared/apis/queryClient';
 import NotificationDropdown from '@shared/components/header/NotificationDropdown';
+import { NOTIFICATIONS_QUERY_KEY } from '@shared/hooks/useGetNotifications';
 import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
 
 const HeaderActions = () => {
@@ -52,6 +53,7 @@ const HeaderActions = () => {
     } finally {
       clearAuth();
       queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
+      queryClient.removeQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
       setIsProfileOpen(false);
     }
   };

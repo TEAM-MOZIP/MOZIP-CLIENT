@@ -1,35 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-
-import type { NotificationResponse } from '@shared/apis/generated/Api';
-import bellIcon from '@shared/assets/icons/bell.svg';
+import { useEffect, useRef } from 'react';
+import { useGetNotifications } from '@shared/hooks/useGetNotifications';
+import { useMarkNotificationAsRead } from '@shared/hooks/useMarkNotificationAsRead';
 import { formatDate } from '@shared/utils/formatDate';
-
-const MOCK_NOTIFICATIONS: NotificationResponse[] = [
-  {
-    notificationId: 1,
-    policyId: 1,
-    title: '마감 임박 알림',
-    content: '청년 월세 지원 신청이 3일 남았습니다.',
-    read: false,
-    createdAt: '2026-09-22T09:00:00',
-  },
-  {
-    notificationId: 2,
-    policyId: 2,
-    title: '신청 시작 알림',
-    content: '내일부터 청년 구직활동 지원금 신청이 시작됩니다.',
-    read: false,
-    createdAt: '2026-09-21T14:30:00',
-  },
-  {
-    notificationId: 3,
-    policyId: 3,
-    title: '북마크 리마인드',
-    content: '관심 정책의 마감일이 일주일 남았습니다.',
-    read: true,
-    createdAt: '2026-09-20T10:00:00',
-  },
-];
+import bellIcon from '@shared/assets/icons/bell.svg';
 
 type NotificationDropdownProps = {
   isOpen: boolean;
@@ -41,8 +14,8 @@ const NotificationDropdown = ({
   onOpenChange,
 }: NotificationDropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [notifications, setNotifications] =
-    useState<NotificationResponse[]>(MOCK_NOTIFICATIONS);
+  const { data: notifications = [] } = useGetNotifications();
+  const { mutate: markAsRead } = useMarkNotificationAsRead();
 
   const unreadCount = notifications.filter((item) => !item.read).length;
 
@@ -62,14 +35,9 @@ const NotificationDropdown = ({
     return () => document.removeEventListener('mousedown', handlePointerDown);
   }, [isOpen, onOpenChange]);
 
-  const handleItemClick = (notificationId?: number) => {
-    if (notificationId == null) return;
-
-    setNotifications((prev) =>
-      prev.map((item) =>
-        item.notificationId === notificationId ? { ...item, read: true } : item
-      )
-    );
+  const handleItemClick = (notificationId?: number, isRead?: boolean) => {
+    if (notificationId == null || isRead) return;
+    markAsRead(notificationId);
   };
 
   return (
@@ -137,7 +105,9 @@ const NotificationDropdown = ({
                     <button
                       type="button"
                       role="menuitem"
-                      onClick={() => handleItemClick(item.notificationId)}
+                      onClick={() =>
+                        handleItemClick(item.notificationId, item.read)
+                      }
                       className={[
                         'flex w-full cursor-pointer gap-[1rem] px-[1.6rem] py-[1rem] text-left transition-colors hover:bg-gray-100',
                         isUnread ? 'bg-primary-sub-3' : 'bg-white',
