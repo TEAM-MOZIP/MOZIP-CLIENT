@@ -8,17 +8,20 @@ import personIcon from '@shared/assets/icons/person.svg';
 import defaultProfileIcon from '@shared/assets/icons/default-profile.svg';
 
 import { postLogout } from '@pages/login/apis/authApi';
+import { ME_QUERY_KEY, useGetMe } from '@pages/mypage/hooks/useGetMe';
+import { queryClient } from '@shared/apis/queryClient';
 import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
-
-// temporary state for UI development
-const MOCK_NICKNAME = '닉네임';
 
 const HeaderActions = () => {
   const [query, setQuery] = useState('');
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const { data: me } = useGetMe();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  const name = me?.nickname ?? '-';
+  const profileImageSrc = me?.profileImageUrl ?? defaultProfileIcon;
 
   useEffect(() => {
     if (!isProfileOpen) return;
@@ -47,6 +50,7 @@ const HeaderActions = () => {
       // API 요청 실패 시에도 로컬 로그아웃은 진행
     } finally {
       clearAuth();
+      queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
       setIsProfileOpen(false);
     }
   };
@@ -119,14 +123,14 @@ const HeaderActions = () => {
           {isLoggedIn ? (
             <>
               <img
-                src={defaultProfileIcon}
+                src={profileImageSrc}
                 alt=""
-                className="size-[3.2rem] shrink-0"
+                className="size-[3.2rem] shrink-0 rounded-full object-cover"
                 aria-hidden
                 draggable={false}
               />
               <span className="shrink-0 whitespace-nowrap font-pretendard text-body font-medium">
-                {MOCK_NICKNAME}
+                {name}
               </span>
             </>
           ) : (
