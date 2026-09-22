@@ -1,10 +1,15 @@
-import type { PolicyItem } from '@pages/package/types';
 import { TAG_STYLES } from '@pages/package/constants/tagStyles';
 import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
 import bookmarkFilledIcon from '@shared/assets/icons/bookmark-filled.svg';
 import shareIcon from '@shared/assets/icons/share.svg';
 
-type PolicyCardProps = PolicyItem & {
+type PolicyCardProps = {
+  title: string;
+  dDay: number | null;
+  age?: string;
+  category?: string;
+  region?: string;
+  bookmarked?: boolean;
   onBookmarkClick?: () => void;
   onShareClick?: () => void;
   onClick?: () => void;
@@ -22,10 +27,13 @@ const PolicyCard = ({
   onClick,
 }: PolicyCardProps) => {
   const tags = [
-    { kind: 'age' as const, label: age },
-    { kind: 'category' as const, label: category },
-    { kind: 'region' as const, label: region },
-  ];
+    age ? { kind: 'age' as const, label: age } : null,
+    category ? { kind: 'category' as const, label: category } : null,
+    region ? { kind: 'region' as const, label: region } : null,
+  ].filter(
+    (tag): tag is { kind: 'age' | 'category' | 'region'; label: string } =>
+      Boolean(tag)
+  );
 
   return (
     <div
@@ -50,7 +58,9 @@ const PolicyCard = ({
       tabIndex={onClick ? 0 : undefined}
     >
       <div className="flex items-center justify-between gap-[1rem]">
-        <span className="text-body-2 font-medium text-point">D-{dDay}</span>
+        <span className="text-body-2 font-medium text-point">
+          {dDay === null ? '상시' : `D-${dDay}`}
+        </span>
         <button
           type="button"
           aria-label={bookmarked ? '북마크 해제' : '북마크'}
