@@ -3,13 +3,22 @@ import ProfileDetails from '@pages/mypage/components/profile/ProfileDetails';
 import CalendarSection from '@pages/mypage/components/CalendarSection';
 import BookmarkSection from '@pages/mypage/components/BookmarkSection';
 import {
-  MOCK_PROFILE_INFO,
   MOCK_PROFILE_DETAILS,
   MOCK_SCHEDULES,
   MOCK_BOOKMARKS,
 } from '@pages/mypage/constants/mockData';
+import { useGetMe } from '@pages/mypage/hooks/useGetMe';
+import type { ProfileInfoData } from '@pages/mypage/types';
 
 const MyPage = () => {
+  const { data: me } = useGetMe();
+
+  const profile: ProfileInfoData = {
+    profileImage: me?.profileImageUrl ?? undefined,
+    name: me?.nickname ?? '-',
+    email: me?.email ?? '-',
+  };
+
   return (
     <div className="min-h-full">
       <div className="mx-auto w-full px-[8rem] py-[6rem]">
@@ -17,7 +26,7 @@ const MyPage = () => {
 
         <div className="flex flex-col gap-[6rem] lg:flex-row lg:items-start">
           <aside className="flex w-full shrink-0 flex-col gap-[2rem] lg:w-[32rem]">
-            <ProfileInfo profile={MOCK_PROFILE_INFO} />
+            <ProfileInfo profile={profile} />
             <ProfileDetails details={MOCK_PROFILE_DETAILS} />
           </aside>
 

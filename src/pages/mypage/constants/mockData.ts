@@ -1,19 +1,9 @@
-import type {
-  ProfileDetailsData,
-  ProfileInfoData,
-  ScheduleItem,
-} from '@pages/mypage/types';
+import type { ProfileDetailsData, ScheduleItem } from '@pages/mypage/types';
 import type { PolicyItem } from '@pages/package/types';
 import { POLICY_ITEMS } from '@pages/package/constants/mockData';
 import employmentIcon from '@shared/assets/images/onboarding/employment.png';
 import educationIcon from '@shared/assets/images/onboarding/education.png';
 import housingIcon from '@shared/assets/images/onboarding/housing.png';
-
-export const MOCK_PROFILE_INFO: ProfileInfoData = {
-  name: '나문희',
-  nickname: '닉네임',
-  email: 'nmh@mozip.com',
-};
 
 export const MOCK_PROFILE_DETAILS: ProfileDetailsData = {
   age: 25,
