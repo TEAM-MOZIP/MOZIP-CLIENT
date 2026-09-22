@@ -2,11 +2,7 @@ import ProfileInfo from '@pages/mypage/components/profile/ProfileInfo';
 import ProfileDetails from '@pages/mypage/components/profile/ProfileDetails';
 import CalendarSection from '@pages/mypage/components/CalendarSection';
 import BookmarkSection from '@pages/mypage/components/BookmarkSection';
-import {
-  MOCK_PROFILE_DETAILS,
-  MOCK_SCHEDULES,
-  MOCK_BOOKMARKS,
-} from '@pages/mypage/constants/mockData';
+import { MOCK_PROFILE_DETAILS } from '@pages/mypage/constants/mockData';
 import { useGetMe } from '@pages/mypage/hooks/useGetMe';
 import type { ProfileInfoData } from '@pages/mypage/types';
 
@@ -31,9 +27,9 @@ const MyPage = () => {
           </aside>
 
           <div className="flex min-w-0 flex-1 flex-col gap-[6rem]">
-            <CalendarSection schedules={MOCK_SCHEDULES} />
+            <CalendarSection />
             <hr className="border-0 border-t border-gray-200" />
-            <BookmarkSection bookmarks={MOCK_BOOKMARKS} />
+            <BookmarkSection />
           </div>
         </div>
       </div>
