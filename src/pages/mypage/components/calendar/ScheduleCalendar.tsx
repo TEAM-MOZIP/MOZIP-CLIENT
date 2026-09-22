@@ -6,6 +6,8 @@ import {
   toDateKey,
   isSameDay,
   getMonthMatrix,
+  isDateInSchedule,
+  pickHigherStatus,
 } from '@pages/mypage/utils/calendar';
 import leftChevron from '@shared/assets/icons/left-chevron.svg';
 import rightChevron from '@shared/assets/icons/right-chevron.svg';
@@ -37,9 +39,23 @@ const ScheduleCalendar = ({
 }: ScheduleCalendarProps) => {
   const weeks = getMonthMatrix(year, month);
 
-  const statusByDate = schedules.reduce<Record<string, ScheduleStatus>>(
-    (dateStatus, schedule) => {
-      dateStatus[schedule.date] = schedule.status;
+  const statusByDate = weeks.reduce<Record<string, ScheduleStatus>>(
+    (dateStatus, week) => {
+      week.forEach((date) => {
+        if (!date) return;
+        const dateKey = toDateKey(date);
+        schedules.forEach((schedule) => {
+          if (
+            !isDateInSchedule(dateKey, schedule.startDate, schedule.endDate)
+          ) {
+            return;
+          }
+          dateStatus[dateKey] = pickHigherStatus(
+            dateStatus[dateKey],
+            schedule.status
+          );
+        });
+      });
       return dateStatus;
     },
     {}
