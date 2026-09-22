@@ -1,24 +1,31 @@
 import { useState } from 'react';
 import ScheduleCalendar from '@pages/mypage/components/calendar/ScheduleCalendar';
 import ScheduleList from '@pages/mypage/components/calendar/ScheduleList';
+import { useGetMyBookmarks } from '@pages/mypage/hooks/useGetMyBookmarks';
 import type { ScheduleItem } from '@pages/mypage/types';
-import { toDateKey } from '@pages/mypage/utils/calendar';
+import { isDateInSchedule, toDateKey } from '@pages/mypage/utils/calendar';
+import { mapBookmarkToSchedule } from '@pages/mypage/utils/mapBookmarkToSchedule';
 
 type CalendarSectionProps = {
-  schedules: ScheduleItem[];
   initialDate?: Date;
 };
 
 const CalendarSection = ({
-  schedules,
   initialDate = new Date(),
 }: CalendarSectionProps) => {
+  const { data } = useGetMyBookmarks();
   const [currentYear, setCurrentYear] = useState(initialDate.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(initialDate.getMonth());
   const [selectedDate, setSelectedDate] = useState(initialDate);
 
-  const selectedSchedules = schedules.filter(
-    (schedule) => schedule.date === toDateKey(selectedDate)
+  const schedules: ScheduleItem[] =
+    data?.content
+      ?.map(mapBookmarkToSchedule)
+      .filter((item): item is ScheduleItem => item != null) ?? [];
+
+  const selectedKey = toDateKey(selectedDate);
+  const selectedSchedules = schedules.filter((schedule) =>
+    isDateInSchedule(selectedKey, schedule.startDate, schedule.endDate)
   );
 
   const handlePrevMonth = () => {

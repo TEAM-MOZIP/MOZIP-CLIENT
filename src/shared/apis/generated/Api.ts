@@ -435,5 +435,7 @@ export interface UserResponse {
   email?: string;
   /** @format int64 */
   id?: number;
+  nickname?: string;
+  profileImageUrl?: string;
   provider?: 'LOCAL' | 'KAKAO';
 }

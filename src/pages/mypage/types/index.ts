@@ -1,7 +1,6 @@
 export type ProfileInfoData = {
   profileImage?: string;
   name: string;
-  nickname: string;
   email: string;
 };
 
@@ -26,7 +25,9 @@ export type ScheduleItem = {
   title: string;
   startLabel: string;
   endLabel: string;
-  /** YYYY-MM-DD — 캘린더에 표시할 날짜 */
-  date: string;
+  /** YYYY-MM-DD — 신청 시작일 */
+  startDate: string | null;
+  /** YYYY-MM-DD — 신청 마감일 */
+  endDate: string | null;
   status: ScheduleStatus;
 };

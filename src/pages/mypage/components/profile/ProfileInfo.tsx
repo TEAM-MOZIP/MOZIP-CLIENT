@@ -7,7 +7,7 @@ type ProfileInfoProps = {
 };
 
 const ProfileInfo = ({ profile, onEdit }: ProfileInfoProps) => {
-  const { profileImage, name, nickname, email } = profile;
+  const { profileImage, name, email } = profile;
 
   return (
     <section className="flex flex-col items-center rounded-[1.2rem] border border-gray-200 bg-white p-[2.4rem] gap-[1.6rem]">
@@ -22,10 +22,8 @@ const ProfileInfo = ({ profile, onEdit }: ProfileInfoProps) => {
 
       <div className="flex flex-col items-center gap-[0.4rem]">
         <h2 className="text-body-1 font-semibold text-black">{name}</h2>
-        <p className="text-body-3 text-gray-500">@{nickname}</p>
+        <p className="text-body-3 text-gray-500">{email}</p>
       </div>
-
-      <p className="text-body-3 text-gray-700">{email}</p>
 
       <button
         type="button"

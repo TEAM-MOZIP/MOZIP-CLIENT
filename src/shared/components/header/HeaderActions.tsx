@@ -3,22 +3,27 @@ import { Link } from 'react-router-dom';
 
 import searchIcon from '@shared/assets/icons/search.svg';
 import deleteIcon from '@shared/assets/icons/delete.svg';
-import bellIcon from '@shared/assets/icons/bell.svg';
 import personIcon from '@shared/assets/icons/person.svg';
 import defaultProfileIcon from '@shared/assets/icons/default-profile.svg';
 
 import { postLogout } from '@pages/login/apis/authApi';
+import { ME_QUERY_KEY, useGetMe } from '@pages/mypage/hooks/useGetMe';
+import { queryClient } from '@shared/apis/queryClient';
+import NotificationDropdown from '@shared/components/header/NotificationDropdown';
+import { NOTIFICATIONS_QUERY_KEY } from '@shared/hooks/useGetNotifications';
 import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
-
-// temporary state for UI development
-const MOCK_NICKNAME = '닉네임';
 
 const HeaderActions = () => {
   const [query, setQuery] = useState('');
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
   const clearAuth = useAuthStore((state) => state.clearAuth);
+  const { data: me } = useGetMe();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  const name = me?.nickname ?? '-';
+  const profileImageSrc = me?.profileImageUrl ?? defaultProfileIcon;
 
   useEffect(() => {
     if (!isProfileOpen) return;
@@ -47,6 +52,8 @@ const HeaderActions = () => {
       // API 요청 실패 시에도 로컬 로그아웃은 진행
     } finally {
       clearAuth();
+      queryClient.removeQueries({ queryKey: ME_QUERY_KEY });
+      queryClient.removeQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
       setIsProfileOpen(false);
     }
   };
@@ -87,19 +94,13 @@ const HeaderActions = () => {
         )}
       </label>
 
-      <button
-        type="button"
-        aria-label="알림"
-        className="flex size-[4.2rem] shrink-0 cursor-pointer items-center justify-center rounded-full border border-gray-300 bg-white"
-      >
-        <img
-          src={bellIcon}
-          alt=""
-          className="h-[2.2rem] w-auto"
-          aria-hidden
-          draggable={false}
-        />
-      </button>
+      <NotificationDropdown
+        isOpen={isNotificationOpen}
+        onOpenChange={(open) => {
+          setIsNotificationOpen(open);
+          if (open) setIsProfileOpen(false);
+        }}
+      />
 
       <div ref={profileRef} className="relative shrink-0">
         <button
@@ -107,7 +108,10 @@ const HeaderActions = () => {
           aria-label="프로필"
           aria-expanded={isProfileOpen}
           aria-haspopup="menu"
-          onClick={() => setIsProfileOpen((prev) => !prev)}
+          onClick={() => {
+            setIsProfileOpen((prev) => !prev);
+            setIsNotificationOpen(false);
+          }}
           className={[
             'flex shrink-0 cursor-pointer items-center justify-center border border-gray-300 transition-colors',
             isLoggedIn
@@ -119,14 +123,14 @@ const HeaderActions = () => {
           {isLoggedIn ? (
             <>
               <img
-                src={defaultProfileIcon}
+                src={profileImageSrc}
                 alt=""
-                className="size-[3.2rem] shrink-0"
+                className="size-[3.2rem] shrink-0 rounded-full object-cover"
                 aria-hidden
                 draggable={false}
               />
               <span className="shrink-0 whitespace-nowrap font-pretendard text-body font-medium">
-                {MOCK_NICKNAME}
+                {name}
               </span>
             </>
           ) : (
