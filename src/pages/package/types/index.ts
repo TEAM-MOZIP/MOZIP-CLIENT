@@ -10,6 +10,8 @@ export type FilterGroup = {
   id: string;
   title: string;
   options: FilterOption[];
+  /** 칩 대신 보여줄 안내 문구. 있으면 칩 목록을 그리지 않는다(줄바꿈 \n 지원). */
+  notice?: string;
 };
 
 export type PackageItem = {
