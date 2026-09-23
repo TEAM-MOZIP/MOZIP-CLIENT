@@ -14,11 +14,17 @@ export type FilterGroup = {
   notice?: string;
 };
 
+export type PackageTheme = 'yellow' | 'black';
+
 export type PackageItem = {
   id: string;
-  icon: string;
+  /** 패키지명 (카드 하단 보조 텍스트) */
   title: string;
-  description: string;
+  /** 카드 메인 문구. \n 으로 줄바꿈 */
+  headline: string;
+  /** 카드 상단 기하학 패턴 SVG */
+  pattern: string;
+  theme: PackageTheme;
   policyCount: number;
 };
 
