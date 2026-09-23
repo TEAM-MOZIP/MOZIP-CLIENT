@@ -10,6 +10,7 @@ import {
 import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
 import bookmarkFilledIcon from '@shared/assets/icons/bookmark-filled.svg';
 import shareIcon from '@shared/assets/icons/share.svg';
+import { displayValue } from '@shared/utils/displayValue';
 
 const BADGE_TONE_CLASS: Record<AvailabilityBadgeTone, string> = {
   open: 'border-primary bg-primary-sub-2 text-black',
@@ -18,6 +19,11 @@ const BADGE_TONE_CLASS: Record<AvailabilityBadgeTone, string> = {
   closed: 'border-gray-300 bg-gray-100 text-gray-600',
   review: 'border-gray-400 bg-gray-100 text-gray-600',
 };
+
+// 카드 폭이 좁아 카테고리 칩은 2개, 지역 칩은 1개까지만 보여주고 나머지는 +N으로 줄인다.
+const MAX_VISIBLE_CATEGORIES = 2;
+const MAX_VISIBLE_REGIONS = 1;
+const NATIONAL_REGION_LABEL = '전국';
 
 type PolicyCardProps = PolicyListItem & {
   onBookmarkClick?: () => void;
@@ -33,6 +39,9 @@ const PolicyCard = ({
   applicationEndDate,
   availability,
   bookmarked,
+  categories,
+  regionScope,
+  regions,
   onBookmarkClick,
   onShareClick,
   onClick,
@@ -44,6 +53,14 @@ const PolicyCard = ({
     applicationType
   );
   const badge = getAvailabilityBadge(availability);
+  const visibleCategories = categories.slice(0, MAX_VISIBLE_CATEGORIES);
+  const hiddenCategoryCount = categories.length - visibleCategories.length;
+  const regionNames =
+    regionScope === 'NATIONAL'
+      ? [NATIONAL_REGION_LABEL]
+      : regions.map((region) => region.name);
+  const visibleRegionNames = regionNames.slice(0, MAX_VISIBLE_REGIONS);
+  const hiddenRegionNames = regionNames.slice(MAX_VISIBLE_REGIONS);
 
   return (
     <div
@@ -100,25 +117,63 @@ const PolicyCard = ({
         {title}
       </h3>
 
-      <p className="text-body-3 text-body truncate" title={organizationName}>
-        {organizationName}
+      <p
+        className="text-body-3 text-body truncate"
+        title={displayValue(organizationName)}
+      >
+        {displayValue(organizationName)}
       </p>
 
       <p className="text-body-3 text-gray-500">{period}</p>
 
       <div className="flex min-w-0 items-center justify-between gap-[1rem]">
-        {badge ? (
-          <span
-            className={[
-              'shrink-0 whitespace-nowrap rounded-[0.8rem] border px-[1rem] py-[0.2rem] font-semibold text-body-3',
-              BADGE_TONE_CLASS[badge.tone],
-            ].join(' ')}
-          >
-            {badge.label}
-          </span>
-        ) : (
-          <span />
-        )}
+        <div className="flex min-w-0 items-center gap-[0.6rem] overflow-hidden">
+          {badge && (
+            <span
+              className={[
+                'shrink-0 whitespace-nowrap rounded-[0.8rem] border px-[1rem] py-[0.2rem] font-semibold text-body-3',
+                BADGE_TONE_CLASS[badge.tone],
+              ].join(' ')}
+            >
+              {badge.label}
+            </span>
+          )}
+          {visibleCategories.map((category) => (
+            <span
+              key={category.id}
+              className="shrink-0 whitespace-nowrap rounded-full border border-[#8CE29C] bg-[#DDFAD4] px-[1rem] py-[0.2rem] text-caption font-semibold text-gray-700"
+            >
+              {category.name}
+            </span>
+          ))}
+          {hiddenCategoryCount > 0 && (
+            <span
+              className="shrink-0 text-caption text-gray-500"
+              title={categories
+                .slice(MAX_VISIBLE_CATEGORIES)
+                .map((category) => category.name)
+                .join(', ')}
+            >
+              +{hiddenCategoryCount}
+            </span>
+          )}
+          {visibleRegionNames.map((name) => (
+            <span
+              key={name}
+              className="shrink-0 whitespace-nowrap rounded-full border border-[#97C4FF] bg-[#D7EAFF] px-[1rem] py-[0.2rem] text-caption font-semibold text-gray-700"
+            >
+              {name}
+            </span>
+          ))}
+          {hiddenRegionNames.length > 0 && (
+            <span
+              className="shrink-0 text-caption text-gray-500"
+              title={hiddenRegionNames.join(', ')}
+            >
+              +{hiddenRegionNames.length}
+            </span>
+          )}
+        </div>
         <button
           type="button"
           aria-label="공유"
