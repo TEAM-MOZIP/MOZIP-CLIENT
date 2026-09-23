@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import type { PackagePolicyDetailBundle } from '@pages/package/constants/mockData';
 import { useApplicationGuide } from '@pages/package/hooks/useApplicationGuide';
 import { usePolicyDetail } from '@pages/package/hooks/usePolicyDetail';
 import { usePolicyEvaluation } from '@pages/package/hooks/usePolicyEvaluation';
@@ -27,6 +28,7 @@ type PolicyDetailModalProps = {
   policyId: number;
   onClose: () => void;
   onShareClick?: () => void;
+  mockData?: PackagePolicyDetailBundle | null;
 };
 
 const DetailSection = ({
@@ -60,12 +62,30 @@ const PolicyDetailModal = ({
   policyId,
   onClose,
   onShareClick,
+  mockData,
 }: PolicyDetailModalProps) => {
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
-  const { data: detail, isLoading, isError } = usePolicyDetail(policyId);
-  const { data: guide } = useApplicationGuide(policyId);
-  const { data: aiSummary } = usePolicySummary(policyId);
-  const { data: evaluation } = usePolicyEvaluation(policyId);
+  const useMock = mockData != null;
+  const {
+    data: apiDetail,
+    isLoading,
+    isError,
+  } = usePolicyDetail(policyId, !useMock);
+  const { data: apiGuide } = useApplicationGuide(policyId, !useMock);
+  const { data: apiSummary } = usePolicySummary(policyId, !useMock);
+  const { data: apiEvaluation } = usePolicyEvaluation(policyId, !useMock);
+  const detail = mockData?.detail ?? apiDetail;
+  const guide = useMock ? (isLoggedIn ? mockData.guide : undefined) : apiGuide;
+  const aiSummary = useMock
+    ? isLoggedIn
+      ? mockData.summary
+      : undefined
+    : apiSummary;
+  const evaluation = useMock
+    ? isLoggedIn
+      ? mockData.evaluation
+      : undefined
+    : apiEvaluation;
   const { mutate: mutateBookmark } = useToggleBookmark();
   const { mutateAsync: explainTerm } = useTermExplanation(policyId);
   const showExchange = useChatPanelStore((state) => state.showExchange);
@@ -79,6 +99,7 @@ const PolicyDetailModal = ({
   const handleBookmarkClick = () => {
     const next = !bookmarked;
     setBookmarkOverride(next);
+    if (useMock) return;
     mutateBookmark(
       { policyId, bookmarked: next },
       { onError: () => setBookmarkOverride(!next) }

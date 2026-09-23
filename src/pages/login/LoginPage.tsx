@@ -1,19 +1,19 @@
-import { useState, type SubmitEventHandler } from 'react';
-import { Link } from 'react-router-dom';
+import { type SubmitEventHandler } from 'react';
+// import { Link } from 'react-router-dom';
 
-import InputField from '@shared/components/auth/InputField';
+// import InputField from '@shared/components/auth/InputField';
 import Button from '@shared/components/auth/Button';
 
-import {
-  getAuthFieldValidationError,
-  getEmailSubmitError,
-  getPasswordSubmitError,
-} from '@shared/utils/authValidation';
+// import {
+//   // getAuthFieldValidationError,
+//   getEmailSubmitError,
+//   getPasswordSubmitError,
+// } from '@shared/utils/authValidation';
 
 import logo from '@shared/assets/logo.svg';
 import kakaoIcon from '@shared/assets/icons/kakao-icon.svg';
-import checkWhiteIcon from '@shared/assets/icons/check-white.svg';
-import arrowRightIcon from '@shared/assets/icons/chevron-right.svg';
+// import checkWhiteIcon from '@shared/assets/icons/check-white.svg';
+// import arrowRightIcon from '@shared/assets/icons/chevron-right.svg';
 
 import { redirectToKakaoLogin } from '@pages/login/hooks/useKakaoLogin';
 
@@ -23,23 +23,23 @@ type FieldErrors = {
 };
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [keepLoggedIn, setKeepLoggedIn] = useState(false);
-  const [errors, setErrors] = useState<FieldErrors>({});
+  // const [email, setEmail] = useState('');
+  // const [password, setPassword] = useState('');
+  // const [keepLoggedIn, setKeepLoggedIn] = useState(false);
+  // const [errors, setErrors] = useState<FieldErrors>({});
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
     const nextErrors: FieldErrors = {};
 
-    const emailError = getEmailSubmitError(email);
-    if (emailError) nextErrors.email = emailError;
+    // const emailError = getEmailSubmitError(email);
+    // if (emailError) nextErrors.email = emailError;
 
-    const passwordError = getPasswordSubmitError(password);
-    if (passwordError) nextErrors.password = passwordError;
+    // const passwordError = getPasswordSubmitError(password);
+    // if (passwordError) nextErrors.password = passwordError;
 
-    setErrors(nextErrors);
+    // setErrors(nextErrors);
 
     if (Object.keys(nextErrors).length > 0) return;
   };
@@ -50,10 +50,10 @@ const LoginPage = () => {
         <img
           src={logo}
           alt="MOZIP"
-          className="h-[6rem] w-auto"
+          className="h-[4.8rem] w-auto"
           draggable={false}
         />
-        <p className="mt-[4rem] text-center text-[2.4rem] text-gray-500 font-medium">
+        <p className="mt-[4rem] text-center text-[2.2rem] text-gray-500 font-medium">
           나를 위한 혜택 모음집, 신청까지 한 번에
         </p>
 
@@ -62,7 +62,7 @@ const LoginPage = () => {
           onSubmit={handleSubmit}
           className="mt-[8rem] flex w-full flex-col gap-[2.4rem]"
         >
-          <InputField
+          {/* <InputField
             label="이메일"
             type="email"
             value={email}
@@ -94,9 +94,9 @@ const LoginPage = () => {
             errorMessage={errors.password}
             autoComplete="current-password"
             required
-          />
+          /> */}
 
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <label className="flex cursor-pointer items-center gap-[0.8rem]">
               <span className="relative flex size-[1.8rem] shrink-0 items-center justify-center">
                 <input
@@ -123,10 +123,10 @@ const LoginPage = () => {
             >
               아이디 · 비밀번호 찾기
             </button>
-          </div>
+          </div> */}
 
           <div className="flex flex-col gap-[1.6rem]">
-            <Button type="submit" variant="primary">
+            {/* <Button type="submit" variant="primary">
               로그인
             </Button>
 
@@ -134,7 +134,7 @@ const LoginPage = () => {
               <div className="h-px flex-1 bg-gray-300" aria-hidden />
               <span className="text-caption text-gray-500">또는</span>
               <div className="h-px flex-1 bg-gray-300" aria-hidden />
-            </div>
+            </div> */}
 
             <Button
               type="button"
@@ -155,7 +155,7 @@ const LoginPage = () => {
           </div>
         </form>
 
-        <div className="mt-[4rem] flex items-center gap-[1.2rem] text-body-3 text-gray-700">
+        {/* <div className="mt-[4rem] flex items-center gap-[1.2rem] text-body-3 text-gray-700">
           아직 회원이 아니신가요?
           <Link
             to="/signup"
@@ -170,7 +170,7 @@ const LoginPage = () => {
               className="h-[1.2rem] w-auto"
             />
           </Link>
-        </div>
+        </div> */}
       </div>
     </section>
   );

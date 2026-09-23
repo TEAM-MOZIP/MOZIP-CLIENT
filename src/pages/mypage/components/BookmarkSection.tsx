@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PolicyCard from '@pages/package/components/PolicyCard';
+import PolicyDetailModal from '@pages/package/components/PolicyDetailModal';
 import type { PolicyListItem } from '@pages/package/types/package';
 import { useGetMyBookmarks } from '@pages/mypage/hooks/useGetMyBookmarks';
 import { useRemoveBookmark } from '@pages/mypage/hooks/useRemoveBookmark';
@@ -15,6 +16,7 @@ const BookmarkSection = () => {
       .filter((item): item is PolicyListItem => item != null) ?? [];
 
   const [removedIds, setRemovedIds] = useState<Set<number>>(new Set());
+  const [selectedPolicyId, setSelectedPolicyId] = useState<number | null>(null);
 
   const toggleBookmark = (id: number) => {
     if (removedIds.has(id)) return;
@@ -51,9 +53,16 @@ const BookmarkSection = () => {
               {...item}
               bookmarked={!removedIds.has(item.id)}
               onBookmarkClick={() => toggleBookmark(item.id)}
+              onClick={() => setSelectedPolicyId(item.id)}
             />
           ))}
         </div>
+      )}
+      {selectedPolicyId !== null && (
+        <PolicyDetailModal
+          policyId={selectedPolicyId}
+          onClose={() => setSelectedPolicyId(null)}
+        />
       )}
     </section>
   );

@@ -2,18 +2,22 @@ import ProfileInfo from '@pages/mypage/components/profile/ProfileInfo';
 import ProfileDetails from '@pages/mypage/components/profile/ProfileDetails';
 import CalendarSection from '@pages/mypage/components/CalendarSection';
 import BookmarkSection from '@pages/mypage/components/BookmarkSection';
-import { MOCK_PROFILE_DETAILS } from '@pages/mypage/constants/mockData';
 import { useGetMe } from '@pages/mypage/hooks/useGetMe';
+import { useGetMyProfile } from '@pages/mypage/hooks/useGetMyProfile';
+import { mapUserProfileToDetails } from '@pages/mypage/utils/mapUserProfileToDetails';
 import type { ProfileInfoData } from '@pages/mypage/types';
 
 const MyPage = () => {
   const { data: me } = useGetMe();
+  const { data: myProfile } = useGetMyProfile();
 
   const profile: ProfileInfoData = {
     profileImage: me?.profileImageUrl ?? undefined,
     name: me?.nickname ?? '-',
     email: me?.email ?? '-',
   };
+
+  const profileDetails = mapUserProfileToDetails(myProfile);
 
   return (
     <div className="min-h-full">
@@ -23,7 +27,7 @@ const MyPage = () => {
         <div className="flex flex-col gap-[6rem] lg:flex-row lg:items-start">
           <aside className="flex w-full shrink-0 flex-col gap-[2rem] lg:w-[32rem]">
             <ProfileInfo profile={profile} />
-            <ProfileDetails details={MOCK_PROFILE_DETAILS} />
+            {profileDetails && <ProfileDetails details={profileDetails} />}
           </aside>
 
           <div className="flex min-w-0 flex-1 flex-col gap-[6rem]">
