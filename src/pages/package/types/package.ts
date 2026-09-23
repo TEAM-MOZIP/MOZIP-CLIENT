@@ -55,6 +55,15 @@ export const AGE_GROUPS = [
 
 export type AgeGroup = (typeof AGE_GROUPS)[number];
 
+// 정책 목록 "상태" 필터. 서버가 오늘 날짜 기준 신청 가능 상태로 계산해 거른다(모든 정렬에서 지원).
+export const AVAILABILITY_FILTERS = [
+  'OPEN',
+  'CLOSING_SOON',
+  'UPCOMING',
+] as const;
+
+export type AvailabilityFilter = (typeof AVAILABILITY_FILTERS)[number];
+
 export type PolicySort =
   | 'createdAt,desc'
   | 'createdAt,asc'
@@ -69,7 +78,9 @@ export type PolicyListSource = 'public' | 'recommended' | 'personalized';
 
 // GET /api/policies(PolicySummaryResponse)와 GET /api/recommendations/policies
 // (PolicyRecommendationResponse) 두 응답 shape을 화면 하나로 그리기 위한 통합 뷰모델.
-// 카테고리/지역명은 두 응답 모두에 없어서 뷰모델에도 넣지 않는다.
+export type PolicyListCategory = { id: number; name: string };
+export type PolicyListRegion = { id: number; name: string };
+
 export type PolicyListItem = {
   id: number;
   title: string;
@@ -79,6 +90,10 @@ export type PolicyListItem = {
   applicationEndDate: string | null;
   availability: PolicyAvailability | null;
   bookmarked: boolean | null; // null = 북마크 정보 없음(공개 목록 응답)
+  categories: PolicyListCategory[];
+  // 전국 정책은 regionScope가 NATIONAL이고 regions는 비어 있다.
+  regionScope: 'NATIONAL' | 'REGIONAL' | null;
+  regions: PolicyListRegion[];
 };
 
 export type PolicyListFilters = {
@@ -86,5 +101,6 @@ export type PolicyListFilters = {
   categoryId?: number;
   regionId?: number;
   ageGroup?: AgeGroup; // recommended/personalized 소스에선 서버가 지원하지 않아 무시됨
+  availability?: AvailabilityFilter;
   sort?: PolicySortOption; // personalized 소스에선 서버가 지원하지 않아 무시됨
 };

@@ -316,6 +316,7 @@ export interface PolicyPackageResponse {
 }
 
 export interface PolicyRecommendationResponse {
+  categories?: CategoryResponse[];
   /** @format date */
   applicationEndDate?: string;
   /** @format date */
@@ -330,6 +331,8 @@ export interface PolicyRecommendationResponse {
   /** @format double */
   semanticScore?: number;
   title?: string;
+  regionScope?: 'NATIONAL' | 'REGIONAL';
+  regions?: RegionResponse[];
 }
 
 export interface PolicySummaryContentResponse {
@@ -339,6 +342,7 @@ export interface PolicySummaryContentResponse {
 }
 
 export interface PolicySummaryResponse {
+  categories?: CategoryResponse[];
   /** @format date */
   applicationEndDate?: string;
   /** @format date */
@@ -352,6 +356,7 @@ export interface PolicySummaryResponse {
   status?: 'DRAFT' | 'OPEN' | 'CLOSED' | 'ALWAYS_OPEN' | 'SUSPENDED';
   summary?: string;
   title?: string;
+  regions?: RegionResponse[];
 }
 
 export interface PublicPolicyPackageResponse {
