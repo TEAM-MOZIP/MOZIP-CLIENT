@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import type {
   ChatMatchedPolicyResponse,
   ChatMessageRole,
 } from '@pages/chatbot/types/chat';
+import PolicyDetailModal from '@pages/package/components/PolicyDetailModal';
+import ChatMessageContent from '@shared/components/chatbot/ChatMessageContent';
 
 type MessageItemProps = {
   role: ChatMessageRole;
@@ -28,6 +31,7 @@ const MessageItem = ({
   const isUser = role === 'user';
   const policies =
     matchedPolicies?.filter((policy) => policy.title?.trim()) ?? [];
+  const [selectedPolicyId, setSelectedPolicyId] = useState<number | null>(null);
 
   return (
     <div
@@ -43,7 +47,8 @@ const MessageItem = ({
       >
         <div
           className={[
-            'w-full whitespace-pre-wrap break-words text-gray-800',
+            'w-full break-words text-gray-800',
+            isUser ? 'whitespace-pre-wrap' : '',
             compact ? 'text-body-3' : 'text-body-2',
             isUser
               ? 'rounded-[2rem] bg-primary-sub-3 px-[1.6rem] py-[1.2rem]'
@@ -52,7 +57,7 @@ const MessageItem = ({
                 : 'p-[0.8rem]',
           ].join(' ')}
         >
-          {content}
+          {isUser ? content : <ChatMessageContent content={content} />}
         </div>
 
         {!isUser && policies.length > 0 && (
@@ -63,31 +68,54 @@ const MessageItem = ({
             ].join(' ')}
           >
             {policies.map((policy, index) => (
-              <li
-                key={`${policy.policyId ?? policy.title}-${index}`}
-                className={[
-                  'rounded-[1.2rem] border border-gray-200 bg-white px-[1.2rem] py-[0.8rem] text-gray-700',
-                  compact ? 'text-caption' : 'text-body-3',
-                ].join(' ')}
-              >
-                <span className="font-medium text-gray-800">
-                  {policy.title}
-                </span>
-                {policy.eligibilityStatus && (
-                  <span
-                    className={[
-                      'ml-[1.2rem] text-gray-400',
-                      compact ? 'text-[1.2rem]' : 'text-[1.4rem]',
-                    ].join(' ')}
-                  >
-                    {ELIGIBILITY_LABEL[policy.eligibilityStatus]}
+              <li key={`${policy.policyId ?? policy.title}-${index}`}>
+                <button
+                  type="button"
+                  disabled={policy.policyId == null}
+                  onClick={() => {
+                    if (policy.policyId != null) {
+                      setSelectedPolicyId(policy.policyId);
+                    }
+                  }}
+                  aria-label={`${policy.title} 상세 보기`}
+                  className={[
+                    'flex w-full items-center gap-[1.2rem] rounded-[1.2rem] border border-gray-200 bg-white px-[1.2rem] py-[0.8rem] text-left text-gray-700 transition-colors',
+                    'enabled:cursor-pointer enabled:hover:border-gray-300 enabled:hover:bg-gray-100',
+                    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400',
+                    compact ? 'text-caption' : 'text-body-3',
+                  ].join(' ')}
+                >
+                  <span className="min-w-0 flex-1 font-medium text-gray-800">
+                    {policy.title}
                   </span>
-                )}
+                  {policy.eligibilityStatus && (
+                    <span
+                      className={[
+                        'shrink-0 text-gray-400',
+                        compact ? 'text-[1.2rem]' : 'text-[1.4rem]',
+                      ].join(' ')}
+                    >
+                      {ELIGIBILITY_LABEL[policy.eligibilityStatus]}
+                    </span>
+                  )}
+                  {policy.policyId != null && (
+                    <span aria-hidden="true" className="shrink-0 text-gray-400">
+                      ›
+                    </span>
+                  )}
+                </button>
               </li>
             ))}
           </ul>
         )}
       </div>
+
+      {selectedPolicyId !== null && (
+        <PolicyDetailModal
+          policyId={selectedPolicyId}
+          onClose={() => setSelectedPolicyId(null)}
+        />
+      )}
     </div>
   );
 };
