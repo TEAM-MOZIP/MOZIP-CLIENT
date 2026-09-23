@@ -38,44 +38,48 @@ const ProfileDetails = ({ details, onEdit }: ProfileDetailsProps) => {
         ))}
       </dl>
 
-      <div className="mt-[2.4rem]">
-        <p className="mb-[1.2rem] text-body-3 font-medium text-gray-500">
-          현재 상황
-        </p>
-        <div className="flex flex-wrap gap-[0.8rem]">
-          {details.situations.map((situation) => (
-            <span
-              key={situation}
-              className="rounded-full bg-primary-sub-2 px-[1.2rem] py-[0.6rem] text-caption font-medium text-gray-800"
-            >
-              {situation}
-            </span>
-          ))}
+      {details.situations.length > 0 && (
+        <div className="mt-[2.4rem]">
+          <p className="mb-[1.2rem] text-body-3 font-medium text-gray-500">
+            현재 상황
+          </p>
+          <div className="flex flex-wrap gap-[0.8rem]">
+            {details.situations.map((situation) => (
+              <span
+                key={situation}
+                className="rounded-full bg-primary-sub-2 px-[1.2rem] py-[0.6rem] text-caption font-medium text-gray-800"
+              >
+                {situation}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="mt-[2.4rem]">
-        <p className="mb-[1.2rem] text-body-3 font-medium text-gray-500">
-          관심 분야
-        </p>
-        <div className="flex flex-wrap gap-[1rem]">
-          {details.interests.map((interest) => (
-            <span
-              key={interest.id}
-              className="inline-flex items-center gap-[0.6rem] rounded-[0.6rem] border border-primary bg-white px-[0.8rem] py-[0.4rem] text-caption font-medium text-gray-800"
-            >
-              <img
-                src={interest.icon}
-                alt=""
-                aria-hidden
-                className="size-[2rem] object-contain"
-                draggable={false}
-              />
-              {interest.label}
-            </span>
-          ))}
+      {details.interests.length > 0 && (
+        <div className="mt-[2.4rem]">
+          <p className="mb-[1.2rem] text-body-3 font-medium text-gray-500">
+            관심 분야
+          </p>
+          <div className="flex flex-wrap gap-[1rem]">
+            {details.interests.map((interest) => (
+              <span
+                key={interest.id}
+                className="inline-flex items-center gap-[0.6rem] rounded-[0.6rem] border border-primary bg-white px-[0.8rem] py-[0.4rem] text-caption font-medium text-gray-800"
+              >
+                <img
+                  src={interest.icon}
+                  alt=""
+                  aria-hidden
+                  className="size-[2rem] object-contain"
+                  draggable={false}
+                />
+                {interest.label}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };

@@ -3,10 +3,9 @@ import defaultProfile from '@shared/assets/images/default-profile.png';
 
 type ProfileInfoProps = {
   profile: ProfileInfoData;
-  onEdit?: () => void;
 };
 
-const ProfileInfo = ({ profile, onEdit }: ProfileInfoProps) => {
+const ProfileInfo = ({ profile }: ProfileInfoProps) => {
   const { profileImage, name, email } = profile;
 
   return (
@@ -24,14 +23,6 @@ const ProfileInfo = ({ profile, onEdit }: ProfileInfoProps) => {
         <h2 className="text-body-1 font-semibold text-black">{name}</h2>
         <p className="text-body-3 text-gray-500">{email}</p>
       </div>
-
-      <button
-        type="button"
-        onClick={onEdit}
-        className="cursor-pointer text-caption text-gray-500 underline underline-offset-2"
-      >
-        수정
-      </button>
     </section>
   );
 };
