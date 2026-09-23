@@ -4,6 +4,7 @@ import PolicyCard from '@pages/package/components/PolicyCard';
 import PolicyDetailModal from '@pages/package/components/PolicyDetailModal';
 import {
   getPackageCollectionCategories,
+  getPackagePolicyDetailBundle,
   PACKAGE_ITEMS,
   type PackagePolicyView,
 } from '@pages/package/constants/mockData';
@@ -152,6 +153,7 @@ const PackageCollectionPage = () => {
       {selectedPolicyId !== null && (
         <PolicyDetailModal
           policyId={selectedPolicyId}
+          mockData={getPackagePolicyDetailBundle(selectedPolicyId)}
           onClose={() => setSelectedPolicyId(null)}
         />
       )}
