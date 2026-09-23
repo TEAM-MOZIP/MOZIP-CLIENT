@@ -9,6 +9,7 @@ import PackageCollectionPage from '@pages/package/PackageCollectionPage';
 import ChatbotPage from '@pages/chatbot/ChatbotPage';
 import OnboardingPage from '@pages/onboarding/OnboardingPage';
 import KakaoOAuthCallback from '@pages/login/hooks/KakaoOAuthCallback';
+import RequireAuth from '@routes/RequireAuth';
 
 const router = createBrowserRouter([
   {
@@ -28,8 +29,13 @@ const router = createBrowserRouter([
         element: <SignupPage />,
       },
       {
-        path: 'mypage',
-        element: <MyPage />,
+        element: <RequireAuth />,
+        children: [
+          {
+            path: 'mypage',
+            element: <MyPage />,
+          },
+        ],
       },
       {
         path: 'package',
