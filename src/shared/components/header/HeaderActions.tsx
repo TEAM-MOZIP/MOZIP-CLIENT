@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import searchIcon from '@shared/assets/icons/search.svg';
-import deleteIcon from '@shared/assets/icons/delete.svg';
+// import searchIcon from '@shared/assets/icons/search.svg';
+// import deleteIcon from '@shared/assets/icons/delete.svg';
 import personIcon from '@shared/assets/icons/person.svg';
 import defaultProfileIcon from '@shared/assets/icons/default-profile.svg';
 
@@ -14,7 +14,7 @@ import { NOTIFICATIONS_QUERY_KEY } from '@shared/hooks/useGetNotifications';
 import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
 
 const HeaderActions = () => {
-  const [query, setQuery] = useState('');
+  // const [query, setQuery] = useState('');
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const { data: me } = useGetMe();
@@ -60,7 +60,7 @@ const HeaderActions = () => {
 
   return (
     <div className="col-start-3 hidden min-[600px]:flex min-w-max shrink-0 items-center justify-self-end gap-[1.6rem] pl-[2rem]">
-      <label className="relative shrink-0">
+      {/* <label className="relative shrink-0">
         <span className="sr-only">검색</span>
         <input
           type="search"
@@ -92,7 +92,7 @@ const HeaderActions = () => {
             />
           </button>
         )}
-      </label>
+      </label> */}
 
       <NotificationDropdown
         isOpen={isNotificationOpen}
