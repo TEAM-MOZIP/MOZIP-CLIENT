@@ -1,4 +1,5 @@
 import type { PolicyEligibilityResponse } from '@pages/package/types/package';
+import { EMPTY_VALUE } from '@shared/utils/displayValue';
 
 const EMPLOYMENT_STATUS_LABELS: Record<string, string> = {
   EMPLOYED: '재직 중',
@@ -13,10 +14,13 @@ const HOUSEHOLD_TYPE_LABELS: Record<string, string> = {
   DISABLED: '장애인 가구',
 };
 
-const formatAgeRange = (min?: number, max?: number) => {
-  if (min !== undefined && max !== undefined) return `만 ${min}~${max}세`;
-  if (min !== undefined) return `만 ${min}세 이상`;
-  if (max !== undefined) return `만 ${max}세 이하`;
+// 서버는 값이 없는 필드를 null로 내려주므로 undefined뿐 아니라 null도 "없음"으로 본다.
+const hasValue = (value?: number | null): value is number => value != null;
+
+const formatAgeRange = (min?: number | null, max?: number | null) => {
+  if (hasValue(min) && hasValue(max)) return `만 ${min}~${max}세`;
+  if (hasValue(min)) return `만 ${min}세 이상`;
+  if (hasValue(max)) return `만 ${max}세 이하`;
   return null;
 };
 
@@ -27,12 +31,12 @@ const formatIncome = (eligibility: PolicyEligibilityResponse) => {
   const unit = incomeType === 'MEDIAN_PERCENTAGE' ? '%' : '만원';
   const label = incomeType === 'MEDIAN_PERCENTAGE' ? '기준 중위소득' : '연소득';
 
-  if (minimumIncomeValue !== undefined && maximumIncomeValue !== undefined) {
+  if (hasValue(minimumIncomeValue) && hasValue(maximumIncomeValue)) {
     return `${label} ${minimumIncomeValue}~${maximumIncomeValue}${unit}`;
   }
-  if (maximumIncomeValue !== undefined)
+  if (hasValue(maximumIncomeValue))
     return `${label} ${maximumIncomeValue}${unit} 이하`;
-  if (minimumIncomeValue !== undefined)
+  if (hasValue(minimumIncomeValue))
     return `${label} ${minimumIncomeValue}${unit} 이상`;
   return null;
 };
@@ -43,7 +47,7 @@ const formatIncome = (eligibility: PolicyEligibilityResponse) => {
 export const getEligibilitySummary = (
   eligibility: PolicyEligibilityResponse | null
 ): string[] => {
-  if (!eligibility) return ['자격 조건 정보가 등록되지 않았어요.'];
+  if (!eligibility) return [EMPTY_VALUE];
 
   const lines: string[] = [];
 
