@@ -37,6 +37,7 @@ const fetchPolicyListPage = async (
         keyword: filters.keyword,
         categoryId: filters.categoryId,
         regionId: filters.regionId,
+        availability: filters.availability,
         page,
         size: PAGE_SIZE,
       });
@@ -61,6 +62,7 @@ const fetchPolicyListPage = async (
       keyword: filters.keyword,
       categoryId: filters.categoryId,
       regionId: filters.regionId,
+      availability: filters.availability,
       page,
       size: PAGE_SIZE,
     });
@@ -81,6 +83,7 @@ const fetchPolicyListPage = async (
     categoryId: filters.categoryId,
     regionId: filters.regionId,
     ageGroup: filters.ageGroup,
+    availability: filters.availability,
     sort: filters.sort,
     page,
     size: PAGE_SIZE,
