@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import PackageCard from '@pages/package/components/PackageCard';
 import type { PackageItem } from '@pages/package/types';
 
@@ -6,6 +7,8 @@ type PackageCollectionSectionProps = {
 };
 
 const PackageCollectionSection = ({ items }: PackageCollectionSectionProps) => {
+  const navigate = useNavigate();
+
   return (
     <section className="w-full bg-primary-sub-2 py-[4rem]">
       <div className="mx-auto w-full px-16">
@@ -16,7 +19,11 @@ const PackageCollectionSection = ({ items }: PackageCollectionSectionProps) => {
 
         <div className="mt-[2rem] grid grid-cols-4 gap-[1.8rem]">
           {items.map((item) => (
-            <PackageCard key={item.id} {...item} />
+            <PackageCard
+              key={item.id}
+              {...item}
+              onClick={() => navigate(`/package/${item.id}`)}
+            />
           ))}
         </div>
       </div>
