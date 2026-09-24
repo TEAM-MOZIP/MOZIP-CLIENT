@@ -6,6 +6,13 @@ import type {
   UserProfileUpdateRequest,
 } from '@pages/onboarding/types/onboarding';
 
+export const getMyProfile = async () => {
+  const { data } = await axiosInstance.get<UserProfileResponse>(
+    ENDPOINTS.USER_PROFILE.ME
+  );
+  return data;
+};
+
 export const putUserProfile = async (payload: UserProfileUpdateRequest) => {
   const { data } = await axiosInstance.put<UserProfileResponse>(
     ENDPOINTS.USER_PROFILE.ME,

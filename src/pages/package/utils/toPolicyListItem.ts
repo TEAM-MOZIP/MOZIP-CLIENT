@@ -1,8 +1,28 @@
 import type {
+  CategoryResponse,
+  PolicyListCategory,
   PolicyListItem,
+  PolicyListRegion,
   PolicyRecommendationResponse,
   PolicySummaryResponse,
+  RegionResponse,
 } from '@pages/package/types/package';
+
+const toCategories = (
+  categories: CategoryResponse[] | undefined
+): PolicyListCategory[] =>
+  (categories ?? []).flatMap((category) =>
+    category.id !== undefined && category.name?.trim()
+      ? [{ id: category.id, name: category.name }]
+      : []
+  );
+
+const toRegions = (regions: RegionResponse[] | undefined): PolicyListRegion[] =>
+  (regions ?? []).flatMap((region) =>
+    region.id !== undefined && region.name?.trim()
+      ? [{ id: region.id, name: region.name }]
+      : []
+  );
 
 export const fromPolicySummary = (
   response: PolicySummaryResponse
@@ -18,6 +38,9 @@ export const fromPolicySummary = (
     applicationEndDate: response.applicationEndDate ?? null,
     availability: response.availability ?? null,
     bookmarked: null,
+    categories: toCategories(response.categories),
+    regionScope: response.regionScope ?? null,
+    regions: toRegions(response.regions),
   };
 };
 
@@ -35,5 +58,8 @@ export const fromPolicyRecommendation = (
     applicationEndDate: response.applicationEndDate ?? null,
     availability: response.availability ?? null,
     bookmarked: response.bookmarked ?? false,
+    categories: toCategories(response.categories),
+    regionScope: response.regionScope ?? null,
+    regions: toRegions(response.regions),
   };
 };

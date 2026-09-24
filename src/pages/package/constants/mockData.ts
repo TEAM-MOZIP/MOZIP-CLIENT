@@ -8,10 +8,10 @@ import type {
   PolicyListItem,
   PolicySummaryContentResponse,
 } from '@pages/package/types/package';
-import emojiBag from '@shared/assets/images/package/emoji-1-bag.png';
-import emojiHouse from '@shared/assets/images/package/emoji-2-house.png';
-import emojiEdu from '@shared/assets/images/package/emoji-3-edu.png';
-import emojiSprout from '@shared/assets/images/package/emoji-4-sprout.png';
+import patternAsterisk from '@shared/assets/images/package/pattern-1-asterisk.svg';
+import patternHalfCircle from '@shared/assets/images/package/pattern-2-halfcircle.svg';
+import patternQuarter from '@shared/assets/images/package/pattern-3-quarter.svg';
+import patternChevron from '@shared/assets/images/package/pattern-4-chevron.svg';
 
 export type PackagePolicyView = PolicyListItem & {
   summary: string | null;
@@ -29,32 +29,34 @@ export type PackageCategoryView = {
 export const PACKAGE_ITEMS: PackageItem[] = [
   {
     id: 'job-seeker',
-    icon: emojiBag,
-    title: '취업 준비생',
-    description: '이력서 지원부터 면접비, 취업 장려금까지 한 번에 알아보세요.',
+    title: '취업 준비생 패키지',
+    headline: '취업 준비,\n혼자 하지 마세요',
+    pattern: patternAsterisk,
+    theme: 'yellow',
     policyCount: 42,
   },
   {
     id: 'solo-youth',
-    icon: emojiHouse,
-    title: '자취 청년',
-    description:
-      '월세 · 전세 지원부터 공공임대 입주 정보, 공과금, 생활비까지 한 번에 알아보세요.',
+    title: '자취 청년 패키지',
+    headline: '첫 자취,\n월세부터 챙겨요',
+    pattern: patternHalfCircle,
+    theme: 'black',
     policyCount: 38,
   },
   {
-    id: 'university',
-    icon: emojiEdu,
-    title: '대학생',
-    description:
-      '장학금, 각종 교육비 · 자격증 비용, 생활 지원 정책 모음입니다.',
+    id: 'senior',
+    title: '정보취약계층 패키지',
+    headline: '어르신 혜택,\n쉬운 말로 풀었어요',
+    pattern: patternQuarter,
+    theme: 'yellow',
     policyCount: 35,
   },
   {
-    id: 'early-career',
-    icon: emojiSprout,
-    title: '사회 초년생',
-    description: '첫 직장 적응을 돕는 복지, 저축, 경력 지원 정책 모음입니다.',
+    id: 'teen',
+    title: '청소년 패키지',
+    headline: '부모님 동의도,\n한 번에 전달해요',
+    pattern: patternChevron,
+    theme: 'black',
     policyCount: 40,
   },
 ];
@@ -79,6 +81,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: true,
         summary: '구직 중인 청년에게 월 50만 원을 지원합니다.',
         regionScope: 'REGIONAL',
+        categories: [{ id: 1, name: '취업·창업' }],
+        regions: [{ id: 1, name: '서울특별시' }],
         eligibility: {
           status: 'ELIGIBLE',
           overallReason: '연령·지역 조건을 충족해요.',
@@ -117,6 +121,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: false,
         summary: '면접 참석 시 발생하는 교통비를 실비로 지원합니다.',
         regionScope: 'NATIONAL',
+        categories: [{ id: 1, name: '취업·창업' }],
+        regions: [],
         eligibility: {
           status: 'ELIGIBLE',
           overallReason: '구직 상태 조건에 맞아요.',
@@ -150,6 +156,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: false,
         summary: '예비 창업자를 위한 최대 1,000만 원 초기 자금을 지원합니다.',
         regionScope: 'NATIONAL',
+        categories: [{ id: 1, name: '취업·창업' }],
+        regions: [],
         eligibility: {
           status: 'NEEDS_REVIEW',
           overallReason: '사업자등록 여부를 확인해야 해요.',
@@ -189,6 +197,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: false,
         summary: '직업훈련 수강료를 지원하는 평생 능력개발 카드입니다.',
         regionScope: 'NATIONAL',
+        categories: [{ id: 2, name: '교육' }],
+        regions: [],
         eligibility: {
           status: 'ELIGIBLE',
           overallReason: '연령 조건을 충족해요.',
@@ -217,6 +227,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: false,
         summary: '국가기술자격 응시료를 연 2회까지 지원합니다.',
         regionScope: 'REGIONAL',
+        categories: [{ id: 2, name: '교육' }],
+        regions: [{ id: 1, name: '서울특별시' }],
         eligibility: {
           status: 'INELIGIBLE',
           overallReason: '신청 기간이 아직 시작되지 않았어요.',
@@ -256,6 +268,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: true,
         summary: '독립 거주 청년에게 월 최대 20만 원의 월세를 지원합니다.',
         regionScope: 'NATIONAL',
+        categories: [{ id: 3, name: '주거' }],
+        regions: [],
         eligibility: {
           status: 'ELIGIBLE',
           overallReason: '1인 가구·소득 조건을 충족해요.',
@@ -294,6 +308,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: false,
         summary: '무주택 청년을 위한 전세임대 입주 기회를 제공합니다.',
         regionScope: 'NATIONAL',
+        categories: [{ id: 3, name: '주거' }],
+        regions: [],
         eligibility: {
           status: 'NEEDS_REVIEW',
           overallReason: '무주택 여부를 확인해야 해요.',
@@ -333,6 +349,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: false,
         summary: '만기 시 정부 기여금을 더해 목돈 마련을 돕습니다.',
         regionScope: 'NATIONAL',
+        categories: [{ id: 4, name: '금융' }],
+        regions: [],
         eligibility: {
           status: 'ELIGIBLE',
           overallReason: '연령·소득 조건을 충족해요.',
@@ -366,6 +384,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
         bookmarked: false,
         summary: '생활·교육 목적의 저금리 소액 대출을 지원합니다.',
         regionScope: 'NATIONAL',
+        categories: [{ id: 4, name: '금융' }],
+        regions: [],
         eligibility: {
           status: 'INELIGIBLE',
           overallReason: '소득 조건이 맞지 않아요.',
@@ -391,8 +411,8 @@ const PACKAGE_COLLECTION_CATEGORIES: PackageCategoryView[] = [
 const PACKAGE_CATEGORY_IDS: Record<string, number[]> = {
   'job-seeker': [1, 2],
   'solo-youth': [3, 4],
-  university: [2, 1],
-  'early-career': [4, 1],
+  senior: [3, 4],
+  teen: [2, 1],
 };
 
 export const getPackageCollectionCategories = (packageId: string) => {

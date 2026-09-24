@@ -8,7 +8,7 @@ const Footer = () => {
               MOZIP
             </p>
             <p className="font-pretendard text-body-3 text-black">
-              나를 위한 혜택 모음집, 신청까지 한 번에
+              나를 위한 정책 모음집, AI 요약부터 신청 가이드까지
             </p>
           </div>
 

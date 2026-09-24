@@ -24,5 +24,9 @@ export const mapBookmarkToCardItem = (
     applicationEndDate: bookmark.applicationEndDate ?? null,
     availability: bookmark.availability ?? null,
     bookmarked: true,
+    // 북마크 응답에는 카테고리·지역이 없어 카드에 칩을 표시하지 않는다.
+    categories: [],
+    regionScope: null,
+    regions: [],
   };
 };

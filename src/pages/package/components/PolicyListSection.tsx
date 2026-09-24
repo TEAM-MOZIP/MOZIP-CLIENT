@@ -2,16 +2,19 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import FilterSidebar from '@pages/package/components/FilterSidebar';
 import PolicyCard from '@pages/package/components/PolicyCard';
 import PolicyDetailModal from '@pages/package/components/PolicyDetailModal';
+import { useMyProfile } from '@pages/package/hooks/useMyProfile';
 import { usePolicyFilterGroups } from '@pages/package/hooks/usePolicyFilterGroups';
 import { usePolicyList } from '@pages/package/hooks/usePolicyList';
 import { useToggleBookmark } from '@pages/package/hooks/useToggleBookmark';
 import type {
   AgeGroup,
+  AvailabilityFilter,
   PolicyListFilters,
   PolicyListItem,
   PolicySortOption,
 } from '@pages/package/types/package';
 import arrowDownIcon from '@shared/assets/icons/chevron-down.svg';
+import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
 
 const SORT_OPTIONS: { value: PolicySortOption; label: string }[] = [
   { value: 'recommended', label: '추천순' },
@@ -20,18 +23,27 @@ const SORT_OPTIONS: { value: PolicySortOption; label: string }[] = [
 ];
 
 type FilterSelection = {
+  status: string;
   age: string;
   category: string;
   region: string;
 };
 
 const INITIAL_SELECTION: FilterSelection = {
+  status: 'all',
   age: 'all',
   category: 'all',
   region: 'all',
 };
 
+const PERSONALIZED_AGE_NOTICE =
+  '온보딩에서 입력한 정보로 맞춤 추천하고 있어요.\n연령 필터 없이도 내게 맞는 정책만 보여요.';
+const RECOMMENDED_AGE_NOTICE =
+  '신청 가능한 정책부터 추천하고 있어요.\n연령 필터는 최신순·마감 임박 순에서 사용해 보세요.';
+
 const PolicyListSection = () => {
+  const isLoggedIn = useAuthStore(selectIsLoggedIn);
+  const { data: myProfile, isLoading: isMyProfileLoading } = useMyProfile();
   const [selection, setSelection] =
     useState<FilterSelection>(INITIAL_SELECTION);
   const [sort, setSort] = useState<PolicySortOption>('recommended');
@@ -42,17 +54,31 @@ const PolicyListSection = () => {
   const [selectedPolicyId, setSelectedPolicyId] = useState<number | null>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
+  // 연령 필터를 쓸 수 있는지는 응답(source)이 아니라 요청 전에 알 수 있는 값으로 정한다.
+  // 응답을 기다리면 첫 로딩·정렬 변경 때 연령 그룹이 생겼다 사라지는 깜빡임이 생긴다.
+  // - 로그인 + 프로필 있음(프로필 확인 중 포함) → 맞춤 추천 목록: 서버가 연령 필터를 지원하지 않음
+  // - 추천순 → 공개 추천 목록: 서버가 연령 필터를 지원하지 않음
+  const isPersonalized =
+    isLoggedIn && (isMyProfileLoading || myProfile != null);
+  const isAgeFilterLocked = isPersonalized || sort === 'recommended';
+
   const filters = useMemo<PolicyListFilters>(
     () => ({
       categoryId:
         selection.category === 'all' ? undefined : Number(selection.category),
       regionId:
         selection.region === 'all' ? undefined : Number(selection.region),
+      availability:
+        selection.status === 'all'
+          ? undefined
+          : (selection.status as AvailabilityFilter),
       ageGroup:
-        selection.age === 'all' ? undefined : (selection.age as AgeGroup),
+        isAgeFilterLocked || selection.age === 'all'
+          ? undefined
+          : (selection.age as AgeGroup),
       sort,
     }),
-    [selection, sort]
+    [selection, sort, isAgeFilterLocked]
   );
 
   const {
@@ -68,11 +94,12 @@ const PolicyListSection = () => {
   const pages = data?.pages ?? [];
   const items = pages.flatMap((page) => page.items);
   const totalElements = pages[0]?.totalElements ?? 0;
-  const source = pages[0]?.source ?? 'public';
-  const showAgeFilter = source === 'public';
-  const showSort = source !== 'personalized';
+  const showSort = !isPersonalized;
 
-  const filterGroups = usePolicyFilterGroups(showAgeFilter);
+  const filterGroups = usePolicyFilterGroups({
+    locked: isAgeFilterLocked,
+    notice: isPersonalized ? PERSONALIZED_AGE_NOTICE : RECOMMENDED_AGE_NOTICE,
+  });
 
   const selectedSortLabel =
     SORT_OPTIONS.find((option) => option.value === sort)?.label ?? '추천순';
@@ -91,6 +118,7 @@ const PolicyListSection = () => {
   }, [isSortOpen]);
 
   const handleSelectFilter = (groupId: string, optionId: string) => {
+    if (groupId === 'age' && isAgeFilterLocked) return;
     setSelection((prev) => ({ ...prev, [groupId]: optionId }));
   };
 
@@ -169,6 +197,11 @@ const PolicyListSection = () => {
                           role="menuitem"
                           onClick={() => {
                             setSort(option.value);
+                            // 연령 필터를 못 쓰는 정렬로 바꾸면 이전 선택을 초기화한다 —
+                            // 숨겨진 선택값이 다른 정렬로 돌아왔을 때 몰래 다시 적용되지 않게.
+                            if (option.value === 'recommended') {
+                              setSelection((prev) => ({ ...prev, age: 'all' }));
+                            }
                             setIsSortOpen(false);
                           }}
                           className="flex w-full cursor-pointer items-center whitespace-nowrap px-[1rem] py-[0.8rem] text-body-3 text-body font-medium hover:bg-gray-100"

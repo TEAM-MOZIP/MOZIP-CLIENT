@@ -11,7 +11,7 @@ const ChatEmptyState = ({
   disabled = false,
 }: ChatEmptyStateProps) => {
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-white bg-gradient-to-b from-white from-30% to-primary-sub-2/50 px-[4rem]">
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-white bg-gradient-to-b from-white from-30% to-primary-sub-2 px-[4rem]">
       <img
         src={heroWatermark}
         alt=""

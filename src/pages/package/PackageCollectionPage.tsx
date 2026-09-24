@@ -81,7 +81,9 @@ const PackageCollectionPage = () => {
         <div className="mx-auto w-full px-16">
           <div className="flex flex-col items-flex-start gap-[1.4rem]">
             <h1 className="text-heading-3 text-title">{pack.title} 패키지</h1>
-            <p className="text-body-2 text-gray-600">{pack.description}</p>
+            <p className="text-body-2 text-gray-600">
+              {pack.headline.replace(/\n/g, ' ')}
+            </p>
           </div>
         </div>
       </section>

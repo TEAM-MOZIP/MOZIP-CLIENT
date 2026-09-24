@@ -23,6 +23,7 @@ import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
 import { useChatPanelStore } from '@shared/stores/useChatPanelStore';
 import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
 import bookmarkFilledIcon from '@shared/assets/icons/bookmark-filled.svg';
+import { displayValue, EMPTY_VALUE } from '@shared/utils/displayValue';
 
 type PolicyDetailModalProps = {
   policyId: number;
@@ -44,9 +45,42 @@ const DetailSection = ({
   </section>
 );
 
+const SkeletonLines = ({
+  lines = 2,
+  label,
+}: {
+  lines?: number;
+  label: string;
+}) => (
+  <div
+    className="flex flex-col gap-[0.8rem]"
+    aria-busy="true"
+    aria-label={label}
+  >
+    {Array.from({ length: lines }, (_, index) => (
+      <div
+        key={index}
+        className={[
+          'h-[1.6rem] animate-pulse rounded-[0.4rem] bg-gray-200',
+          index === lines - 1 ? 'w-[60%]' : 'w-full',
+        ].join(' ')}
+      />
+    ))}
+  </div>
+);
+
+const DetailSkeleton = () => (
+  <div className="flex flex-col gap-[2.4rem] px-[3.6rem] py-[4rem]">
+    <div className="h-[3.2rem] w-[70%] animate-pulse rounded-[0.8rem] bg-gray-200" />
+    <div className="h-[2.4rem] w-[40%] animate-pulse rounded-[0.8rem] bg-gray-200" />
+    <SkeletonLines lines={3} label="정책 정보를 불러오는 중" />
+    <SkeletonLines lines={3} label="정책 정보를 불러오는 중" />
+  </div>
+);
+
 const BulletList = ({ items }: { items: string[] }) => (
   <ul className="flex flex-col gap-[0.6rem]">
-    {items.map((item) => (
+    {(items.length > 0 ? items : [EMPTY_VALUE]).map((item) => (
       <li key={item} className="text-body-3 text-body">
         • {item}
       </li>
@@ -71,8 +105,14 @@ const PolicyDetailModal = ({
     isLoading,
     isError,
   } = usePolicyDetail(policyId, !useMock);
-  const { data: apiGuide } = useApplicationGuide(policyId, !useMock);
-  const { data: apiSummary } = usePolicySummary(policyId, !useMock);
+  const { data: apiGuide, isLoading: isGuideLoading } = useApplicationGuide(
+    policyId,
+    !useMock
+  );
+  const { data: apiSummary, isLoading: isAiSummaryLoading } = usePolicySummary(
+    policyId,
+    !useMock
+  );
   const { data: apiEvaluation } = usePolicyEvaluation(policyId, !useMock);
   const detail = mockData?.detail ?? apiDetail;
   const guide = useMock ? (isLoggedIn ? mockData.guide : undefined) : apiGuide;
@@ -165,9 +205,7 @@ const PolicyDetailModal = ({
         onClick={(e) => e.stopPropagation()}
       >
         {isLoading ? (
-          <p className="px-[3.6rem] py-[6rem] text-center text-body-2 text-gray-500">
-            불러오는 중이에요.
-          </p>
+          <DetailSkeleton />
         ) : isError || !detail ? (
           <p className="px-[3.6rem] py-[6rem] text-center text-body-2 text-gray-500">
             정책 정보를 불러오지 못했어요.
@@ -192,33 +230,35 @@ const PolicyDetailModal = ({
                   </span>
                 )}
                 <span className="text-body-3 text-gray-500">
-                  {detail.organizationName}
+                  {displayValue(detail.organizationName)}
                 </span>
               </div>
 
-              {aiSummary?.summary && (
+              {/* AI 요약은 생성이 느려서, 받아오는 동안 스켈레톤을 보여주고 받은 뒤에 내용을 보여준다.
+                  요약이 비어 있거나 실패하면 섹션 자체를 숨긴다. */}
+              {(isAiSummaryLoading || aiSummary?.summary?.trim()) && (
                 <div className="mb-[2rem] rounded-[0.8rem] bg-primary-sub-3 px-[1.6rem] py-[1.4rem]">
                   <p className="text-body-3 font-semibold text-title">
                     🤖 AI 요약
                   </p>
-                  <p className="mt-[0.4rem] text-body-3 text-body">
-                    {aiSummary.summary}
-                  </p>
+                  <div className="mt-[0.8rem] text-body-3 text-body">
+                    {isAiSummaryLoading ? (
+                      <SkeletonLines label="AI 요약을 불러오는 중" />
+                    ) : (
+                      aiSummary?.summary
+                    )}
+                  </div>
                 </div>
               )}
 
               <DetailSection title="📌 정책 소개">
                 <TextBlock>
-                  {detail.summary ??
-                    detail.description ??
-                    '등록된 소개가 없어요.'}
+                  {displayValue(detail.summary ?? detail.description)}
                 </TextBlock>
               </DetailSection>
 
               <DetailSection title="💰 지원 내용">
-                <TextBlock>
-                  {detail.benefitDescription ?? '등록된 지원 내용이 없어요.'}
-                </TextBlock>
+                <TextBlock>{displayValue(detail.benefitDescription)}</TextBlock>
               </DetailSection>
 
               <DetailSection title="👤 신청 대상">
@@ -287,7 +327,11 @@ const PolicyDetailModal = ({
                 )}
               </DetailSection>
 
-              {isLoggedIn ? (
+              {isLoggedIn && isGuideLoading ? (
+                <DetailSection title="📝 신청 절차 · 준비 서류">
+                  <SkeletonLines lines={3} label="신청 가이드를 불러오는 중" />
+                </DetailSection>
+              ) : isLoggedIn ? (
                 guide && (
                   <>
                     {guide.steps && guide.steps.length > 0 && (
@@ -325,9 +369,7 @@ const PolicyDetailModal = ({
                     )}
 
                     <DetailSection title="📞 문의처">
-                      <TextBlock>
-                        {guide.contactInfo ?? '문의처 정보가 없어요.'}
-                      </TextBlock>
+                      <TextBlock>{displayValue(guide.contactInfo)}</TextBlock>
                     </DetailSection>
 
                     {guide.applicationUrl && (

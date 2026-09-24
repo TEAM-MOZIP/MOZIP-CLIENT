@@ -18,18 +18,24 @@ const FilterSidebar = ({ groups, selected, onSelect }: FilterSidebarProps) => {
       {groups.map((group) => (
         <div key={group.id} className="mb-[4rem]">
           <h3 className="mb-[1rem] text-body-3 text-gray-700">{group.title}</h3>
-          <div className="flex flex-wrap gap-[0.8rem]">
-            {group.options.map((option) => (
-              <FilterChip
-                key={option.id}
-                label={option.label}
-                variant={isFilterChipVariant(group.id) ? group.id : 'status'}
-                statusDot={option.statusDot}
-                selected={selected[group.id] === option.id}
-                onClick={() => onSelect(group.id, option.id)}
-              />
-            ))}
-          </div>
+          {group.notice ? (
+            <p className="whitespace-pre-line text-caption text-gray-500">
+              {group.notice}
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-[0.8rem]">
+              {group.options.map((option) => (
+                <FilterChip
+                  key={option.id}
+                  label={option.label}
+                  variant={isFilterChipVariant(group.id) ? group.id : 'status'}
+                  statusDot={option.statusDot}
+                  selected={selected[group.id] === option.id}
+                  onClick={() => onSelect(group.id, option.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </aside>

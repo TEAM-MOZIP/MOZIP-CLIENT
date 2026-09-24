@@ -12,7 +12,7 @@ const ChatFloatingButton = ({
   return (
     <button
       type={type}
-      aria-label="Mozip AI"
+      aria-label="MOZIP AI"
       className={[
         'group inline-flex h-[5.6rem] w-[5.6rem] cursor-pointer items-center justify-center overflow-hidden rounded-full bg-primary',
         'shadow-[0_0.4rem_1.2rem_rgba(0,0,0,0.15)] ring-1 ring-transparent',
@@ -49,7 +49,7 @@ const ChatFloatingButton = ({
           'group-focus-visible:max-w-[10rem] group-focus-visible:opacity-100',
         ].join(' ')}
       >
-        Mozip AI
+        MOZIP AI
       </span>
     </button>
   );

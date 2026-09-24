@@ -31,7 +31,7 @@ const ChatLogo = ({
       className={['inline-flex items-center', styles.gap, className]
         .filter(Boolean)
         .join(' ')}
-      aria-label="Mozip AI"
+      aria-label="MOZIP AI"
     >
       <img
         src={mozipAiIcon}
@@ -40,7 +40,7 @@ const ChatLogo = ({
         draggable={false}
         aria-hidden
       />
-      {showLabel && <span className={styles.label}>Mozip AI</span>}
+      {showLabel && <span className={styles.label}>MOZIP AI</span>}
     </div>
   );
 };
