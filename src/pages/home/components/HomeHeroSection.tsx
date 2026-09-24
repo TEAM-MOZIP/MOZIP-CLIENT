@@ -1,11 +1,11 @@
 import heroWatermark from '@shared/assets/hero-watermark.svg';
 import { useTypingAnimation } from '@pages/home/hooks/useTypingAnimation';
 
-const HERO_COPY = '나를 위한 혜택 모음집, 신청까지 한 번에';
+const HERO_COPY = '나를 위한 정책 모음집, AI 요약부터 신청 가이드까지';
 
 const HERO_TYPING_PAUSES = [
   {
-    afterIndex: Array.from('나를 위한 혜택 모음집,').length,
+    afterIndex: Array.from('나를 위한 정책 모음집,').length,
     duration: 500,
   },
 ] as const;
