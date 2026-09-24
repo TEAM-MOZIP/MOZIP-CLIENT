@@ -29,7 +29,7 @@ export type PackageCategoryView = {
 export const PACKAGE_ITEMS: PackageItem[] = [
   {
     id: 'job-seeker',
-    title: '취업 준비생',
+    title: '취업 준비생 패키지',
     headline: '취업 준비,\n혼자 하지 마세요',
     pattern: patternAsterisk,
     theme: 'yellow',
@@ -37,7 +37,7 @@ export const PACKAGE_ITEMS: PackageItem[] = [
   },
   {
     id: 'solo-youth',
-    title: '자취 청년',
+    title: '자취 청년 패키지',
     headline: '첫 자취,\n월세부터 챙겨요',
     pattern: patternHalfCircle,
     theme: 'black',
@@ -45,7 +45,7 @@ export const PACKAGE_ITEMS: PackageItem[] = [
   },
   {
     id: 'senior',
-    title: '어르신',
+    title: '정보취약계층 패키지',
     headline: '어르신 혜택,\n쉬운 말로 풀었어요',
     pattern: patternQuarter,
     theme: 'yellow',
@@ -53,7 +53,7 @@ export const PACKAGE_ITEMS: PackageItem[] = [
   },
   {
     id: 'teen',
-    title: '청소년',
+    title: '청소년 패키지',
     headline: '부모님 동의도,\n한 번에 전달해요',
     pattern: patternChevron,
     theme: 'black',

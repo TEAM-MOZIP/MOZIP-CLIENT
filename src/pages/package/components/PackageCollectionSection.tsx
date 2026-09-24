@@ -10,7 +10,7 @@ const PackageCollectionSection = ({ items }: PackageCollectionSectionProps) => {
   const navigate = useNavigate();
 
   return (
-    <section className="w-full bg-primary-sub-3 py-[4rem]">
+    <section className="w-full bg-background-default py-[4rem]">
       <div className="mx-auto w-full px-16">
         <h2 className="text-heading-2 text-title">정책 패키지 모음</h2>
         <p className="mt-[0.4rem] text-body-2 text-body">
