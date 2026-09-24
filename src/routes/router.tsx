@@ -35,6 +35,10 @@ const router = createBrowserRouter([
             path: 'mypage',
             element: <MyPage />,
           },
+          {
+            path: 'mypage/profile/edit',
+            element: <OnboardingPage mode="edit" />,
+          },
         ],
       },
       {

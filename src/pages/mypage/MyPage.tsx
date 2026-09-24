@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import ProfileInfo from '@pages/mypage/components/profile/ProfileInfo';
 import ProfileDetails from '@pages/mypage/components/profile/ProfileDetails';
 import CalendarSection from '@pages/mypage/components/CalendarSection';
@@ -8,6 +9,7 @@ import { mapUserProfileToDetails } from '@pages/mypage/utils/mapUserProfileToDet
 import type { ProfileInfoData } from '@pages/mypage/types';
 
 const MyPage = () => {
+  const navigate = useNavigate();
   const { data: me } = useGetMe();
   const { data: myProfile } = useGetMyProfile();
 
@@ -27,7 +29,12 @@ const MyPage = () => {
         <div className="flex flex-col gap-[6rem] lg:flex-row lg:items-start">
           <aside className="flex w-full shrink-0 flex-col gap-[2rem] lg:w-[32rem]">
             <ProfileInfo profile={profile} />
-            {profileDetails && <ProfileDetails details={profileDetails} />}
+            {profileDetails && (
+              <ProfileDetails
+                details={profileDetails}
+                onEdit={() => navigate('/mypage/profile/edit')}
+              />
+            )}
           </aside>
 
           <div className="flex min-w-0 flex-1 flex-col gap-[6rem]">

@@ -9,6 +9,7 @@ import EmploymentStatusStep from '@pages/onboarding/components/step/EmploymentSt
 import HouseholdTypeStep from '@pages/onboarding/components/step/HouseholdTypeStep'; // Q5
 import IncomeStep from '@pages/onboarding/components/step/IncomeStep'; // Q6
 import InterestStep from '@pages/onboarding/components/step/InterestStep'; // Q7
+import { useGetMyProfile } from '@pages/mypage/hooks/useGetMyProfile';
 import { useOnboarding } from '@pages/onboarding/hooks/useOnboarding';
 import { useOnboardingSubmit } from '@pages/onboarding/hooks/useOnboardingSubmit';
 import { useRegions } from '@pages/onboarding/hooks/useRegions';
@@ -17,11 +18,22 @@ import {
   type OnboardingAnswers,
 } from '@pages/onboarding/types/onboarding';
 import { getOnboardingErrorMessage } from '@pages/onboarding/utils/getOnboardingErrorMessage';
+import { mapUserProfileToAnswers } from '@pages/onboarding/utils/mapUserProfileToAnswers';
 import { saveOnboardingInterests } from '@pages/onboarding/utils/onboardingInterestsStorage';
 import { toUserProfileUpdateRequest } from '@pages/onboarding/utils/toUserProfileUpdateRequest';
 
-const OnboardingPage = () => {
+type OnboardingPageProps = {
+  mode?: 'create' | 'edit';
+};
+
+type OnboardingFlowProps = {
+  mode: 'create' | 'edit';
+  initialAnswers?: OnboardingAnswers;
+};
+
+const OnboardingFlow = ({ mode, initialAnswers }: OnboardingFlowProps) => {
   const navigate = useNavigate();
+  const isEdit = mode === 'edit';
   const { data: regions = [], isLoading: isRegionsLoading } = useRegions();
   const { mutateAsync, isPending, error } = useOnboardingSubmit();
 
@@ -30,13 +42,17 @@ const OnboardingPage = () => {
       try {
         await mutateAsync(toUserProfileUpdateRequest(answers));
         saveOnboardingInterests(answers.interests);
-        navigate('/');
+        navigate(isEdit ? '/mypage' : '/', { replace: isEdit });
       } catch {
         // 실패 메시지는 useOnboardingSubmit의 error 상태로 화면에 노출한다.
       }
     },
-    [mutateAsync, navigate]
+    [isEdit, mutateAsync, navigate]
   );
+
+  const handleSkip = useCallback(() => {
+    navigate(isEdit ? '/mypage' : '/', { replace: isEdit });
+  }, [isEdit, navigate]);
 
   const {
     step,
@@ -54,7 +70,11 @@ const OnboardingPage = () => {
     setIncomeType,
     setIncomeValue,
     toggleInterest,
-  } = useOnboarding(handleComplete);
+  } = useOnboarding(handleComplete, {
+    initialAnswers,
+    initialStep: isEdit ? ONBOARDING_STEP.birthDate : ONBOARDING_STEP.intro,
+    onSkip: handleSkip,
+  });
 
   if (step === ONBOARDING_STEP.intro) {
     return <OnboardingIntro onStart={start} onLater={skipAll} />;
@@ -130,6 +150,24 @@ const OnboardingPage = () => {
       )}
     </OnboardingStepLayout>
   );
+};
+
+const EditOnboardingPage = () => {
+  const { data: myProfile, isLoading } = useGetMyProfile();
+
+  if (isLoading) return null;
+
+  return (
+    <OnboardingFlow
+      mode="edit"
+      initialAnswers={mapUserProfileToAnswers(myProfile)}
+    />
+  );
+};
+
+const OnboardingPage = ({ mode = 'create' }: OnboardingPageProps) => {
+  if (mode === 'edit') return <EditOnboardingPage />;
+  return <OnboardingFlow mode="create" />;
 };
 
 export default OnboardingPage;
