@@ -88,7 +88,7 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
       ref={panelRef}
       role="dialog"
       aria-modal="true"
-      aria-label="Mozip AI"
+      aria-label="MOZIP AI"
       data-chat-floating="true"
       className="fixed right-[4rem] bottom-[12rem] z-[200] flex h-[50rem] w-[38rem] flex-col overflow-hidden rounded-[2rem] border border-gray-200 bg-white shadow-[0_0.8rem_2.4rem_rgba(0,0,0,0.12)]"
     >
