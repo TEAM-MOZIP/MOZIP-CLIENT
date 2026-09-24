@@ -25,12 +25,23 @@ const INITIAL_ANSWERS: OnboardingAnswers = {
 const toggleItem = (items: string[], id: string) =>
   items.includes(id) ? items.filter((item) => item !== id) : [...items, id];
 
+type UseOnboardingOptions = {
+  initialAnswers?: OnboardingAnswers;
+  initialStep?: OnboardingStep;
+  onSkip?: () => void;
+};
+
 export const useOnboarding = (
-  onComplete: (answers: OnboardingAnswers) => void
+  onComplete: (answers: OnboardingAnswers) => void,
+  {
+    initialAnswers = INITIAL_ANSWERS,
+    initialStep = ONBOARDING_STEP.intro,
+    onSkip,
+  }: UseOnboardingOptions = {}
 ) => {
   const navigate = useNavigate();
-  const [step, setStep] = useState<OnboardingStep>(ONBOARDING_STEP.intro);
-  const [answers, setAnswers] = useState<OnboardingAnswers>(INITIAL_ANSWERS);
+  const [step, setStep] = useState<OnboardingStep>(initialStep);
+  const [answers, setAnswers] = useState<OnboardingAnswers>(initialAnswers);
 
   const canGoNext = useMemo(() => {
     switch (step) {
@@ -72,8 +83,12 @@ export const useOnboarding = (
   }, []);
 
   const skipAll = useCallback(() => {
+    if (onSkip) {
+      onSkip();
+      return;
+    }
     navigate('/');
-  }, [navigate]);
+  }, [navigate, onSkip]);
 
   const setBirthDate = useCallback((birthDate: string) => {
     setAnswers((prev) => ({ ...prev, birthDate }));
