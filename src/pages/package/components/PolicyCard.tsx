@@ -9,7 +9,7 @@ import {
 } from '@pages/package/utils/getPolicyPeriod';
 import bookmarkIcon from '@shared/assets/icons/bookmark.svg';
 import bookmarkFilledIcon from '@shared/assets/icons/bookmark-filled.svg';
-import shareIcon from '@shared/assets/icons/share.svg';
+import rightChevronIcon from '@shared/assets/icons/right-chevron.svg';
 import { displayValue } from '@shared/utils/displayValue';
 
 const BADGE_TONE_CLASS: Record<AvailabilityBadgeTone, string> = {
@@ -43,7 +43,6 @@ const PolicyCard = ({
   regionScope,
   regions,
   onBookmarkClick,
-  onShareClick,
   onClick,
 }: PolicyCardProps) => {
   const dDay = getDDay(applicationEndDate, applicationType);
@@ -65,9 +64,9 @@ const PolicyCard = ({
   return (
     <div
       className={[
-        'flex min-w-0 flex-col overflow-hidden rounded-[1rem] border border-gray-400 bg-white p-[2rem] gap-[2rem]',
+        'flex min-w-0 flex-col overflow-hidden rounded-[2rem] bg-white p-[2.4rem] shadow-[0_0.4rem_1.6rem_rgba(0,0,0,0.12)] gap-[2rem]',
         onClick
-          ? 'cursor-pointer transition-colors duration-300 hover:bg-primary-sub-3/50'
+          ? 'cursor-pointer transition-[transform,box-shadow] duration-300 hover:-translate-y-[0.6rem] hover:shadow-[0_1.2rem_3.2rem_rgba(0,0,0,0.18)]'
           : '',
       ].join(' ')}
       onClick={onClick}
@@ -85,35 +84,46 @@ const PolicyCard = ({
       tabIndex={onClick ? 0 : undefined}
     >
       <div className="flex items-center justify-between gap-[1rem]">
-        <span className="text-body-2 font-medium text-point">
+        <span className="text-heading-3 font-bold text-gray-800">
           {dDay !== null
             ? `D-${dDay}`
             : applicationType === 'ALWAYS'
               ? '상시모집'
               : ''}
         </span>
-        {bookmarked !== null && (
-          <button
-            type="button"
-            aria-label={bookmarked ? '북마크 해제' : '북마크'}
-            aria-pressed={bookmarked}
-            onClick={(e) => {
-              e.stopPropagation();
-              onBookmarkClick?.();
-            }}
-            className="shrink-0 cursor-pointer"
+        <div className="flex shrink-0 items-center gap-[1rem]">
+          {bookmarked !== null && (
+            <button
+              type="button"
+              aria-label={bookmarked ? '북마크 해제' : '북마크'}
+              aria-pressed={bookmarked}
+              onClick={(e) => {
+                e.stopPropagation();
+                onBookmarkClick?.();
+              }}
+              className="shrink-0 cursor-pointer"
+            >
+              <img
+                src={bookmarked ? bookmarkFilledIcon : bookmarkIcon}
+                alt=""
+                aria-hidden
+                className="size-[2.4rem]"
+              />
+            </button>
+          )}
+          <span
+            aria-hidden
+            className="flex size-[4.2rem] items-center justify-center rounded-full bg-gray-100"
           >
-            <img
-              src={bookmarked ? bookmarkFilledIcon : bookmarkIcon}
-              alt=""
-              aria-hidden
-              className="size-[2.4rem]"
-            />
-          </button>
-        )}
+            <img src={rightChevronIcon} alt="" className="size-[1.8rem]" />
+          </span>
+        </div>
       </div>
 
-      <h3 className="text-body-1 font-bold text-title truncate" title={title}>
+      <h3
+        className="text-heading-3 font-bold text-title truncate"
+        title={title}
+      >
         {title}
       </h3>
 
@@ -174,17 +184,6 @@ const PolicyCard = ({
             </span>
           )}
         </div>
-        <button
-          type="button"
-          aria-label="공유"
-          onClick={(e) => {
-            e.stopPropagation();
-            onShareClick?.();
-          }}
-          className="shrink-0 cursor-pointer"
-        >
-          <img src={shareIcon} alt="" aria-hidden className="size-[2.4rem]" />
-        </button>
       </div>
     </div>
   );
