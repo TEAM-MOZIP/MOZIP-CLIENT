@@ -17,7 +17,7 @@ const AVAILABILITY_OPTIONS: {
   { id: 'UPCOMING', label: '예정', statusDot: 'blue' },
 ];
 
-const AGE_GROUP_LABELS: Record<(typeof AGE_GROUPS)[number], string> = {
+export const AGE_GROUP_LABELS: Record<(typeof AGE_GROUPS)[number], string> = {
   UNDER_19: '만 19세 미만',
   AGE_19_24: '만 19~24세',
   AGE_25_29: '만 25~29세',
@@ -37,12 +37,12 @@ const isNamedOption = (value: {
   typeof value.id === 'number' && typeof value.name === 'string';
 
 type AgeFilterState = {
-  /** true면 연령 칩 대신 안내 문구를 보여준다(추천순처럼 연령 필터를 쓸 수 없는 경우). */
-  locked: boolean;
-  notice?: string;
+  /** 연령 칩 위에 보여줄 안내(맞춤 추천 적용 중·다른 연령 보는 중 등). */
+  hint?: string;
+  hintAction?: FilterGroup['hintAction'];
 };
 
-export const usePolicyFilterGroups = ({ locked, notice }: AgeFilterState) => {
+export const usePolicyFilterGroups = ({ hint, hintAction }: AgeFilterState) => {
   const { data: categories = [] } = useCategories();
   const { data: regions = [] } = useRegions();
 
@@ -78,8 +78,7 @@ export const usePolicyFilterGroups = ({ locked, notice }: AgeFilterState) => {
       ],
     });
 
-    // 연령 그룹 제목은 항상 보여준다. 응답이 오기 전후로 그룹이 생겼다 사라지는 깜빡임을 막기 위함이다.
-    // 연령 필터를 쓸 수 없을 때는 칩 대신 안내 문구만 보여준다.
+    // 연령 칩은 모든 정렬·로그인 상태에서 쓸 수 있다. 로그인 사용자는 내 연령 칩 = 맞춤 추천이다.
     groups.push({
       id: 'age',
       title: '연령',
@@ -90,9 +89,10 @@ export const usePolicyFilterGroups = ({ locked, notice }: AgeFilterState) => {
           label: AGE_GROUP_LABELS[ageGroup],
         })),
       ],
-      notice: locked ? notice : undefined,
+      hint,
+      hintAction,
     });
 
     return groups;
-  }, [locked, notice, categories, regions]);
+  }, [hint, hintAction, categories, regions]);
 };

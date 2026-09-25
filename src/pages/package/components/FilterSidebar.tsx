@@ -18,6 +18,22 @@ const FilterSidebar = ({ groups, selected, onSelect }: FilterSidebarProps) => {
       {groups.map((group) => (
         <div key={group.id} className="mb-[4rem]">
           <h3 className="mb-[1rem] text-body-3 text-gray-700">{group.title}</h3>
+          {group.hint && (
+            <div className="mb-[1.2rem] rounded-[0.8rem] bg-gray-100 px-[1.2rem] py-[1rem]">
+              <p className="whitespace-pre-line break-keep text-caption text-gray-600">
+                {group.hint}
+              </p>
+              {group.hintAction && (
+                <button
+                  type="button"
+                  onClick={group.hintAction.onClick}
+                  className="mt-[0.6rem] cursor-pointer text-caption font-semibold text-title underline underline-offset-2"
+                >
+                  {group.hintAction.label}
+                </button>
+              )}
+            </div>
+          )}
           {group.notice ? (
             <p className="whitespace-pre-line text-caption text-gray-500">
               {group.notice}

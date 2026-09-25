@@ -13,6 +13,8 @@ import type {
   PolicyListItem,
   PolicySortOption,
 } from '@pages/package/types/package';
+import { getAgeGroupFromBirthDate } from '@pages/package/utils/getAgeGroup';
+import { useGetMe } from '@pages/mypage/hooks/useGetMe';
 import arrowDownIcon from '@shared/assets/icons/chevron-down.svg';
 import { selectIsLoggedIn, useAuthStore } from '@shared/stores/useAuthStore';
 
@@ -22,24 +24,20 @@ const SORT_OPTIONS: { value: PolicySortOption; label: string }[] = [
   { value: 'applicationEndDate,asc', label: '마감 임박 순' },
 ];
 
+// 연령은 로그인 상태에 따라 기본값이 달라서(내 연령 구간) 따로 관리한다.
 type FilterSelection = {
   status: string;
-  age: string;
   category: string;
   region: string;
 };
 
 const INITIAL_SELECTION: FilterSelection = {
   status: 'all',
-  age: 'all',
   category: 'all',
   region: 'all',
 };
 
-const PERSONALIZED_AGE_NOTICE =
-  '온보딩에서 입력한 정보로 맞춤 추천하고 있어요.\n연령 필터 없이도 내게 맞는 정책만 보여요.';
-const RECOMMENDED_AGE_NOTICE =
-  '신청 가능한 정책부터 추천하고 있어요.\n연령 필터는 최신순·마감 임박 순에서 사용해 보세요.';
+const ALL_AGES = 'all';
 
 const PolicyListSection = () => {
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
@@ -54,13 +52,19 @@ const PolicyListSection = () => {
   const [selectedPolicyId, setSelectedPolicyId] = useState<number | null>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
-  // 연령 필터를 쓸 수 있는지는 응답(source)이 아니라 요청 전에 알 수 있는 값으로 정한다.
-  // 응답을 기다리면 첫 로딩·정렬 변경 때 연령 그룹이 생겼다 사라지는 깜빡임이 생긴다.
-  // - 로그인 + 프로필 있음(프로필 확인 중 포함) → 맞춤 추천 목록: 서버가 연령 필터를 지원하지 않음
-  // - 추천순 → 공개 추천 목록: 서버가 연령 필터를 지원하지 않음
-  const isPersonalized =
+  const { data: me } = useGetMe();
+  const [ageOverride, setAgeOverride] = useState<string | null>(null);
+
+  // 로그인 + 프로필 있음(프로필 확인 중 포함)이면 맞춤 추천을 쓸 수 있다.
+  // 응답(source)이 아니라 요청 전에 알 수 있는 값으로 정해야 첫 로딩 때 필터 UI가 깜빡이지 않는다.
+  const canPersonalize =
     isLoggedIn && (isMyProfileLoading || myProfile != null);
-  const isAgeFilterLocked = isPersonalized || sort === 'recommended';
+  const myAgeGroup = getAgeGroupFromBirthDate(myProfile?.birthDate);
+  // 로그인 사용자는 "내 연령 구간" 칩이 기본 선택 = 맞춤 추천. 다른 칩을 고르면 맞춤을 끄고 그 연령의 공개 목록을 보여준다.
+  // 프로필에 생년월일이 없으면 "전체"가 맞춤 추천 자리다.
+  const defaultAge = canPersonalize ? (myAgeGroup ?? ALL_AGES) : ALL_AGES;
+  const selectedAge = ageOverride ?? defaultAge;
+  const isPersonalized = canPersonalize && selectedAge === defaultAge;
 
   const filters = useMemo<PolicyListFilters>(
     () => ({
@@ -73,12 +77,13 @@ const PolicyListSection = () => {
           ? undefined
           : (selection.status as AvailabilityFilter),
       ageGroup:
-        isAgeFilterLocked || selection.age === 'all'
+        isPersonalized || selectedAge === ALL_AGES
           ? undefined
-          : (selection.age as AgeGroup),
+          : (selectedAge as AgeGroup),
       sort,
+      personalized: isPersonalized,
     }),
-    [selection, sort, isAgeFilterLocked]
+    [selection, sort, isPersonalized, selectedAge]
   );
 
   const {
@@ -96,9 +101,26 @@ const PolicyListSection = () => {
   const totalElements = pages[0]?.totalElements ?? 0;
   const showSort = !isPersonalized;
 
+  const nickname = me?.nickname?.trim() || '회원';
+  const ageHint = !canPersonalize
+    ? undefined
+    : isPersonalized
+      ? `${nickname}님을 위한 맞춤 추천이 적용돼 있어요.\n다른 연령을 고르면 가족·지인 정책도 볼 수 있어요.`
+      : '다른 연령 기준으로 보고 있어요.\n자격 충족 표시는 맞춤 추천에서만 보여요.';
+  const ageHintAction = useMemo(
+    () =>
+      canPersonalize && !isPersonalized
+        ? {
+            label: '내 맞춤 추천으로 돌아가기',
+            onClick: () => setAgeOverride(null),
+          }
+        : undefined,
+    [canPersonalize, isPersonalized]
+  );
+
   const filterGroups = usePolicyFilterGroups({
-    locked: isAgeFilterLocked,
-    notice: isPersonalized ? PERSONALIZED_AGE_NOTICE : RECOMMENDED_AGE_NOTICE,
+    hint: ageHint,
+    hintAction: ageHintAction,
   });
 
   const selectedSortLabel =
@@ -118,7 +140,11 @@ const PolicyListSection = () => {
   }, [isSortOpen]);
 
   const handleSelectFilter = (groupId: string, optionId: string) => {
-    if (groupId === 'age' && isAgeFilterLocked) return;
+    if (groupId === 'age') {
+      // 기본값(내 연령 구간)을 다시 고르면 맞춤 추천으로 돌아간다.
+      setAgeOverride(optionId === defaultAge ? null : optionId);
+      return;
+    }
     setSelection((prev) => ({ ...prev, [groupId]: optionId }));
   };
 
@@ -151,7 +177,7 @@ const PolicyListSection = () => {
         <div className="mt-[4rem] flex items-start gap-[3.2rem]">
           <FilterSidebar
             groups={filterGroups}
-            selected={selection}
+            selected={{ ...selection, age: selectedAge }}
             onSelect={handleSelectFilter}
           />
 
@@ -197,11 +223,6 @@ const PolicyListSection = () => {
                           role="menuitem"
                           onClick={() => {
                             setSort(option.value);
-                            // 연령 필터를 못 쓰는 정렬로 바꾸면 이전 선택을 초기화한다 —
-                            // 숨겨진 선택값이 다른 정렬로 돌아왔을 때 몰래 다시 적용되지 않게.
-                            if (option.value === 'recommended') {
-                              setSelection((prev) => ({ ...prev, age: 'all' }));
-                            }
                             setIsSortOpen(false);
                           }}
                           className="flex w-full cursor-pointer items-center whitespace-nowrap px-[1rem] py-[0.8rem] text-body-3 text-body font-medium hover:bg-gray-100"
