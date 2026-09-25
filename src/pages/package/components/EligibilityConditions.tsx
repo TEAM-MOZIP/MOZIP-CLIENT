@@ -157,14 +157,35 @@ const EligibilityRadar = ({
 
 type EligibilityConditionsProps = {
   conditions: ConditionResult[];
+  /** detail: 정책 상세(목록 + 레이더), chat: 챗봇 답변(테두리 박스 안 목록만) */
+  variant?: 'detail' | 'chat';
 };
 
 /** 나의 신청 자격: 왼쪽에 조건별 충족 여부와 이유, 오른쪽에 조건 레이더(조건 3개 이상일 때만). */
-const EligibilityConditions = ({ conditions }: EligibilityConditionsProps) => (
-  <div className="mt-[1.4rem] flex flex-col gap-[2rem] sm:flex-row sm:items-center sm:gap-[7rem]">
-    <ul className="flex min-w-0 flex-col gap-[1rem] pl-[1.2rem]">
+// 챗봇 답변 안에서는 폭이 좁아 레이더 없이 목록만, 충족 표시는 연한 노랑으로 보여준다.
+const CHAT_MATCHED_CLASS_NAME =
+  'border border-primary-sub-2 bg-primary-sub-3 text-title';
+
+const EligibilityConditions = ({
+  conditions,
+  variant = 'detail',
+}: EligibilityConditionsProps) => (
+  <div
+    className={
+      variant === 'chat'
+        ? 'rounded-[1.2rem] border border-gray-200 px-[1.6rem] py-[1.4rem]'
+        : 'mt-[1.4rem] flex flex-col gap-[2rem] sm:flex-row sm:items-center sm:gap-[7rem]'
+    }
+  >
+    <ul
+      className={`flex min-w-0 flex-col gap-[1rem] ${variant === 'chat' ? '' : 'pl-[1.2rem]'}`}
+    >
       {conditions.map((condition, index) => {
         const status = statusOf(condition);
+        const statusClassName =
+          variant === 'chat' && status === 'MATCHED'
+            ? CHAT_MATCHED_CLASS_NAME
+            : STATUS_CLASS_NAMES[status];
         return (
           <li
             key={`${condition.type}-${index}`}
@@ -173,7 +194,7 @@ const EligibilityConditions = ({ conditions }: EligibilityConditionsProps) => (
             <span
               role="img"
               aria-label={getConditionStatusLabel(condition.status)}
-              className={`mt-[0.1rem] flex size-[2rem] shrink-0 items-center justify-center rounded-full ${STATUS_CLASS_NAMES[status]}`}
+              className={`mt-[0.1rem] flex size-[2rem] shrink-0 items-center justify-center rounded-full ${statusClassName}`}
             >
               <StatusIcon status={status} />
             </span>
@@ -190,7 +211,7 @@ const EligibilityConditions = ({ conditions }: EligibilityConditionsProps) => (
       })}
     </ul>
 
-    {conditions.length >= MIN_RADAR_AXES && (
+    {variant === 'detail' && conditions.length >= MIN_RADAR_AXES && (
       <div className="flex justify-center">
         <EligibilityRadar conditions={conditions} />
       </div>

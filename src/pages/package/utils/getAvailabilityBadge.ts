@@ -7,6 +7,15 @@ export type AvailabilityBadgeTone =
   | 'closed'
   | 'review';
 
+// 상태 필터 칩과 같은 모양의 접수 상태 칩에 쓰는 점 색(흰 배경 + 회색 테두리 + 상태 색 점).
+export const AVAILABILITY_DOT_CLASS: Record<AvailabilityBadgeTone, string> = {
+  open: 'bg-green-500',
+  closing: 'bg-red-500',
+  scheduled: 'bg-blue-500',
+  closed: 'bg-gray-400',
+  review: 'bg-gray-400',
+};
+
 export type AvailabilityBadge = {
   label: string;
   tone: AvailabilityBadgeTone;
