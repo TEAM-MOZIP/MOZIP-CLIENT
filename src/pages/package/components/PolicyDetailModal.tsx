@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { useApplicationGuide } from '@pages/package/hooks/useApplicationGuide';
 import { usePolicyDetail } from '@pages/package/hooks/usePolicyDetail';
@@ -148,6 +148,53 @@ const BulletList = ({ items }: { items: string[] }) => (
 const TextBlock = ({ children }: { children: ReactNode }) => (
   <p className="text-body-3 text-body whitespace-pre-line">{children}</p>
 );
+
+// 판정 뱃지 + 판정 이유. 이유가 두 줄 이상으로 줄바꿈되면 뱃지 위아래 여백을 늘려
+// 문단 높이와 어울리게 하고, 뱃지는 문단 전체의 세로 가운데에 둔다.
+const EligibilityVerdict = ({
+  label,
+  reason,
+}: {
+  label: string;
+  reason?: string;
+}) => {
+  const reasonRef = useRef<HTMLSpanElement>(null);
+  const [isMultiline, setIsMultiline] = useState(false);
+
+  useEffect(() => {
+    const element = reasonRef.current;
+    if (!element) return;
+
+    const observer = new ResizeObserver(() => {
+      const lineHeight = parseFloat(getComputedStyle(element).lineHeight);
+      setIsMultiline(
+        Number.isFinite(lineHeight) && element.offsetHeight > lineHeight * 1.5
+      );
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div className="flex items-center gap-[1.2rem]">
+      <span
+        className={`shrink-0 whitespace-nowrap rounded-[0.8rem] border border-gray-300 bg-gray-100 px-[1rem] font-semibold text-body-3 text-title ${
+          isMultiline ? 'py-[0.8rem]' : ''
+        }`}
+      >
+        {label}
+      </span>
+      {reason && (
+        <span
+          ref={reasonRef}
+          className="min-w-0 flex-1 break-keep text-body-3 text-body"
+        >
+          {reason}
+        </span>
+      )}
+    </div>
+  );
+};
 
 const PolicyDetailModal = ({
   policyId,
@@ -338,20 +385,13 @@ const PolicyDetailModal = ({
               {isLoggedIn && isEvaluationLoading && <EvaluationSkeleton />}
               {evaluation?.eligibility?.status && (
                 <DetailSection title="나의 신청 자격">
-                  {/* 판정 이유가 두 줄이 돼도 뱃지가 문단 전체의 세로 가운데에 오도록 가운데 정렬한다. */}
-                  <div className="flex items-center gap-[0.8rem]">
-                    <span className="shrink-0 whitespace-nowrap rounded-[0.8rem] border border-gray-300 bg-gray-100 px-[1rem] font-semibold text-body-3 text-title">
-                      {
-                        ELIGIBILITY_STATUS_LABELS[evaluation.eligibility.status]
-                          .label
-                      }
-                    </span>
-                    {evaluation.eligibility.overallReason && (
-                      <span className="min-w-0 flex-1 break-keep text-body-3 text-body">
-                        {evaluation.eligibility.overallReason}
-                      </span>
-                    )}
-                  </div>
+                  <EligibilityVerdict
+                    label={
+                      ELIGIBILITY_STATUS_LABELS[evaluation.eligibility.status]
+                        .label
+                    }
+                    reason={evaluation.eligibility.overallReason}
+                  />
 
                   {evaluation.eligibility.conditionResults &&
                     evaluation.eligibility.conditionResults.length > 0 && (

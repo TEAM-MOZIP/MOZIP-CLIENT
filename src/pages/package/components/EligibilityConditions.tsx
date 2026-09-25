@@ -161,8 +161,8 @@ type EligibilityConditionsProps = {
 
 /** 나의 신청 자격: 왼쪽에 조건별 충족 여부와 이유, 오른쪽에 조건 레이더(조건 3개 이상일 때만). */
 const EligibilityConditions = ({ conditions }: EligibilityConditionsProps) => (
-  <div className="mt-[1.4rem] flex flex-col gap-[2rem] sm:flex-row sm:items-center">
-    <ul className="flex min-w-0 flex-1 flex-col gap-[1rem]">
+  <div className="mt-[1.4rem] flex flex-col gap-[2rem] sm:flex-row sm:items-center sm:gap-[7rem]">
+    <ul className="flex min-w-0 flex-col gap-[1rem] pl-[1.2rem]">
       {conditions.map((condition, index) => {
         const status = statusOf(condition);
         return (
