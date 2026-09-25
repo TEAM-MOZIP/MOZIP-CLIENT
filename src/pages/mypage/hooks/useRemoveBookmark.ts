@@ -7,8 +7,13 @@ export const useRemoveBookmark = () => {
 
   return useMutation({
     mutationFn: (policyId: string | number) => removeBookmark(policyId),
-    onSuccess: () => {
+    onSuccess: (_data, policyId) => {
       void queryClient.invalidateQueries({ queryKey: MY_BOOKMARKS_QUERY_KEY });
+      // 반대 방향도 맞춘다: 마이페이지에서 해제하면 정책 목록·상세의 북마크 표시도 갱신.
+      void queryClient.invalidateQueries({ queryKey: ['policies'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['policy-detail', Number(policyId)],
+      });
     },
   });
 };
