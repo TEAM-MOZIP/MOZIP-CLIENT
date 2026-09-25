@@ -28,10 +28,9 @@ type PolicyListPage = {
 
 const fetchPolicyListPage = async (
   filters: PolicyListFilters,
-  isLoggedIn: boolean,
   page: number
 ): Promise<PolicyListPage> => {
-  if (isLoggedIn) {
+  if (filters.personalized) {
     try {
       const data = await getPersonalizedPolicies({
         keyword: filters.keyword,
@@ -62,6 +61,7 @@ const fetchPolicyListPage = async (
       keyword: filters.keyword,
       categoryId: filters.categoryId,
       regionId: filters.regionId,
+      ageGroup: filters.ageGroup,
       availability: filters.availability,
       page,
       size: PAGE_SIZE,
@@ -105,8 +105,7 @@ export const usePolicyList = (filters: PolicyListFilters) => {
 
   return useInfiniteQuery({
     queryKey: ['policies', isLoggedIn, filters],
-    queryFn: ({ pageParam }) =>
-      fetchPolicyListPage(filters, isLoggedIn, pageParam),
+    queryFn: ({ pageParam }) => fetchPolicyListPage(filters, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage) =>
       lastPage.page + 1 < lastPage.totalPages ? lastPage.page + 1 : undefined,

@@ -19,7 +19,10 @@ import type {
   TermExplanationResponse,
 } from '@pages/package/types/package';
 
-export type PolicyPageParams = Omit<PolicyListFilters, 'sort'> & {
+export type PolicyPageParams = Omit<
+  PolicyListFilters,
+  'sort' | 'personalized'
+> & {
   sort?: PolicySort;
   page: number;
   size: number;
@@ -33,9 +36,9 @@ export const getPolicies = async (params: PolicyPageParams) => {
   return data;
 };
 
-// 인증 불필요, 신청 가능 여부 기준 고정 정렬 — ageGroup/sort 파라미터 미지원
+// 인증 불필요, 신청 가능 여부 기준 고정 정렬 — sort 파라미터 미지원(ageGroup은 지원)
 export const getRecommendedPolicies = async (
-  params: Omit<PolicyPageParams, 'ageGroup' | 'sort'>
+  params: Omit<PolicyPageParams, 'sort'>
 ) => {
   const { data } = await axiosInstance.get<PageResponsePolicySummaryResponse>(
     ENDPOINTS.POLICIES.RECOMMENDED,

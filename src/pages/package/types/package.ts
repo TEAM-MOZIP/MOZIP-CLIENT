@@ -96,6 +96,8 @@ export type PolicyListItem = {
   regions: PolicyListRegion[];
   // 개인화(로그인+프로필) 응답에만 있는 자격 판정. 공개 목록·북마크는 null.
   eligibilityStatus: EligibilityStatus | null;
+  // 정책 대상 나이 범위(만). 둘 다 null이면 연령 제한 없음. 북마크처럼 정보가 없는 응답은 ageRange 자체가 null.
+  ageRange: { min: number | null; max: number | null } | null;
 };
 
 export type EligibilityStatus = NonNullable<EligibilityResponse['status']>;
@@ -104,9 +106,11 @@ export type PolicyListFilters = {
   keyword?: string;
   categoryId?: number;
   regionId?: number;
-  ageGroup?: AgeGroup; // recommended/personalized 소스에선 서버가 지원하지 않아 무시됨
+  ageGroup?: AgeGroup; // personalized 소스에선 서버가 지원하지 않아 무시됨
   availability?: AvailabilityFilter;
   sort?: PolicySortOption; // personalized 소스에선 서버가 지원하지 않아 무시됨
+  // true면 로그인 사용자 프로필 기준 맞춤 추천 목록을 요청한다(연령·정렬 무시).
+  personalized?: boolean;
 };
 
 // ---- 대상자별 정책 패키지 ----
