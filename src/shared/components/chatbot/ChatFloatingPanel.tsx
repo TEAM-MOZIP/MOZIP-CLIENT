@@ -14,7 +14,7 @@ type ChatFloatingPanelProps = {
 };
 
 const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
-  const { messages, sendMessage, appendExchange, isSending } = useChatSession();
+  const { messages, sendMessage, appendMessage, isSending } = useChatSession();
   const pendingMessage = useChatPanelStore((state) => state.pendingMessage);
   const pendingExchange = useChatPanelStore((state) => state.pendingExchange);
   const clearPendingMessage = useChatPanelStore(
@@ -24,12 +24,16 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
     (state) => state.clearPendingExchange
   );
   const panelRef = useRef<HTMLDivElement>(null);
+  const shownQuestionIdRef = useRef<string | null>(null);
+  // 용어 설명처럼 답변을 기다리는 중인 교환이 있으면 "설명하는 중"을 띄운다.
+  const isExplaining =
+    pendingExchange !== null && pendingExchange.answer === null;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!scrollRef.current) return;
     scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-  }, [messages, isSending]);
+  }, [messages, isSending, isExplaining]);
 
   useEffect(() => {
     const message = useChatPanelStore.getState().pendingMessage;
@@ -43,9 +47,16 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
     const exchange = useChatPanelStore.getState().pendingExchange;
     if (!exchange) return;
 
+    // 질문은 교환이 시작되자마자 한 번만 띄우고, 답변은 도착했을 때 이어 붙인다.
+    if (shownQuestionIdRef.current !== exchange.id) {
+      shownQuestionIdRef.current = exchange.id;
+      appendMessage('user', exchange.question);
+    }
+    if (exchange.answer === null) return;
+
     clearPendingExchange();
-    appendExchange(exchange.question, exchange.answer);
-  }, [pendingExchange, appendExchange, clearPendingExchange]);
+    appendMessage('assistant', exchange.answer);
+  }, [pendingExchange, appendMessage, clearPendingExchange]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -137,6 +148,9 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
             className="gap-[2.4rem]"
             compact
             isSending={isSending}
+            pendingLabel={
+              isExplaining ? 'MOZIP AI가 용어를 찾고 있어요.' : undefined
+            }
           />
         </div>
 
