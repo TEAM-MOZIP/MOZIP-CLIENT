@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import FilterSidebar from '@pages/package/components/FilterSidebar';
 import PolicyCard from '@pages/package/components/PolicyCard';
 import PolicyDetailModal from '@pages/package/components/PolicyDetailModal';
@@ -49,7 +50,16 @@ const PolicyListSection = () => {
   const [bookmarkOverrides, setBookmarkOverrides] = useState<
     Record<number, boolean>
   >({});
-  const [selectedPolicyId, setSelectedPolicyId] = useState<number | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // 공유 링크(/package?policyId=123)로 들어오면 해당 정책 상세를 바로 연다.
+  const [selectedPolicyId, setSelectedPolicyId] = useState<number | null>(
+    () => {
+      const sharedPolicyId = Number(searchParams.get('policyId'));
+      return Number.isInteger(sharedPolicyId) && sharedPolicyId > 0
+        ? sharedPolicyId
+        : null;
+    }
+  );
   const sortRef = useRef<HTMLDivElement>(null);
 
   const { data: me } = useGetMe();
@@ -289,7 +299,19 @@ const PolicyListSection = () => {
       {selectedPolicyId !== null && (
         <PolicyDetailModal
           policyId={selectedPolicyId}
-          onClose={() => setSelectedPolicyId(null)}
+          onClose={() => {
+            setSelectedPolicyId(null);
+            if (searchParams.has('policyId')) {
+              setSearchParams(
+                (prev) => {
+                  const next = new URLSearchParams(prev);
+                  next.delete('policyId');
+                  return next;
+                },
+                { replace: true }
+              );
+            }
+          }}
         />
       )}
     </section>

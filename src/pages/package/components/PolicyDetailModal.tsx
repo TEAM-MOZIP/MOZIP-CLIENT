@@ -6,10 +6,16 @@ import { usePolicyEvaluation } from '@pages/package/hooks/usePolicyEvaluation';
 import { usePolicySummary } from '@pages/package/hooks/usePolicySummary';
 import EligibilityConditions from '@pages/package/components/EligibilityConditions';
 import AiSummaryLoading from '@pages/package/components/AiSummaryLoading';
+import PolicyShareMenu from '@pages/package/components/PolicyShareMenu';
 import PolicyText from '@pages/package/components/PolicyText';
 import { useTermExplanation } from '@pages/package/hooks/useTermExplanation';
 import { useToggleBookmark } from '@pages/package/hooks/useToggleBookmark';
 import { getAvailabilityBadge } from '@pages/package/utils/getAvailabilityBadge';
+import {
+  buildPolicyKakaoText,
+  buildPolicyShareText,
+  getPolicyShareUrl,
+} from '@pages/package/utils/buildPolicyShareText';
 import { getEligibilitySummary } from '@pages/package/utils/getEligibilitySummary';
 import { ELIGIBILITY_STATUS_LABELS } from '@pages/package/utils/getEvaluationLabels';
 import { formatPolicyPeriod } from '@pages/package/utils/getPolicyPeriod';
@@ -26,7 +32,6 @@ import { displayValue, EMPTY_VALUE } from '@shared/utils/displayValue';
 type PolicyDetailModalProps = {
   policyId: number;
   onClose: () => void;
-  onShareClick?: () => void;
 };
 
 const DetailSection = ({
@@ -196,11 +201,7 @@ const EligibilityVerdict = ({
   );
 };
 
-const PolicyDetailModal = ({
-  policyId,
-  onClose,
-  onShareClick,
-}: PolicyDetailModalProps) => {
+const PolicyDetailModal = ({ policyId, onClose }: PolicyDetailModalProps) => {
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
   const { data: detail, isLoading, isError } = usePolicyDetail(policyId);
   const { data: guide, isLoading: isGuideLoading } =
@@ -538,13 +539,24 @@ const PolicyDetailModal = ({
                   />
                 </button>
 
-                <button
-                  type="button"
-                  onClick={onShareClick}
-                  className="flex h-[4.4rem] flex-1 cursor-pointer items-center justify-center rounded-[0.8rem] border border-gray-300 bg-white text-button-2 text-title transition-colors duration-200 hover:bg-gray-100"
-                >
-                  공유
-                </button>
+                <PolicyShareMenu
+                  className="flex-1"
+                  getCopyText={() =>
+                    buildPolicyShareText({
+                      detail,
+                      aiSummary: aiSummary?.summary,
+                      guide: isLoggedIn ? guide : null,
+                      shareUrl: getPolicyShareUrl(policyId),
+                    })
+                  }
+                  getKakaoShare={() => ({
+                    text: buildPolicyKakaoText({
+                      detail,
+                      aiSummary: aiSummary?.summary,
+                    }),
+                    url: getPolicyShareUrl(policyId),
+                  })}
+                />
 
                 <button
                   type="button"
