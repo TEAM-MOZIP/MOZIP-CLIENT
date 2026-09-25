@@ -1,5 +1,7 @@
 import type {
+  ChatBlockResponse,
   ChatMatchedPolicyResponse,
+  ChatPolicyCardResponse,
   ChatRequest,
   ChatResponse,
   ChatTurn,
@@ -7,7 +9,9 @@ import type {
 } from '@shared/apis/generated/Api';
 
 export type {
+  ChatBlockResponse,
   ChatMatchedPolicyResponse,
+  ChatPolicyCardResponse,
   ChatRequest,
   ChatResponse,
   ChatTurn,
@@ -28,6 +32,9 @@ export type ChatMessage = {
   content: string;
   matchedPolicies?: ChatMatchedPolicyResponse[];
   unresolvedConditions?: ChatUnresolvedConditionResponse[];
+  // 블록 답변(있으면 content 대신 블록으로 그린다)과 후속 질문 칩
+  blocks?: ChatBlockResponse[];
+  followUps?: string[];
   isError?: boolean;
 };
 
