@@ -36,6 +36,8 @@ export const useChatSession = (initialMessages: ChatMessage[] = []) => {
               '응답을 받지 못했습니다. 잠시 후 다시 시도해 주세요.',
             matchedPolicies: data.matchedPolicies,
             unresolvedConditions: data.unresolvedConditions,
+            blocks: data.blocks,
+            followUps: data.followUps,
           };
 
           setMessages((prev) => [...prev, assistantMessage]);
