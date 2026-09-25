@@ -4,17 +4,14 @@ import { useApplicationGuide } from '@pages/package/hooks/useApplicationGuide';
 import { usePolicyDetail } from '@pages/package/hooks/usePolicyDetail';
 import { usePolicyEvaluation } from '@pages/package/hooks/usePolicyEvaluation';
 import { usePolicySummary } from '@pages/package/hooks/usePolicySummary';
+import EligibilityConditions from '@pages/package/components/EligibilityConditions';
 import AiSummaryLoading from '@pages/package/components/AiSummaryLoading';
 import PolicyText from '@pages/package/components/PolicyText';
 import { useTermExplanation } from '@pages/package/hooks/useTermExplanation';
 import { useToggleBookmark } from '@pages/package/hooks/useToggleBookmark';
 import { getAvailabilityBadge } from '@pages/package/utils/getAvailabilityBadge';
 import { getEligibilitySummary } from '@pages/package/utils/getEligibilitySummary';
-import {
-  ELIGIBILITY_STATUS_LABELS,
-  getConditionStatusLabel,
-  getConditionTypeLabel,
-} from '@pages/package/utils/getEvaluationLabels';
+import { ELIGIBILITY_STATUS_LABELS } from '@pages/package/utils/getEvaluationLabels';
 import { formatPolicyPeriod } from '@pages/package/utils/getPolicyPeriod';
 import { getTermExplanationErrorMessage } from '@pages/package/utils/getTermExplanationErrorMessage';
 import TextSelection, {
@@ -135,6 +132,9 @@ const EvaluationSkeleton = () => (
   </section>
 );
 
+// 원문의 "-"처럼 글자·숫자가 없는 항목은 "없음" 표시라 목록에서 뺀다.
+const hasMeaningfulText = (value: string) => /[\p{L}\p{N}]/u.test(value);
+
 const BulletList = ({ items }: { items: string[] }) => (
   <ul className="flex flex-col gap-[0.6rem]">
     {(items.length > 0 ? items : [EMPTY_VALUE]).map((item) => (
@@ -164,12 +164,26 @@ const PolicyDetailModal = ({
     usePolicyEvaluation(policyId);
   const { mutate: mutateBookmark } = useToggleBookmark();
   const { mutateAsync: explainTerm } = useTermExplanation(policyId);
-  const showExchange = useChatPanelStore((state) => state.showExchange);
+  const startExchange = useChatPanelStore((state) => state.startExchange);
+  const resolveExchange = useChatPanelStore((state) => state.resolveExchange);
   const [bookmarkOverride, setBookmarkOverride] = useState<boolean | null>(
     null
   );
 
   const bookmarked = bookmarkOverride ?? detail?.bookmarked ?? false;
+  // 준비 서류가 비었거나 "-"뿐이면 "• -"만 덩그러니 보이므로 섹션을 숨긴다.
+  const requiredDocuments = (guide?.requiredDocuments ?? []).filter(
+    hasMeaningfulText
+  );
+  // 신청 링크(가이드, 로그인 전용)와 원문 링크를 한 줄에 버튼으로 모아 보여준다. 같은 주소면 원문 보기만 남긴다.
+  const sourceUrl = detail?.sourceUrl?.trim() || undefined;
+  const guideApplicationUrl = isLoggedIn
+    ? guide?.applicationUrl?.trim() || undefined
+    : undefined;
+  const applicationUrl =
+    guideApplicationUrl && guideApplicationUrl !== sourceUrl
+      ? guideApplicationUrl
+      : undefined;
   // 신청 가이드(로그인 전용)가 신청 방법 원문을 단계로 보여주므로, 가이드가 있거나 불러오는 중이면
   // "신청 기간" 아래의 원문 신청 방법은 숨겨 같은 내용이 두 번 나오지 않게 한다.
   const hasGuideSteps =
@@ -185,27 +199,24 @@ const PolicyDetailModal = ({
     );
   };
 
-  const handleAskSubmit = async ({
+  // 선택 팝오버에서 기다리게 하지 않고, 바로 챗봇 창을 열어 질문을 띄운 뒤
+  // 답변을 받는 동안 챗봇 창에 "설명하는 중"을 보여준다.
+  const handleAskSubmit = ({
     selectedText,
     context,
   }: TextSelectionAskPayload) => {
-    const question = `"${selectedText}" 뜻이 뭐예요?`;
+    const exchangeId = startExchange(`"${selectedText}" 뜻이 뭐예요?`);
 
-    try {
-      const { explanation } = await explainTerm({
-        term: selectedText,
-        context,
-      });
-      showExchange({
-        question,
-        answer: explanation?.trim() || '설명을 가져오지 못했어요.',
-      });
-    } catch (error) {
-      showExchange({
-        question,
-        answer: getTermExplanationErrorMessage(error),
-      });
-    }
+    explainTerm({ term: selectedText, context })
+      .then(({ explanation }) =>
+        resolveExchange(
+          exchangeId,
+          explanation?.trim() || '설명을 가져오지 못했어요.'
+        )
+      )
+      .catch((error: unknown) =>
+        resolveExchange(exchangeId, getTermExplanationErrorMessage(error))
+      );
   };
 
   useEffect(() => {
@@ -276,9 +287,15 @@ const PolicyDetailModal = ({
               {/* AI 요약은 생성이 느려서, 받아오는 동안 진행 안내(AiSummaryLoading)를 보여주고 받은 뒤에 내용을 보여준다.
                   요약이 비어 있거나 실패하면 섹션 자체를 숨긴다. */}
               {(isAiSummaryLoading || aiSummary?.summary?.trim()) && (
-                <div className="mb-[2rem] rounded-[0.8rem] bg-primary-sub-3 px-[1.6rem] py-[1.4rem]">
+                <div
+                  className={
+                    isAiSummaryLoading
+                      ? 'mb-[2rem]'
+                      : 'mb-[2rem] rounded-[0.8rem] bg-primary-sub-3 px-[1.6rem] py-[1.4rem]'
+                  }
+                >
                   <p className="text-body-3 font-semibold text-title">
-                    🤖 AI 요약
+                    MOZIP AI 요약
                   </p>
                   <div className="mt-[0.8rem] text-body-3 text-body">
                     {isAiSummaryLoading ? (
@@ -290,13 +307,13 @@ const PolicyDetailModal = ({
                 </div>
               )}
 
-              <DetailSection title="📌 정책 소개">
+              <DetailSection title="정책 소개">
                 <TextBlock>
                   {displayValue(detail.summary ?? detail.description)}
                 </TextBlock>
               </DetailSection>
 
-              <DetailSection title="💰 지원 내용">
+              <DetailSection title="지원 내용">
                 {detail.benefitDescription?.trim() ? (
                   <PolicyText text={detail.benefitDescription} />
                 ) : (
@@ -306,7 +323,7 @@ const PolicyDetailModal = ({
                 )}
               </DetailSection>
 
-              <DetailSection title="👤 신청 대상">
+              <DetailSection title="신청 대상">
                 <BulletList
                   items={getEligibilitySummary(detail.eligibility ?? null)}
                 />
@@ -320,16 +337,17 @@ const PolicyDetailModal = ({
 
               {isLoggedIn && isEvaluationLoading && <EvaluationSkeleton />}
               {evaluation?.eligibility?.status && (
-                <DetailSection title="🎯 나의 신청 자격">
+                <DetailSection title="나의 신청 자격">
+                  {/* 판정 이유가 두 줄이 돼도 뱃지가 문단 전체의 세로 가운데에 오도록 가운데 정렬한다. */}
                   <div className="flex items-center gap-[0.8rem]">
-                    <span className="shrink-0 whitespace-nowrap rounded-[0.8rem] border border-gray-300 bg-gray-100 px-[1rem] py-[0.2rem] font-semibold text-body-3 text-title">
+                    <span className="shrink-0 whitespace-nowrap rounded-[0.8rem] border border-gray-300 bg-gray-100 px-[1rem] font-semibold text-body-3 text-title">
                       {
                         ELIGIBILITY_STATUS_LABELS[evaluation.eligibility.status]
                           .label
                       }
                     </span>
                     {evaluation.eligibility.overallReason && (
-                      <span className="text-body-3 text-body">
+                      <span className="min-w-0 flex-1 break-keep text-body-3 text-body">
                         {evaluation.eligibility.overallReason}
                       </span>
                     )}
@@ -337,29 +355,14 @@ const PolicyDetailModal = ({
 
                   {evaluation.eligibility.conditionResults &&
                     evaluation.eligibility.conditionResults.length > 0 && (
-                      <ul className="mt-[1.2rem] flex flex-col gap-[0.6rem]">
-                        {evaluation.eligibility.conditionResults.map(
-                          (condition, index) => (
-                            <li
-                              key={`${condition.type}-${index}`}
-                              className="text-body-3 text-body"
-                            >
-                              <span className="font-semibold text-title">
-                                {getConditionTypeLabel(condition.type)} ·{' '}
-                                {getConditionStatusLabel(condition.status)}
-                              </span>
-                              {condition.reason && (
-                                <span> — {condition.reason}</span>
-                              )}
-                            </li>
-                          )
-                        )}
-                      </ul>
+                      <EligibilityConditions
+                        conditions={evaluation.eligibility.conditionResults}
+                      />
                     )}
                 </DetailSection>
               )}
 
-              <DetailSection title="📅 신청 기간">
+              <DetailSection title="신청 기간">
                 <TextBlock>
                   {formatPolicyPeriod(
                     detail.applicationStartDate ?? null,
@@ -381,7 +384,7 @@ const PolicyDetailModal = ({
                 guide && (
                   <>
                     {guide.steps && guide.steps.length > 0 && (
-                      <DetailSection title="📝 신청 절차">
+                      <DetailSection title="신청 절차">
                         {guide.steps.length === 1 ? (
                           // 단계가 하나뿐이면 번호를 붙이지 않고, 제목이 섹션 제목과 같은 "신청 절차"면 제목도 생략한다.
                           <div className="text-body-3 text-body">
@@ -423,30 +426,21 @@ const PolicyDetailModal = ({
                       </DetailSection>
                     )}
 
-                    <DetailSection title="📋 준비 서류">
-                      <BulletList items={guide.requiredDocuments ?? []} />
-                    </DetailSection>
+                    {requiredDocuments.length > 0 && (
+                      <DetailSection title="준비 서류">
+                        <BulletList items={requiredDocuments} />
+                      </DetailSection>
+                    )}
 
                     {guide.notes && (
-                      <DetailSection title="⚠️ 유의사항">
+                      <DetailSection title="유의사항">
                         <PolicyText text={guide.notes} />
                       </DetailSection>
                     )}
 
-                    <DetailSection title="📞 문의처">
+                    <DetailSection title="문의처">
                       <TextBlock>{displayValue(guide.contactInfo)}</TextBlock>
                     </DetailSection>
-
-                    {guide.applicationUrl && (
-                      <a
-                        href={guide.applicationUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-[0.8rem] inline-block text-body-3 font-semibold text-blue underline"
-                      >
-                        신청하러 가기
-                      </a>
-                    )}
                   </>
                 )
               ) : (
@@ -457,15 +451,29 @@ const PolicyDetailModal = ({
                 </DetailSection>
               )}
 
-              {detail.sourceUrl && (
-                <a
-                  href={detail.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-[2rem] inline-block text-body-3 text-gray-500 underline"
-                >
-                  원문 보기
-                </a>
+              {(applicationUrl || sourceUrl) && (
+                <div className="mt-[2rem] flex flex-wrap gap-[0.8rem]">
+                  {applicationUrl && (
+                    <a
+                      href={applicationUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-[3.6rem] items-center rounded-[0.8rem] border border-gray-300 bg-white px-[1.4rem] text-body-3 font-semibold text-title transition-colors duration-200 hover:bg-gray-100"
+                    >
+                      신청하러 가기
+                    </a>
+                  )}
+                  {sourceUrl && (
+                    <a
+                      href={sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex h-[3.6rem] items-center rounded-[0.8rem] border border-gray-300 bg-white px-[1.4rem] text-body-3 font-semibold text-title transition-colors duration-200 hover:bg-gray-100"
+                    >
+                      원문 보기
+                    </a>
+                  )}
+                </div>
               )}
             </TextSelection>
 
