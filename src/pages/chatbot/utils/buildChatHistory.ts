@@ -16,9 +16,16 @@ export const buildChatHistory = (messages: ChatMessage[]): ChatTurn[] => {
       continue;
     }
 
+    // 그 턴에 카드로 보여준 정책 id — "신청 방법 알려줘", "두 정책 비교해줘" 같은 후속 질문이 가리키는 정책을
+    // 서버가 알 수 있게 함께 보낸다.
+    const policyIds = (next.matchedPolicies ?? [])
+      .map((policy) => policy.policyId)
+      .filter((id): id is number => typeof id === 'number');
+
     history.push({
       message: current.content,
       reply: next.content,
+      ...(policyIds.length > 0 && { policyIds }),
     });
     index += 1;
   }

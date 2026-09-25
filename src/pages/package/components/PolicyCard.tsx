@@ -3,8 +3,8 @@ import type {
   PolicyListItem,
 } from '@pages/package/types/package';
 import {
+  AVAILABILITY_DOT_CLASS,
   getAvailabilityBadge,
-  type AvailabilityBadgeTone,
 } from '@pages/package/utils/getAvailabilityBadge';
 import {
   formatPolicyPeriod,
@@ -16,15 +16,6 @@ import rightChevronIcon from '@shared/assets/icons/right-chevron.svg';
 import { STATUS_OUTLINE_CLASS } from '@pages/package/components/FilterChip';
 import { formatAgeRange } from '@pages/package/utils/formatAgeRange';
 import { displayValue } from '@shared/utils/displayValue';
-
-// 왼쪽 "상태" 필터 칩과 같은 모양: 흰 배경 + 회색 테두리 + 상태 색 점.
-const BADGE_DOT_CLASS: Record<AvailabilityBadgeTone, string> = {
-  open: 'bg-green-500',
-  closing: 'bg-red-500',
-  scheduled: 'bg-blue-500',
-  closed: 'bg-gray-400',
-  review: 'bg-gray-400',
-};
 
 // 개인화 응답에서만 보여주는 자격 판정 칩
 const ELIGIBILITY_CHIPS: Record<
@@ -130,7 +121,7 @@ const PolicyCard = ({
             >
               <span
                 aria-hidden
-                className={`size-[0.8rem] shrink-0 rounded-full ${BADGE_DOT_CLASS[badge.tone]}`}
+                className={`size-[0.8rem] shrink-0 rounded-full ${AVAILABILITY_DOT_CLASS[badge.tone]}`}
               />
               {badge.label}
             </span>

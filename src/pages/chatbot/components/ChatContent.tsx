@@ -44,7 +44,11 @@ const ChatContent = ({
           >
             <div className="mx-auto flex min-h-full w-full max-w-[80rem] flex-col">
               <div className="flex-1">
-                <MessageList messages={messages} isSending={isSending} />
+                <MessageList
+                  messages={messages}
+                  isSending={isSending}
+                  onSendMessage={onSendMessage}
+                />
               </div>
               <p className="mt-auto pt-[2.4rem] text-center text-caption text-gray-400">
                 답변에 오류가 있을 수 있으니 중요한 정보는 다시 확인해 주세요.

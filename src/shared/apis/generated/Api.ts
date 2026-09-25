@@ -107,11 +107,72 @@ export interface ChatResponse {
   matchedPolicies?: ChatMatchedPolicyResponse[];
   reply?: string;
   unresolvedConditions?: ChatUnresolvedConditionResponse[];
+  /** 질문 의도에 따른 답변 유형 */
+  responseType?:
+    | 'RECOMMEND'
+    | 'COMPARE'
+    | 'HOW_TO_APPLY'
+    | 'ELIGIBILITY'
+    | 'CLARIFY'
+    | 'TERM'
+    | 'NO_RESULT'
+    | 'GENERAL';
+  /** 화면에 순서대로 그릴 답변 블록 */
+  blocks?: ChatBlockResponse[];
+  /** 답변 아래 칩으로 보여줄 후속 질문 */
+  followUps?: string[];
+}
+
+export interface ChatBlockResponse {
+  type?:
+    | 'TEXT'
+    | 'POLICY_GROUP'
+    | 'COMPARISON'
+    | 'CONCLUSION'
+    | 'STEPS'
+    | 'CHECKLIST'
+    | 'TERM'
+    | 'QUICK_REPLIES'
+    | 'CONDITIONS'
+    | 'LINKS';
+  text?: string | null;
+  title?: string | null;
+  example?: string | null;
+  policies?: ChatPolicyCardResponse[];
+  columns?: { policyId?: number; title?: string }[];
+  rows?: { label?: string; values?: string[] }[];
+  steps?: { title?: string; description?: string | null }[];
+  items?: string[];
+  conditions?: ConditionResult[];
+  links?: { applicationUrl?: string | null; sourceUrl?: string | null } | null;
+}
+
+export interface ChatPolicyCardResponse {
+  /** @format int64 */
+  policyId?: number;
+  title?: string;
+  summary?: string | null;
+  reason?: string | null;
+  highlight?: string | null;
+  eligibilityStatus?: 'ELIGIBLE' | 'INELIGIBLE' | 'NEEDS_REVIEW' | null;
+  applicationType?: 'PERIOD' | 'ALWAYS' | 'UNKNOWN';
+  /** @format date */
+  applicationStartDate?: string | null;
+  /** @format date */
+  applicationEndDate?: string | null;
+  availability?: PolicyAvailabilityResponse;
+  categories?: CategoryResponse[];
+  regionScope?: 'NATIONAL' | 'REGIONAL';
+  regions?: RegionResponse[];
+  minimumAge?: number | null;
+  maximumAge?: number | null;
 }
 
 export interface ChatTurn {
   message?: string;
   reply?: string;
+  /** 그 턴의 답변에 카드로 보여준 정책 id(후속 질문 해석용) */
+  policyIds?: number[];
 }
 
 export interface ChatUnresolvedConditionResponse {

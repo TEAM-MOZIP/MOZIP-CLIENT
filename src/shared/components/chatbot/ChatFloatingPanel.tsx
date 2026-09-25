@@ -148,6 +148,7 @@ const ChatFloatingPanel = ({ onClose, onExpand }: ChatFloatingPanelProps) => {
             className="gap-[2.4rem]"
             compact
             isSending={isSending}
+            onSendMessage={sendMessage}
             pendingLabel={
               isExplaining ? 'MOZIP AI가 용어를 찾고 있어요.' : undefined
             }
