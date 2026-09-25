@@ -8,6 +8,8 @@ type MessageListProps = {
   isSending?: boolean;
   /** 챗봇 전송이 아닌 대기(예: 용어 설명)를 문구로 보여줄 때 */
   pendingLabel?: string;
+  /** 빠른 선택·후속 질문 칩을 눌렀을 때 보낼 메시지 */
+  onSendMessage?: (message: string) => void;
 };
 
 const PendingMessage = ({ label }: { label: string }) => (
@@ -41,7 +43,9 @@ const MessageList = ({
   compact = false,
   isSending = false,
   pendingLabel,
+  onSendMessage,
 }: MessageListProps) => {
+  const lastIndex = messages.length - 1;
   return (
     <div
       className={['flex w-full flex-col', className].filter(Boolean).join(' ')}
@@ -49,15 +53,23 @@ const MessageList = ({
       aria-live="polite"
       aria-relevant="additions"
     >
-      {messages.map((message) => (
-        <MessageItem
-          key={message.id}
-          role={message.role}
-          content={message.content}
-          compact={compact}
-          matchedPolicies={message.matchedPolicies}
-        />
-      ))}
+      {messages.map((message, index) => {
+        const isLatest = index === lastIndex;
+        return (
+          <MessageItem
+            key={message.id}
+            role={message.role}
+            content={message.content}
+            compact={compact}
+            matchedPolicies={message.matchedPolicies}
+            blocks={message.blocks}
+            followUps={message.followUps}
+            showFollowUps={isLatest}
+            interactive={isLatest && !isSending && Boolean(onSendMessage)}
+            onSendMessage={onSendMessage}
+          />
+        );
+      })}
       {isSending && <MessageSkeleton />}
       {pendingLabel && <PendingMessage label={pendingLabel} />}
     </div>
