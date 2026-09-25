@@ -25,7 +25,6 @@ export type PackageItem = {
   /** 카드 상단 기하학 패턴 SVG */
   pattern: string;
   theme: PackageTheme;
-  policyCount: number;
 };
 
 /** 상태 옵션 */

@@ -28,6 +28,10 @@ export const ENDPOINTS = {
     DETAIL: (id: string | number) => `/api/policies/${id}`,
     RECOMMENDED: '/api/policies/recommended',
     PACKAGES: '/api/policies/packages',
+    PACKAGE_DETAIL: (packageId: string) =>
+      `/api/policies/packages/${packageId}`,
+    PACKAGE_SECTION: (packageId: string, sectionKey: string) =>
+      `/api/policies/packages/${packageId}/sections/${sectionKey}`,
   },
 
   // Recommendation - 정책 추천/판정 API
@@ -36,6 +40,10 @@ export const ENDPOINTS = {
     POLICY_EVALUATION: (policyId: string | number) =>
       `/api/recommendations/policies/${policyId}/evaluation`,
     PACKAGES: '/api/recommendations/packages',
+    PACKAGE_DETAIL: (packageId: string) =>
+      `/api/recommendations/packages/${packageId}`,
+    PACKAGE_SECTION: (packageId: string, sectionKey: string) =>
+      `/api/recommendations/packages/${packageId}/sections/${sectionKey}`,
   },
 
   // Category - 카테고리 조회 API
