@@ -58,6 +58,16 @@ const PolicyTextLine = ({ kind, text }: Line) => {
   );
 };
 
+// "○"는 아래에 "-"·"·" 항목이 딸린 경우에만 소제목(굵게)으로 쓴다.
+// "○ 내용 / ○ 내용"처럼 ○만 나열된 원문은 사실상 목록이라 모두 굵게 나오지 않도록 일반 항목으로 바꾼다.
+const resolveHeadings = (lines: Line[]): Line[] =>
+  lines.map((line, index) => {
+    if (line.kind !== 'heading') return line;
+    const next = lines[index + 1];
+    const hasChildren = next?.kind === 'item' || next?.kind === 'subitem';
+    return hasChildren ? line : { ...line, kind: 'item' };
+  });
+
 type PolicyTextProps = {
   text: string;
   className?: string;
@@ -70,11 +80,9 @@ const PolicyText = ({ text, className = '' }: PolicyTextProps) => (
       .filter(Boolean)
       .join(' ')}
   >
-    {splitLines(text)
-      .map(parseLine)
-      .map((line, index) => (
-        <PolicyTextLine key={index} {...line} />
-      ))}
+    {resolveHeadings(splitLines(text).map(parseLine)).map((line, index) => (
+      <PolicyTextLine key={index} {...line} />
+    ))}
   </div>
 );
 
