@@ -41,6 +41,7 @@ export const fromPolicySummary = (
     categories: toCategories(response.categories),
     regionScope: response.regionScope ?? null,
     regions: toRegions(response.regions),
+    eligibilityStatus: null,
   };
 };
 
@@ -61,5 +62,6 @@ export const fromPolicyRecommendation = (
     categories: toCategories(response.categories),
     regionScope: response.regionScope ?? null,
     regions: toRegions(response.regions),
+    eligibilityStatus: response.eligibility?.status ?? null,
   };
 };

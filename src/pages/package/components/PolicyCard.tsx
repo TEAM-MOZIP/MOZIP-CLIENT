@@ -1,4 +1,7 @@
-import type { PolicyListItem } from '@pages/package/types/package';
+import type {
+  EligibilityStatus,
+  PolicyListItem,
+} from '@pages/package/types/package';
 import {
   getAvailabilityBadge,
   type AvailabilityBadgeTone,
@@ -18,6 +21,25 @@ const BADGE_TONE_CLASS: Record<AvailabilityBadgeTone, string> = {
   scheduled: 'border-blue bg-blue/10 text-blue',
   closed: 'border-gray-300 bg-gray-100 text-gray-600',
   review: 'border-gray-400 bg-gray-100 text-gray-600',
+};
+
+// 개인화 응답에서만 보여주는 자격 판정 칩
+const ELIGIBILITY_CHIPS: Record<
+  EligibilityStatus,
+  { label: string; className: string }
+> = {
+  ELIGIBLE: {
+    label: '자격 충족',
+    className: 'border-primary bg-primary-sub-2 text-black',
+  },
+  NEEDS_REVIEW: {
+    label: '자격 확인 필요',
+    className: 'border-gray-400 bg-gray-100 text-gray-600',
+  },
+  INELIGIBLE: {
+    label: '자격 미충족',
+    className: 'border-gray-300 bg-white text-gray-500',
+  },
 };
 
 // 카드 폭이 좁아 카테고리 칩은 2개, 지역 칩은 1개까지만 보여주고 나머지는 +N으로 줄인다.
@@ -42,6 +64,7 @@ const PolicyCard = ({
   categories,
   regionScope,
   regions,
+  eligibilityStatus,
   onBookmarkClick,
   onClick,
 }: PolicyCardProps) => {
@@ -60,6 +83,9 @@ const PolicyCard = ({
       : regions.map((region) => region.name);
   const visibleRegionNames = regionNames.slice(0, MAX_VISIBLE_REGIONS);
   const hiddenRegionNames = regionNames.slice(MAX_VISIBLE_REGIONS);
+  const eligibilityChip = eligibilityStatus
+    ? ELIGIBILITY_CHIPS[eligibilityStatus]
+    : null;
 
   return (
     <div
@@ -84,13 +110,25 @@ const PolicyCard = ({
       tabIndex={onClick ? 0 : undefined}
     >
       <div className="flex items-center justify-between gap-[1rem]">
-        <span className="text-heading-3 font-bold text-gray-800">
-          {dDay !== null
-            ? `D-${dDay}`
-            : applicationType === 'ALWAYS'
-              ? '상시모집'
-              : ''}
-        </span>
+        <div className="flex min-w-0 items-center gap-[0.8rem]">
+          <span className="text-heading-3 font-bold text-gray-800">
+            {dDay !== null
+              ? `D-${dDay}`
+              : applicationType === 'ALWAYS'
+                ? '상시모집'
+                : ''}
+          </span>
+          {eligibilityChip && (
+            <span
+              className={[
+                'shrink-0 whitespace-nowrap rounded-[0.8rem] border px-[1rem] py-[0.2rem] text-caption font-semibold',
+                eligibilityChip.className,
+              ].join(' ')}
+            >
+              {eligibilityChip.label}
+            </span>
+          )}
+        </div>
         <div className="flex shrink-0 items-center gap-[1rem]">
           {bookmarked !== null && (
             <button

@@ -28,5 +28,6 @@ export const mapBookmarkToCardItem = (
     categories: [],
     regionScope: null,
     regions: [],
+    eligibilityStatus: null,
   };
 };
