@@ -73,6 +73,14 @@ export interface BookmarkResponse {
   /** @format int64 */
   policyId?: number;
   title?: string;
+  applicationType?: 'PERIOD' | 'ALWAYS' | 'UNKNOWN';
+  categories?: CategoryResponse[];
+  regionScope?: 'NATIONAL' | 'REGIONAL';
+  regions?: RegionResponse[];
+  /** @format int32 정책 대상 최소 나이(만). 제한 없으면 null */
+  minimumAge?: number | null;
+  /** @format int32 정책 대상 최대 나이(만). 제한 없으면 null */
+  maximumAge?: number | null;
 }
 
 export interface CategoryResponse {
@@ -333,6 +341,10 @@ export interface PolicyRecommendationResponse {
   title?: string;
   regionScope?: 'NATIONAL' | 'REGIONAL';
   regions?: RegionResponse[];
+  /** @format int32 정책 대상 최소 나이(만). 제한 없으면 null */
+  minimumAge?: number | null;
+  /** @format int32 정책 대상 최대 나이(만). 제한 없으면 null */
+  maximumAge?: number | null;
 }
 
 export interface PolicySummaryContentResponse {
@@ -357,6 +369,12 @@ export interface PolicySummaryResponse {
   summary?: string;
   title?: string;
   regions?: RegionResponse[];
+  /** 로그인 사용자의 북마크 여부. 비로그인 조회면 null */
+  bookmarked?: boolean | null;
+  /** @format int32 정책 대상 최소 나이(만). 제한 없으면 null */
+  minimumAge?: number | null;
+  /** @format int32 정책 대상 최대 나이(만). 제한 없으면 null */
+  maximumAge?: number | null;
 }
 
 export interface PublicPolicyPackageResponse {

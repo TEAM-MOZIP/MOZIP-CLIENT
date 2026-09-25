@@ -75,10 +75,18 @@ export const useChatSession = (initialMessages: ChatMessage[] = []) => {
     setMessages((prev) => [...prev, userMessage, assistantMessage]);
   };
 
+  const appendMessage = (role: ChatMessage['role'], content: string) => {
+    setMessages((prev) => [
+      ...prev,
+      { id: createMessageId(role), role, content },
+    ]);
+  };
+
   return {
     messages,
     sendMessage,
     appendExchange,
+    appendMessage,
     reset,
     isSending: isPending,
   };

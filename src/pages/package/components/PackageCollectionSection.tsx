@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import PackageCard from '@pages/package/components/PackageCard';
+import { usePackageCounts } from '@pages/package/hooks/usePolicyPackages';
 import type { PackageItem } from '@pages/package/types';
 
 type PackageCollectionSectionProps = {
@@ -8,6 +9,7 @@ type PackageCollectionSectionProps = {
 
 const PackageCollectionSection = ({ items }: PackageCollectionSectionProps) => {
   const navigate = useNavigate();
+  const { data: policyCounts } = usePackageCounts();
 
   return (
     <section className="w-full bg-background-default py-[4rem]">
@@ -22,6 +24,7 @@ const PackageCollectionSection = ({ items }: PackageCollectionSectionProps) => {
             <PackageCard
               key={item.id}
               {...item}
+              policyCount={policyCounts?.[item.id] ?? null}
               onClick={() => navigate(`/package/${item.id}`)}
             />
           ))}

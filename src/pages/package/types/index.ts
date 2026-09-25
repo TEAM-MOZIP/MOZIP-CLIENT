@@ -12,6 +12,10 @@ export type FilterGroup = {
   options: FilterOption[];
   /** 칩 대신 보여줄 안내 문구. 있으면 칩 목록을 그리지 않는다(줄바꿈 \n 지원). */
   notice?: string;
+  /** 칩 위에 함께 보여줄 안내 문구(줄바꿈 \n 지원). */
+  hint?: string;
+  /** 안내 문구 아래 텍스트 버튼(예: 내 맞춤으로 돌아가기). */
+  hintAction?: { label: string; onClick: () => void };
 };
 
 export type PackageTheme = 'yellow' | 'black';
@@ -25,7 +29,6 @@ export type PackageItem = {
   /** 카드 상단 기하학 패턴 SVG */
   pattern: string;
   theme: PackageTheme;
-  policyCount: number;
 };
 
 /** 상태 옵션 */

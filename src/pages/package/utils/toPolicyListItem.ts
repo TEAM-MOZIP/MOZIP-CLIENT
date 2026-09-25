@@ -8,7 +8,7 @@ import type {
   RegionResponse,
 } from '@pages/package/types/package';
 
-const toCategories = (
+export const toCategories = (
   categories: CategoryResponse[] | undefined
 ): PolicyListCategory[] =>
   (categories ?? []).flatMap((category) =>
@@ -17,7 +17,9 @@ const toCategories = (
       : []
   );
 
-const toRegions = (regions: RegionResponse[] | undefined): PolicyListRegion[] =>
+export const toRegions = (
+  regions: RegionResponse[] | undefined
+): PolicyListRegion[] =>
   (regions ?? []).flatMap((region) =>
     region.id !== undefined && region.name?.trim()
       ? [{ id: region.id, name: region.name }]
@@ -37,10 +39,16 @@ export const fromPolicySummary = (
     applicationStartDate: response.applicationStartDate ?? null,
     applicationEndDate: response.applicationEndDate ?? null,
     availability: response.availability ?? null,
-    bookmarked: null,
+    // 로그인 상태로 공개 목록을 보면 서버가 북마크 여부를 채워 준다(비로그인은 null → 북마크 버튼 숨김).
+    bookmarked: response.bookmarked ?? null,
     categories: toCategories(response.categories),
     regionScope: response.regionScope ?? null,
     regions: toRegions(response.regions),
+    eligibilityStatus: null,
+    ageRange: {
+      min: response.minimumAge ?? null,
+      max: response.maximumAge ?? null,
+    },
   };
 };
 
@@ -61,5 +69,10 @@ export const fromPolicyRecommendation = (
     categories: toCategories(response.categories),
     regionScope: response.regionScope ?? null,
     regions: toRegions(response.regions),
+    eligibilityStatus: response.eligibility?.status ?? null,
+    ageRange: {
+      min: response.minimumAge ?? null,
+      max: response.maximumAge ?? null,
+    },
   };
 };

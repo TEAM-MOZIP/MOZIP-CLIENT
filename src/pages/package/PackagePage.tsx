@@ -1,6 +1,6 @@
 import PackageCollectionSection from '@pages/package/components/PackageCollectionSection';
 import PolicyListSection from '@pages/package/components/PolicyListSection';
-import { PACKAGE_ITEMS } from '@pages/package/constants/mockData';
+import { PACKAGE_ITEMS } from '@pages/package/constants/packageItems';
 
 const PackagePage = () => {
   return (

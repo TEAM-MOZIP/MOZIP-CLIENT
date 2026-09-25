@@ -94,13 +94,56 @@ export type PolicyListItem = {
   // 전국 정책은 regionScope가 NATIONAL이고 regions는 비어 있다.
   regionScope: 'NATIONAL' | 'REGIONAL' | null;
   regions: PolicyListRegion[];
+  // 개인화(로그인+프로필) 응답에만 있는 자격 판정. 공개 목록·북마크는 null.
+  eligibilityStatus: EligibilityStatus | null;
+  // 정책 대상 나이 범위(만). 둘 다 null이면 연령 제한 없음. 북마크처럼 정보가 없는 응답은 ageRange 자체가 null.
+  ageRange: { min: number | null; max: number | null } | null;
 };
+
+export type EligibilityStatus = NonNullable<EligibilityResponse['status']>;
 
 export type PolicyListFilters = {
   keyword?: string;
   categoryId?: number;
   regionId?: number;
-  ageGroup?: AgeGroup; // recommended/personalized 소스에선 서버가 지원하지 않아 무시됨
+  ageGroup?: AgeGroup; // personalized 소스에선 서버가 지원하지 않아 무시됨
   availability?: AvailabilityFilter;
   sort?: PolicySortOption; // personalized 소스에선 서버가 지원하지 않아 무시됨
+  // true면 로그인 사용자 프로필 기준 맞춤 추천 목록을 요청한다(연령·정렬 무시).
+  personalized?: boolean;
+};
+
+// ---- 대상자별 정책 패키지 ----
+// 서버 스펙(/api/policies/packages, /api/recommendations/packages)이 generated/Api.ts에 반영되기 전이라 직접 정의한다.
+export type PolicyPackageSummaryResponse = {
+  packageId?: string;
+  policyCount?: number;
+};
+
+export type PolicyPackageSectionResponse<T> = {
+  sectionKey?: string;
+  sectionName?: string;
+  totalCount?: number;
+  policies?: T[];
+};
+
+export type PolicyPackageDetailResponse<T> = {
+  packageId?: string;
+  policyCount?: number;
+  sections?: PolicyPackageSectionResponse<T>[];
+};
+
+// 공개/개인화 응답을 화면 하나로 그리기 위한 뷰모델
+export type PolicyPackageSection = {
+  key: string;
+  name: string;
+  totalCount: number;
+  // 미리보기(섹션당 최대 6개)
+  policies: PolicyListItem[];
+};
+
+export type PolicyPackageDetail = {
+  packageId: string;
+  policyCount: number;
+  sections: PolicyPackageSection[];
 };

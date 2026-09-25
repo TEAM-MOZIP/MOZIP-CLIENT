@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { MY_BOOKMARKS_QUERY_KEY } from '@pages/mypage/hooks/useGetMyBookmarks';
 import { deleteBookmark, postBookmark } from '@pages/package/apis/policyApi';
 
 type ToggleBookmarkPayload = {
@@ -17,6 +18,8 @@ export const useToggleBookmark = () => {
       // 목록에서 토글하든 상세에서 토글하든 서로 어긋나지 않게 한다.
       queryClient.invalidateQueries({ queryKey: ['policies'] });
       queryClient.invalidateQueries({ queryKey: ['policy-detail', policyId] });
+      // 마이페이지 북마크 목록도 staleTime(1분) 동안 캐시를 그대로 보여주므로 같이 무효화한다.
+      queryClient.invalidateQueries({ queryKey: MY_BOOKMARKS_QUERY_KEY });
     },
   });
 };

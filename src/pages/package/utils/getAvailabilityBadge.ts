@@ -25,8 +25,8 @@ export const getAvailabilityBadge = (
 
   if (availability.status === 'AVAILABLE') {
     return availability.closingSoon
-      ? { label: '마감임박', tone: 'closing' }
-      : { label: '접수중', tone: 'open' };
+      ? { label: '마감 임박', tone: 'closing' }
+      : { label: '접수 중', tone: 'open' };
   }
 
   return availability.reason === 'BEFORE_APPLICATION_PERIOD'
