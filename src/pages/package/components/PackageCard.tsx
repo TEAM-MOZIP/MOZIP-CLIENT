@@ -1,6 +1,8 @@
 import type { PackageItem, PackageTheme } from '@pages/package/types';
 
 type PackageCardProps = PackageItem & {
+  // 서버에서 불러오기 전이거나 실패하면 null — 개수 뱃지를 숨긴다.
+  policyCount: number | null;
   onClick?: () => void;
 };
 
@@ -48,9 +50,11 @@ const PackageCard = ({
             {title}
           </p>
         </div>
-        <span className="inline-flex shrink-0 rounded-full border border-black bg-white px-[1.2rem] py-[0.4rem] text-button-2 font-medium text-black">
-          {policyCount} +
-        </span>
+        {policyCount !== null && (
+          <span className="inline-flex shrink-0 rounded-full border border-black bg-white px-[1.2rem] py-[0.4rem] text-button-2 font-medium text-black">
+            {policyCount} +
+          </span>
+        )}
       </div>
     </button>
   );
