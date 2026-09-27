@@ -66,6 +66,14 @@ const HomeContentSection = () => {
             transform: ${getCarouselTransform(CAROUSEL_END_OFFSET_REM)};
           }
         }
+
+        .mozip-featured-carousel-track {
+          animation: mozip-featured-carousel ${CAROUSEL_DURATION_S}s linear infinite;
+        }
+
+        .mozip-featured-carousel-viewport:hover .mozip-featured-carousel-track {
+          animation-play-state: paused;
+        }
       `}</style>
 
       <div ref={ref} className={reveal.className} style={reveal.style}>
@@ -76,12 +84,11 @@ const HomeContentSection = () => {
           </p>
         </div>
 
-        <div className="mt-[6rem] w-full overflow-hidden [container-type:inline-size]">
+        <div className="mozip-featured-carousel-viewport mt-[6rem] w-full overflow-hidden [container-type:inline-size]">
           <div
-            className="flex w-max gap-[2.6rem] hover:[animation-play-state:paused]"
+            className="mozip-featured-carousel-track flex w-max gap-[2.6rem]"
             style={{
               transform: getCarouselTransform(CAROUSEL_START_OFFSET_REM),
-              animation: `mozip-featured-carousel ${CAROUSEL_DURATION_S}s linear infinite`,
               willChange: 'transform',
             }}
           >
