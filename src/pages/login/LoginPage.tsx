@@ -10,7 +10,7 @@ import Button from '@shared/components/auth/Button';
 //   getPasswordSubmitError,
 // } from '@shared/utils/authValidation';
 
-import logo from '@shared/assets/logo.svg';
+import onboardingHero from '@shared/assets/images/onboarding/onboarding-hero.png';
 import kakaoIcon from '@shared/assets/icons/kakao-icon.svg';
 // import checkWhiteIcon from '@shared/assets/icons/check-white.svg';
 // import arrowRightIcon from '@shared/assets/icons/chevron-right.svg';
@@ -48,19 +48,21 @@ const LoginPage = () => {
     <section className="flex min-h-[calc(100dvh-8.1rem)] w-full items-center justify-center bg-white px-16 py-[6.5rem]">
       <div className="flex w-full max-w-[40rem] flex-col items-center">
         <img
-          src={logo}
+          src={onboardingHero}
           alt="MOZIP"
-          className="h-[4.8rem] w-auto"
+          className="h-auto w-full max-w-[34rem] max-h-[min(38rem,38dvh)] object-contain"
           draggable={false}
         />
-        <p className="mt-[4rem] text-center text-[2.2rem] text-gray-500 font-medium">
-          나를 위한 정책 모음집, 신청까지 한 번에
+        <p className="mt-[2rem] text-center text-[2.2rem] text-gray-600 font-medium">
+          나를 위한 정책 모음집,
+          <br />
+          AI 요약부터 신청 가이드까지
         </p>
 
         <form
           noValidate
           onSubmit={handleSubmit}
-          className="mt-[8rem] flex w-full flex-col gap-[2.4rem]"
+          className="mt-[6rem] flex w-full flex-col gap-[2.4rem]"
         >
           {/* <InputField
             label="이메일"
