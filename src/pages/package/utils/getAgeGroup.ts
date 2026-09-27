@@ -1,7 +1,10 @@
 import type { AgeGroup } from '@pages/package/types/package';
 
 // 생년월일(YYYY-MM-DD)로 오늘 기준 만 나이를 구한다.
-const getAgeFromBirthDate = (birthDate: string, today = new Date()) => {
+export const getAgeFromBirthDate = (
+  birthDate: string,
+  today = new Date()
+): number | null => {
   const [year, month, day] = birthDate.split('-').map(Number);
   if (!year || !month || !day) return null;
 

@@ -25,20 +25,19 @@ const SORT_OPTIONS: { value: PolicySortOption; label: string }[] = [
   { value: 'applicationEndDate,asc', label: '마감 임박 순' },
 ];
 
-// 연령은 로그인 상태에 따라 기본값이 달라서(내 연령 구간) 따로 관리한다.
+// 연령·지역은 로그인 상태에 따라 기본값이 달라서(내 연령 구간 / 내 지역) 따로 관리한다.
 type FilterSelection = {
   status: string;
   category: string;
-  region: string;
 };
 
 const INITIAL_SELECTION: FilterSelection = {
   status: 'all',
   category: 'all',
-  region: 'all',
 };
 
 const ALL_AGES = 'all';
+const ALL_REGIONS = 'all';
 
 const PolicyListSection = () => {
   const isLoggedIn = useAuthStore(selectIsLoggedIn);
@@ -64,6 +63,7 @@ const PolicyListSection = () => {
 
   const { data: me } = useGetMe();
   const [ageOverride, setAgeOverride] = useState<string | null>(null);
+  const [regionOverride, setRegionOverride] = useState<string | null>(null);
 
   // 로그인 + 프로필 있음(프로필 확인 중 포함)이면 맞춤 추천을 쓸 수 있다.
   // 응답(source)이 아니라 요청 전에 알 수 있는 값으로 정해야 첫 로딩 때 필터 UI가 깜빡이지 않는다.
@@ -74,14 +74,29 @@ const PolicyListSection = () => {
   // 프로필에 생년월일이 없으면 "전체"가 맞춤 추천 자리다.
   const defaultAge = canPersonalize ? (myAgeGroup ?? ALL_AGES) : ALL_AGES;
   const selectedAge = ageOverride ?? defaultAge;
-  const isPersonalized = canPersonalize && selectedAge === defaultAge;
+
+  // 로그인 사용자는 내 거주 지역이 기본 선택. 다른 지역을 고르면 그 지역 정책을 볼 수 있다.
+  // 프로필에 지역 정보가 없으면 "전체"가 기본이다.
+  const myRegionId = myProfile?.regionId;
+  const defaultRegion = canPersonalize
+    ? myRegionId != null
+      ? String(myRegionId)
+      : ALL_REGIONS
+    : ALL_REGIONS;
+  const selectedRegion = regionOverride ?? defaultRegion;
+
+  // 연령·지역 모두 내 프로필 기본값일 때만 맞춤 추천으로 간주한다.
+  const isPersonalized =
+    canPersonalize &&
+    selectedAge === defaultAge &&
+    selectedRegion === defaultRegion;
 
   const filters = useMemo<PolicyListFilters>(
     () => ({
       categoryId:
         selection.category === 'all' ? undefined : Number(selection.category),
       regionId:
-        selection.region === 'all' ? undefined : Number(selection.region),
+        selectedRegion === ALL_REGIONS ? undefined : Number(selectedRegion),
       availability:
         selection.status === 'all'
           ? undefined
@@ -93,7 +108,7 @@ const PolicyListSection = () => {
       sort,
       personalized: isPersonalized,
     }),
-    [selection, sort, isPersonalized, selectedAge]
+    [selection, sort, isPersonalized, selectedAge, selectedRegion]
   );
 
   const {
@@ -112,26 +127,25 @@ const PolicyListSection = () => {
   const showSort = !isPersonalized;
 
   const nickname = me?.nickname?.trim() || '회원';
-  const ageHint = !canPersonalize
+
+  // 상단 notice: 맞춤 추천 중이면 적용 안내, 조건이 달라졌으면 이탈 안내.
+  // 힌트 박스는 더 이상 쓰지 않는다.
+  const topNotice = !canPersonalize
     ? undefined
     : isPersonalized
-      ? `${nickname}님을 위한 맞춤 추천이 적용돼 있어요.\n다른 연령을 고르면 가족·지인 정책도 볼 수 있어요.`
-      : '다른 연령 기준으로 보고 있어요.\n자격 충족 표시는 맞춤 추천에서만 보여요.';
-  const ageHintAction = useMemo(
-    () =>
-      canPersonalize && !isPersonalized
-        ? {
+      ? { text: `${nickname}님을 위한 맞춤 추천이 적용되어 있어요.` }
+      : {
+          text: '맞춤 추천과 다른 조건으로 보고 있어요.',
+          action: {
             label: '내 맞춤 추천으로 돌아가기',
-            onClick: () => setAgeOverride(null),
-          }
-        : undefined,
-    [canPersonalize, isPersonalized]
-  );
+            onClick: () => {
+              setAgeOverride(null);
+              setRegionOverride(null);
+            },
+          },
+        };
 
-  const filterGroups = usePolicyFilterGroups({
-    hint: ageHint,
-    hintAction: ageHintAction,
-  });
+  const filterGroups = usePolicyFilterGroups({});
 
   const selectedSortLabel =
     SORT_OPTIONS.find((option) => option.value === sort)?.label ?? '추천순';
@@ -153,6 +167,11 @@ const PolicyListSection = () => {
     if (groupId === 'age') {
       // 기본값(내 연령 구간)을 다시 고르면 맞춤 추천으로 돌아간다.
       setAgeOverride(optionId === defaultAge ? null : optionId);
+      return;
+    }
+    if (groupId === 'region') {
+      // 기본값(내 거주 지역)을 다시 고르면 내 지역으로 돌아간다.
+      setRegionOverride(optionId === defaultRegion ? null : optionId);
       return;
     }
     setSelection((prev) => ({ ...prev, [groupId]: optionId }));
@@ -187,8 +206,13 @@ const PolicyListSection = () => {
         <div className="mt-[4rem] flex items-start gap-[3.2rem]">
           <FilterSidebar
             groups={filterGroups}
-            selected={{ ...selection, age: selectedAge }}
+            selected={{
+              ...selection,
+              region: selectedRegion,
+              age: selectedAge,
+            }}
             onSelect={handleSelectFilter}
+            topNotice={topNotice}
           />
 
           <div className="min-w-0 flex-1">
