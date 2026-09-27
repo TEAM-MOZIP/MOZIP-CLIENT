@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Header from '@shared/components/header/Header';
 import Footer from '@shared/components/footer/Footer';
@@ -12,6 +13,12 @@ const RootLayout = () => {
   const togglePanel = useChatPanelStore((state) => state.toggle);
   const closePanel = useChatPanelStore((state) => state.close);
   const showFloatingButton = pathname !== '/' && pathname !== '/chatbot';
+
+  // 페이지 이동 시 window 스크롤을 맨 위로 초기화한다.
+  // React Router는 자동으로 스크롤을 복원하지 않아서 이전 페이지의 스크롤 위치가 남는다.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   const handleExpandPanel = () => {
     closePanel();
