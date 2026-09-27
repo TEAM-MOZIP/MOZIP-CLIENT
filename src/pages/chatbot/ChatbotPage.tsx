@@ -1,20 +1,37 @@
 import ChatSidebar from '@pages/chatbot/components/sidebar/ChatSidebar';
 import ChatContent from '@pages/chatbot/components/ChatContent';
-import { useChatSession } from '@pages/chatbot/hooks/useChatSession';
+import { useChatSessions } from '@pages/chatbot/hooks/useChatSessions';
 
 const ChatbotPage = () => {
-  const { messages, sendMessage, reset, isSending } = useChatSession();
+  const {
+    sessions,
+    activeSessionId,
+    activeMessages,
+    sendMessage,
+    newChat,
+    selectChat,
+    deleteChat,
+    isSending,
+  } = useChatSessions();
+
+  const histories = sessions.map((s) => ({
+    id: s.id,
+    title: s.title,
+    timestamp: String(s.createdAt),
+  }));
 
   return (
     <div className="flex h-[calc(100dvh-8.1rem)] w-full bg-white">
       <ChatSidebar
-        histories={[]}
-        activeChatId={messages.length > 0 ? 'current' : null}
-        onNewChat={reset}
+        histories={histories}
+        activeChatId={activeSessionId}
+        onNewChat={newChat}
+        onSelectChat={selectChat}
+        onDeleteChat={deleteChat}
       />
       <main className="min-w-0 flex-1">
         <ChatContent
-          messages={messages}
+          messages={activeMessages}
           onSendMessage={sendMessage}
           isSending={isSending}
         />

@@ -4,14 +4,14 @@ type ChatHistoryItemProps = {
   title: string;
   isActive?: boolean;
   onClick?: () => void;
-  onMenuClick?: () => void;
+  onDelete?: () => void;
 };
 
 const ChatHistoryItem = ({
   title,
   isActive = false,
   onClick,
-  onMenuClick,
+  onDelete,
 }: ChatHistoryItemProps) => {
   return (
     <li>
@@ -33,9 +33,9 @@ const ChatHistoryItem = ({
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            onMenuClick?.();
+            onDelete?.();
           }}
-          aria-label="히스토리 메뉴"
+          aria-label="채팅 삭제"
           className="flex size-[2.4rem] shrink-0 cursor-pointer items-center justify-center opacity-0 transition-opacity group-hover:opacity-50 hover:opacity-100"
         >
           <img
