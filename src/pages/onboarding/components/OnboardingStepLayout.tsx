@@ -1,12 +1,23 @@
 import type { ReactNode } from 'react';
-import { QUESTION_TITLES } from '@pages/onboarding/constants/onboarding';
+import {
+  QUESTION_DESCRIPTIONS,
+  QUESTION_TITLES,
+  TOTAL_QUESTION_STEPS,
+} from '@pages/onboarding/constants/onboarding';
 import type { QuestionStep } from '@pages/onboarding/types/onboarding';
 import OnboardingNav from '@pages/onboarding/components/OnboardingNav';
-import OnboardingProgress from '@pages/onboarding/components/OnboardingProgress';
+import OnboardingSidebarLayout from '@pages/onboarding/components/OnboardingSidebarLayout';
 
 type OnboardingStepLayoutProps = {
   currentStep: QuestionStep;
   children: ReactNode;
+  /** 질문 제목을 답변에 따라 바꿀 때(기본값은 QUESTION_TITLES) */
+  title?: string;
+  /** 제목 아래 안내 문구(기본값은 QUESTION_DESCRIPTIONS) */
+  description?: ReactNode;
+  stepAnswers?: Partial<Record<QuestionStep, string | null>>;
+  maxVisitedStep?: number;
+  onStepClick?: (step: QuestionStep) => void;
   nextLabel?: string;
   nextDisabled?: boolean;
   onPrev?: () => void;
@@ -17,36 +28,47 @@ type OnboardingStepLayoutProps = {
 const OnboardingStepLayout = ({
   currentStep,
   children,
+  title,
+  description,
+  stepAnswers,
+  maxVisitedStep,
+  onStepClick,
   nextLabel,
   nextDisabled,
   onPrev,
   onNext,
   onSkip,
 }: OnboardingStepLayoutProps) => {
-  const showPrev = currentStep > 1;
-
   return (
-    <section className="flex min-h-[calc(100dvh-8.1rem)] w-full items-center justify-center bg-white p-[6rem]">
-      <div className="flex w-full max-w-[80rem] flex-col items-center">
-        <OnboardingProgress currentStep={currentStep} />
-        <h1 className="mt-[10rem] text-center text-heading-3 text-black">
-          {QUESTION_TITLES[currentStep]}
-        </h1>
+    <OnboardingSidebarLayout
+      currentStep={currentStep}
+      stepAnswers={stepAnswers}
+      maxVisitedStep={maxVisitedStep}
+      onStepClick={onStepClick}
+    >
+      <p className="text-caption font-semibold text-gray-500">
+        STEP {currentStep} / {TOTAL_QUESTION_STEPS}
+      </p>
+      <h1 className="mt-[0.6rem] text-[2.6rem] leading-[1.4] font-bold tracking-[-0.04em] text-gray-800">
+        {title ?? QUESTION_TITLES[currentStep]}
+      </h1>
+      <p className="mt-[0.6rem] text-body-3 text-gray-500">
+        {description ?? QUESTION_DESCRIPTIONS[currentStep]}
+      </p>
 
-        <div className="mt-[6rem] flex w-full flex-col items-center">
-          {children}
-        </div>
-
-        <OnboardingNav
-          showPrev={showPrev}
-          nextLabel={nextLabel}
-          nextDisabled={nextDisabled}
-          onPrev={onPrev}
-          onNext={onNext}
-          onSkip={onSkip}
-        />
+      <div className="mt-[2.8rem] max-w-[72rem] rounded-[2rem] bg-white p-[2rem] shadow-[0_0.2rem_1.6rem_rgba(0,0,0,0.06)] lg:p-[2.8rem]">
+        {children}
       </div>
-    </section>
+
+      <OnboardingNav
+        showPrev={currentStep > 1}
+        nextLabel={nextLabel}
+        nextDisabled={nextDisabled}
+        onPrev={onPrev}
+        onNext={onNext}
+        onSkip={onSkip}
+      />
+    </OnboardingSidebarLayout>
   );
 };
 
