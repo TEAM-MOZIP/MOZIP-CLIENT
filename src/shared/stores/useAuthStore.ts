@@ -24,12 +24,19 @@ export const useAuthStore = create<AuthState>()(
           refreshToken,
           accessTokenExpiresIn,
         }),
-      clearAuth: () =>
+      clearAuth: () => {
+        try {
+          localStorage.removeItem('mozip-chat');
+          localStorage.removeItem('mozip-chat-sessions');
+        } catch {
+          /* ignore */
+        }
         set({
           accessToken: null,
           refreshToken: null,
           accessTokenExpiresIn: null,
-        }),
+        });
+      },
     }),
     {
       name: 'mozip-auth',
