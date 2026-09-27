@@ -12,11 +12,31 @@ const CARD_STEP_REM = CARD_WIDTH_REM + CARD_GAP_REM;
 const CAROUSEL_DURATION_S = 25;
 
 const FEATURED_CARDS = [
-  { id: 'featured-0', image: content0 },
-  { id: 'featured-1', image: content1 },
-  { id: 'featured-2', image: content2 },
-  { id: 'featured-3', image: content3 },
-  { id: 'featured-4', image: content4 },
+  {
+    id: 1,
+    image: content0,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=41&lan=KO',
+  },
+  {
+    id: 2,
+    image: content1,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=1066&lan=KO',
+  },
+  {
+    id: 3,
+    image: content2,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=126&lan=KO',
+  },
+  {
+    id: 4,
+    image: content3,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=112&lan=KO',
+  },
+  {
+    id: 5,
+    image: content4,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=102&lan=KO',
+  },
 ] as const;
 
 const CARD_COUNT = FEATURED_CARDS.length;
@@ -58,20 +78,22 @@ const HomeContentSection = () => {
 
         <div className="mt-[6rem] w-full overflow-hidden [container-type:inline-size]">
           <div
-            className="flex w-max gap-[2.6rem]"
+            className="flex w-max gap-[2.6rem] hover:[animation-play-state:paused]"
             style={{
               transform: getCarouselTransform(CAROUSEL_START_OFFSET_REM),
               animation: `mozip-featured-carousel ${CAROUSEL_DURATION_S}s linear infinite`,
               willChange: 'transform',
             }}
-            aria-hidden
           >
             {CAROUSEL_TRACK.map((cardIndex, index) => {
               const card = FEATURED_CARDS[cardIndex];
 
               return (
-                <div
+                <a
                   key={`${card.id}-${index}`}
+                  href={card.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="shrink-0 overflow-hidden rounded-[1.6rem] border-[1.5px] border-primary"
                   style={{ width: `${CARD_WIDTH_REM}rem` }}
                 >
@@ -81,7 +103,7 @@ const HomeContentSection = () => {
                     className="h-auto w-full"
                     draggable={false}
                   />
-                </div>
+                </a>
               );
             })}
           </div>
