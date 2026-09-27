@@ -34,35 +34,45 @@ const ChatContent = ({
 
   return (
     <div className="relative h-full w-full">
-      {!hasMessages ? (
+      {/* EmptyState 레이어: 메시지가 생기면 fade-out */}
+      <div
+        className={`absolute inset-0 transition-opacity duration-300 ${
+          hasMessages ? 'pointer-events-none opacity-0' : 'opacity-100'
+        }`}
+      >
         <ChatEmptyState onSubmit={onSendMessage} disabled={isSending} />
-      ) : (
-        <div className="relative h-full w-full bg-white">
-          <div
-            ref={scrollRef}
-            className="h-full overflow-y-auto px-[4rem] pt-[2.4rem] pb-[12rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            <div className="mx-auto flex min-h-full w-full max-w-[80rem] flex-col">
-              <div className="flex-1">
-                <MessageList
-                  messages={messages}
-                  isSending={isSending}
-                  onSendMessage={onSendMessage}
-                />
-              </div>
-              <p className="mt-auto pt-[2.4rem] text-center text-caption text-gray-400">
-                답변에 오류가 있을 수 있으니 중요한 정보는 다시 확인해 주세요.
-              </p>
-            </div>
-          </div>
+      </div>
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-b from-white/50 to-white px-[4rem] pb-[2.8rem]">
-            <div className="pointer-events-auto mx-auto w-full max-w-[80rem]">
-              <MessageInput onSubmit={onSendMessage} disabled={isSending} />
+      {/* 메시지 레이어: 메시지가 생기면 fade-in */}
+      <div
+        className={`absolute inset-0 bg-white transition-opacity duration-300 ${
+          hasMessages ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+      >
+        <div
+          ref={scrollRef}
+          className="h-full overflow-y-auto px-[4rem] pt-[2.4rem] pb-[12rem] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div className="mx-auto flex min-h-full w-full max-w-[80rem] flex-col">
+            <div className="flex-1">
+              <MessageList
+                messages={messages}
+                isSending={isSending}
+                onSendMessage={onSendMessage}
+              />
             </div>
+            <p className="mt-auto pt-[2.4rem] text-center text-caption text-gray-400">
+              답변에 오류가 있을 수 있으니 중요한 정보는 다시 확인해 주세요.
+            </p>
           </div>
         </div>
-      )}
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-b from-white/50 to-white px-[4rem] pb-[2.8rem]">
+          <div className="pointer-events-auto mx-auto w-full max-w-[80rem]">
+            <MessageInput onSubmit={onSendMessage} disabled={isSending} />
+          </div>
+        </div>
+      </div>
 
       {isSearchOpen && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 p-[4rem]">
