@@ -24,10 +24,11 @@ export const ONBOARDING_STEP = {
   birthDate: 1,
   gender: 2,
   residence: 3,
-  employmentStatus: 4,
-  householdType: 5,
-  income: 6,
-  interest: 7,
+  occupation: 4,
+  householdSize: 5,
+  householdSpecial: 6,
+  income: 7,
+  interest: 8,
 } as const;
 
 export type OnboardingStep =
@@ -38,21 +39,36 @@ export type QuestionStep = Exclude<
   typeof ONBOARDING_STEP.intro
 >;
 
-// 관심 분야(Q7) — 서버 프로필 스키마엔 대응 필드가 없어 로컬 저장 전용
+// 관심 분야(Q8) — 서버 프로필 스키마엔 대응 필드가 없어 로컬 저장 전용
 export type InterestOption = {
   id: string;
   label: string;
   icon: string;
 };
 
-// 온보딩 답변 — PUT /api/users/me/profile 제출용 필드 + interests(로컬 전용)
+// Q4 "요즘 무엇을 하고 계세요?" — 서버 employmentStatus(3종)로 바꿔서 보낸다.
+export type Occupation =
+  | 'STUDENT'
+  | 'OFFICE_WORKER'
+  | 'SELF_EMPLOYED'
+  | 'JOB_SEEKER'
+  | 'RESTING'
+  | 'OTHER';
+
+// Q6 "해당하는 게 있다면" — 빈 배열이면 "해당 없음"
+export type HouseholdSpecial = 'SINGLE_PARENT' | 'DISABLED' | 'ELDERLY';
+
+// Q7 소득 구간 — 기준 중위소득 대비 비율 구간의 윗값(200% 초과는 250). 모르면 'UNKNOWN'
+export type IncomeBracket = 50 | 75 | 100 | 200 | 250 | 'UNKNOWN';
+
+// 온보딩 답변 — 제출할 때 toUserProfileUpdateRequest가 서버 7개 필드로 바꾼다.
 export type OnboardingAnswers = {
   birthDate: string | null; // 'YYYY-MM-DD'
   gender: Gender | null;
   regionId: number | null;
-  employmentStatus: EmploymentStatus | null;
-  householdType: HouseholdType | null;
-  incomeType: IncomeType | null;
-  incomeValue: number | null;
+  occupation: Occupation | null;
+  householdSize: number | null; // 나 포함 가구원 수, 6은 "6명 이상"
+  householdSpecials: HouseholdSpecial[];
+  incomeBracket: IncomeBracket | null;
   interests: string[];
 };
