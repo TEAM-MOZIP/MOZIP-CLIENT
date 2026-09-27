@@ -1,68 +1,79 @@
-import { INCOME_TYPE_OPTIONS } from '@pages/onboarding/constants/incomeTypes';
-import type { IncomeType } from '@pages/onboarding/types/onboarding';
+import {
+  getIncomeBracketOptions,
+  UNKNOWN_INCOME_LABEL,
+} from '@pages/onboarding/constants/medianIncome';
+import type { IncomeBracket } from '@pages/onboarding/types/onboarding';
 
 type IncomeStepProps = {
-  incomeType: IncomeType | null;
-  incomeValue: number | null;
-  onChangeType: (incomeType: IncomeType) => void;
-  onChangeValue: (incomeValue: number | null) => void;
+  householdSize: number;
+  value: IncomeBracket | null;
+  showParentIncomeHint?: boolean;
+  onChange: (bracket: IncomeBracket) => void;
 };
 
 const IncomeStep = ({
-  incomeType,
-  incomeValue,
-  onChangeType,
-  onChangeValue,
+  householdSize,
+  value,
+  showParentIncomeHint = false,
+  onChange,
 }: IncomeStepProps) => {
-  const selectedOption = INCOME_TYPE_OPTIONS.find(
-    (option) => option.id === incomeType
-  );
+  const options = [
+    ...getIncomeBracketOptions(householdSize),
+    { value: 'UNKNOWN' as const, label: UNKNOWN_INCOME_LABEL },
+  ];
 
   return (
-    <div className="flex w-full max-w-[40rem] flex-col items-center gap-[3.2rem]">
-      <div className="flex gap-[1.6rem]">
-        {INCOME_TYPE_OPTIONS.map((option) => {
-          const selected = incomeType === option.id;
+    <div className="flex w-full flex-col">
+      <div
+        role="radiogroup"
+        aria-label="한 달 소득 구간"
+        className="flex w-full flex-col gap-[0.8rem]"
+      >
+        {options.map((option) => {
+          const selected = value === option.value;
+          const isUnknown = option.value === 'UNKNOWN';
 
           return (
             <button
-              key={option.id}
+              key={option.value}
               type="button"
-              aria-pressed={selected}
-              onClick={() => onChangeType(option.id)}
+              role="radio"
+              aria-checked={selected}
+              onClick={() => onChange(option.value)}
               className={[
-                'rounded-[1.2rem] border-2 px-[2.4rem] py-[1rem] text-heading-4 transition-colors',
+                'flex w-full cursor-pointer items-center gap-[1.2rem] rounded-[1.4rem] border-[0.15rem] bg-white px-[1.8rem] py-[1.5rem] text-left text-body-3 text-gray-800 transition-colors',
+                isUnknown ? 'border-dashed' : '',
                 selected
-                  ? 'border-primary bg-primary-sub-2 text-black'
-                  : 'border-primary bg-white text-black hover:bg-primary-sub-2',
+                  ? 'border-gray-700 font-bold'
+                  : 'border-gray-200 hover:border-gray-400',
               ].join(' ')}
             >
+              <span
+                aria-hidden
+                className={[
+                  'size-[2rem] shrink-0 rounded-full',
+                  selected
+                    ? 'border-[0.6rem] border-gray-700'
+                    : 'border-[0.15rem] border-gray-300',
+                ].join(' ')}
+              />
               {option.label}
+              {isUnknown && (
+                <span className="ml-auto text-caption font-medium text-gray-500">
+                  소득 조건은 &quot;확인 필요&quot;로 보여드려요
+                </span>
+              )}
             </button>
           );
         })}
       </div>
 
-      <label className="relative w-full">
-        <span className="sr-only">소득 값 입력</span>
-        <input
-          type="text"
-          inputMode="numeric"
-          disabled={!incomeType}
-          value={incomeValue ?? ''}
-          onChange={(event) => {
-            const digitsOnly = event.target.value.replace(/\D/g, '');
-            onChangeValue(digitsOnly === '' ? null : Number(digitsOnly));
-          }}
-          placeholder={incomeType ? '0' : '소득 유형을 먼저 선택해주세요.'}
-          className="h-[5.4rem] w-full rounded-[0.8rem] border border-gray-400 bg-white px-[1.6rem] pr-[4.8rem] text-body-2 text-black outline-none placeholder:text-gray-500 disabled:bg-gray-100"
-        />
-        {selectedOption && (
-          <span className="pointer-events-none absolute top-1/2 right-[1.6rem] -translate-y-1/2 text-body-3 text-gray-500">
-            {selectedOption.unit}
-          </span>
-        )}
-      </label>
+      {showParentIncomeHint && (
+        <p className="mt-[1.6rem] w-full rounded-[1.2rem] bg-primary-sub-3 px-[1.4rem] py-[1.2rem] text-caption text-gray-700">
+          부모님과 함께 산다면 부모님 소득도 합쳐서 골라주세요. 잘 모르겠다면
+          &apos;잘 모르겠어요&apos;도 괜찮아요.
+        </p>
+      )}
     </div>
   );
 };
