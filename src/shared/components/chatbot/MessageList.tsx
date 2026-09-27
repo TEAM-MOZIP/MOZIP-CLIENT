@@ -1,4 +1,5 @@
 import MessageItem from '@shared/components/chatbot/MessageItem';
+import mozipAiIcon from '@shared/assets/icons/mozip-ai.svg';
 import type { ChatMessage } from '@pages/chatbot/types/chat';
 
 type MessageListProps = {
@@ -30,9 +31,41 @@ const PendingMessage = ({ label }: { label: string }) => (
 );
 
 const MessageSkeleton = () => (
-  <div className="flex w-full justify-start" aria-busy="true" aria-label="로딩">
+  <div
+    className="flex w-full flex-col items-start gap-[1.6rem]"
+    aria-busy="true"
+    aria-label="로딩"
+  >
     <div className="flex w-full max-w-[min(68rem,85%)] flex-col items-start gap-[0.8rem]">
       <div className="h-[3.2rem] w-[60%] rounded-[1.2rem] bg-gray-200 animate-pulse" />
+    </div>
+
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex items-center gap-[0.8rem]"
+    >
+      <style>{`
+        @keyframes mozip-ai-roll {
+          0%, 60%, 100% { transform: translateY(0); opacity: 0.35; }
+          30% { transform: translateY(-0.4rem); opacity: 1; }
+        }
+      `}</style>
+      <span aria-hidden className="flex items-center gap-[0.2rem]">
+        {['0s', '0.2s', '0.4s'].map((delay) => (
+          <img
+            key={delay}
+            src={mozipAiIcon}
+            alt=""
+            draggable={false}
+            className="size-[1.4rem] motion-safe:animate-[mozip-ai-roll_0.9s_ease-in-out_infinite]"
+            style={{ animationDelay: delay }}
+          />
+        ))}
+      </span>
+      <p className="text-caption text-gray-400">
+        MOZIP AI가 답변을 생성하고 있어요
+      </p>
     </div>
   </div>
 );
