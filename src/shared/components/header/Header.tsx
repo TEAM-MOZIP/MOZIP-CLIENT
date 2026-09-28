@@ -1,0 +1,49 @@
+import { Link, NavLink } from 'react-router-dom';
+import logo from '@shared/assets/logo.svg';
+import HeaderActions from '@shared/components/header/HeaderActions';
+
+const navItemClass = ({ isActive }: { isActive: boolean }) =>
+  [
+    'cursor-pointer font-pretendard text-body-1 text-black transition-colors border-b-[3px]',
+    isActive ? 'border-primary !font-bold' : 'border-transparent font-normal',
+  ].join(' ');
+
+const Header = () => {
+  return (
+    <header className="fixed top-0 right-0 left-0 z-50 border-b border-gray-200 bg-white">
+      <div className="grid h-[81px] w-full grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center px-16 py-[1.2rem]">
+        <Link
+          to="/"
+          className="justify-self-start shrink-0 cursor-pointer"
+          aria-label="MOZIP 홈"
+        >
+          <img
+            src={logo}
+            alt=""
+            className="h-[2.8rem] w-auto"
+            draggable={false}
+          />
+        </Link>
+
+        <nav className="hidden min-[720px]:inline-flex items-center justify-self-center whitespace-nowrap gap-[6rem] pl-[2rem]">
+          <NavLink to="/" className={navItemClass}>
+            About
+          </NavLink>
+          <NavLink to="/package" className={navItemClass}>
+            정책 모음
+          </NavLink>
+          <NavLink to="/chatbot" className={navItemClass}>
+            AI 챗봇
+          </NavLink>
+          <NavLink to="/mypage" className={navItemClass}>
+            마이페이지
+          </NavLink>
+        </nav>
+
+        <HeaderActions />
+      </div>
+    </header>
+  );
+};
+
+export default Header;
