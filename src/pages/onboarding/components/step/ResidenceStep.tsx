@@ -26,15 +26,15 @@ const ResidenceStep = ({
   );
 
   return (
-    <div className="flex w-full max-w-[60rem] flex-col items-center">
-      <label className="relative w-full max-w-[30rem]">
+    <div className="flex w-full flex-col">
+      <label className="relative w-full">
         <span className="sr-only">구 이름 검색</span>
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="구 이름을 검색해보세요."
-          className="h-[4.2rem] w-full rounded-full border border-gray-400 bg-white py-[1.2rem] pl-[3.8rem] pr-[3.2rem] text-body-3 text-black outline-none placeholder:text-gray-500 [&::-webkit-search-cancel-button]:appearance-none"
+          placeholder="구 이름으로 찾기 (예: 마포)"
+          className="h-[4.8rem] w-full rounded-[1.2rem] border-[0.15rem] border-gray-200 bg-white py-[1.2rem] pl-[4.2rem] pr-[3.6rem] text-body-3 text-gray-800 outline-none transition-colors placeholder:text-gray-400 focus:border-gray-700 [&::-webkit-search-cancel-button]:appearance-none"
         />
         <img
           src={searchIcon}
@@ -61,7 +61,7 @@ const ResidenceStep = ({
         )}
       </label>
 
-      <div className="mt-[4rem] flex flex-wrap justify-center gap-[2rem_2.4rem]">
+      <div className="mt-[1.6rem] flex flex-wrap gap-[0.8rem]">
         {isLoading ? (
           <p className="text-body-3 text-gray-500">
             지역 목록을 불러오는 중이에요.
@@ -76,9 +76,12 @@ const ResidenceStep = ({
             />
           ))
         ) : (
-          <p className="text-body-3 text-gray-500">검색 결과가 없습니다.</p>
+          <p className="text-body-3 text-gray-500">검색 결과가 없어요.</p>
         )}
       </div>
+      <p className="mt-[1.6rem] rounded-[1.2rem] bg-gray-100 px-[1.4rem] py-[1.2rem] text-caption text-gray-600">
+        지금은 서울특별시 25개 구만 지원하고 있어요.
+      </p>
     </div>
   );
 };

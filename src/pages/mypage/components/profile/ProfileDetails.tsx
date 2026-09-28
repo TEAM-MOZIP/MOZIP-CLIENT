@@ -41,7 +41,7 @@ const ProfileDetails = ({ details, onEdit }: ProfileDetailsProps) => {
       {details.situations.length > 0 && (
         <div className="mt-[2.4rem]">
           <p className="mb-[1.2rem] text-body-3 font-medium text-gray-500">
-            현재 상황
+            맞춤 조건
           </p>
           <div className="flex flex-wrap gap-[0.8rem]">
             {details.situations.map((situation) => (
@@ -65,7 +65,7 @@ const ProfileDetails = ({ details, onEdit }: ProfileDetailsProps) => {
             {details.interests.map((interest) => (
               <span
                 key={interest.id}
-                className="inline-flex items-center gap-[0.6rem] rounded-[0.6rem] border border-primary bg-white px-[0.8rem] py-[0.4rem] text-caption font-medium text-gray-800"
+                className="inline-flex items-center gap-[0.6rem] rounded-full border border-gray-200 bg-white px-[1rem] py-[0.4rem] text-caption font-medium text-gray-800"
               >
                 <img
                   src={interest.icon}

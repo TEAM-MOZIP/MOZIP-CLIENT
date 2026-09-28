@@ -1,15 +1,41 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSendChatMessage } from '@pages/chatbot/hooks/useSendChatMessage';
 import type { ChatMessage } from '@pages/chatbot/types/chat';
 import { buildChatHistory } from '@pages/chatbot/utils/buildChatHistory';
 import { getChatErrorMessage } from '@pages/chatbot/utils/getChatErrorMessage';
 
+const CHAT_STORAGE_KEY = 'mozip-chat';
+
 const createMessageId = (role: ChatMessage['role']) =>
   `${role}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
+const loadMessages = (): ChatMessage[] => {
+  try {
+    const stored = localStorage.getItem(CHAT_STORAGE_KEY);
+    return stored ? (JSON.parse(stored) as ChatMessage[]) : [];
+  } catch {
+    return [];
+  }
+};
+
 export const useChatSession = (initialMessages: ChatMessage[] = []) => {
-  const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
+  const [messages, setMessages] = useState<ChatMessage[]>(() =>
+    initialMessages.length > 0 ? initialMessages : loadMessages()
+  );
   const { mutate, isPending } = useSendChatMessage();
+
+  // 메시지가 바뀔 때마다 localStorage에 동기화
+  useEffect(() => {
+    try {
+      if (messages.length > 0) {
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
+      } else {
+        localStorage.removeItem(CHAT_STORAGE_KEY);
+      }
+    } catch {
+      // 스토리지 용량 초과 등 무시
+    }
+  }, [messages]);
 
   const sendMessage = (content: string) => {
     const trimmed = content.trim();

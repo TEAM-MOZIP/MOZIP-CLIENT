@@ -12,6 +12,7 @@ type ChatSidebarProps = {
   onNewChat?: () => void;
   onSearch?: () => void;
   onSelectChat?: (id: string) => void;
+  onDeleteChat?: (id: string) => void;
 };
 
 const ChatSidebar = ({
@@ -21,6 +22,7 @@ const ChatSidebar = ({
   onNewChat,
   onSearch,
   onSelectChat,
+  onDeleteChat,
 }: ChatSidebarProps) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -107,6 +109,7 @@ const ChatSidebar = ({
               items={histories}
               activeId={activeChatId}
               onSelect={handleSelectChat}
+              onDelete={onDeleteChat}
             />
           </div>
         </div>

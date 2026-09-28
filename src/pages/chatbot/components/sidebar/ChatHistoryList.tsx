@@ -5,14 +5,14 @@ type ChatHistoryListProps = {
   items: ChatHistory[];
   activeId?: string | null;
   onSelect?: (id: string) => void;
-  onMenuClick?: (id: string) => void;
+  onDelete?: (id: string) => void;
 };
 
 const ChatHistoryList = ({
   items,
   activeId,
   onSelect,
-  onMenuClick,
+  onDelete,
 }: ChatHistoryListProps) => {
   const sortedItems = [...items].reverse();
 
@@ -24,7 +24,7 @@ const ChatHistoryList = ({
           title={item.title}
           isActive={item.id === activeId}
           onClick={() => onSelect?.(item.id)}
-          onMenuClick={() => onMenuClick?.(item.id)}
+          onDelete={() => onDelete?.(item.id)}
         />
       ))}
     </ul>
