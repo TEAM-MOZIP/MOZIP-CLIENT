@@ -1,4 +1,4 @@
-type LineKind = 'heading' | 'item' | 'subitem' | 'note' | 'text';
+type LineKind = 'heading' | 'item' | 'subitem' | 'note' | 'text' | 'section';
 
 type Line = { kind: LineKind; text: string };
 
@@ -6,11 +6,13 @@ const HEADING_MARKER = /^[○●◎■□▶►◆◇]\s*/;
 const ITEM_MARKER = /^[-–]\s*/;
 const SUBITEM_MARKER = /^[·•∙ㆍ]\s*/;
 const NOTE_MARKER = /^※/;
+const ASTERISK_NOTE_MARKER = /^\*+\s/;
+const PAREN_SECTION_MARKER = /^\([가-힣A-Za-z\s]{1,15}\)\s*/;
 
-// 정부24 원문은 "○ 제목 / - 항목 / · 세부 / ※ 참고" 기호로 구조를 표현한다.
-// 줄바꿈 없이 한 줄에 이어 쓴 원문도 많아서, 기호 앞에서 줄을 나눈다.
-// - "-"·"·"는 앞뒤가 공백일 때만 나눈다("50㎡~60㎡", "소득·재산", "3-4인" 같은 단어 안의 기호는 그대로 둔다).
-const INLINE_BREAK = /\s+(?=[○●◎■□▶►◆◇※])|\s+(?=[-–·]\s)/;
+// 정부24: "○·- ※" 기호 앞에서 줄을 나눈다.
+// 복지로: "* " "** " 각주 앞, "(소제목)" 앞에서 줄을 나눈다.
+const INLINE_BREAK =
+  /\s+(?=[○●◎■□▶►◆◇※])|\s+(?=[-–·]\s)|\s+(?=\*+[\s(])|\s+(?=\([가-힣A-Za-z\s]{1,15}\)\s)/;
 
 const splitLines = (text: string) =>
   text
@@ -32,11 +34,21 @@ const parseLine = (line: string): Line => {
   if (NOTE_MARKER.test(line)) {
     return { kind: 'note', text: line };
   }
+  if (ASTERISK_NOTE_MARKER.test(line)) {
+    return {
+      kind: 'note',
+      text: '※ ' + line.replace(ASTERISK_NOTE_MARKER, ''),
+    };
+  }
+  if (PAREN_SECTION_MARKER.test(line)) {
+    return { kind: 'section', text: line };
+  }
   return { kind: 'text', text: line };
 };
 
 const LINE_STYLES: Record<LineKind, { className: string; bullet?: string }> = {
   heading: { className: 'mt-[0.8rem] font-semibold text-title first:mt-0' },
+  section: { className: 'mt-[0.6rem] font-medium text-title first:mt-0' },
   item: { className: 'pl-[0.4rem]', bullet: '•' },
   subitem: { className: 'pl-[1.6rem]', bullet: '·' },
   note: { className: 'text-caption text-gray-500' },
@@ -73,7 +85,7 @@ type PolicyTextProps = {
   className?: string;
 };
 
-/** 정부24 원문(지원대상·지원내용·신청방법 등)을 기호 구조대로 줄을 나눠 읽기 좋게 보여준다. */
+/** 정부24·복지로 원문(지원대상·지원내용·신청방법 등)을 기호 구조대로 줄을 나눠 읽기 좋게 보여준다. */
 const PolicyText = ({ text, className = '' }: PolicyTextProps) => (
   <div
     className={['flex flex-col gap-[0.4rem] text-body-3 text-body', className]

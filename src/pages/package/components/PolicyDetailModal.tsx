@@ -16,7 +16,10 @@ import {
   buildPolicyShareText,
   getPolicyShareUrl,
 } from '@pages/package/utils/buildPolicyShareText';
-import { getEligibilitySummary } from '@pages/package/utils/getEligibilitySummary';
+import {
+  getEligibilitySummary,
+  hasStructuredEligibility,
+} from '@pages/package/utils/getEligibilitySummary';
 import { ELIGIBILITY_STATUS_LABELS } from '@pages/package/utils/getEvaluationLabels';
 import { formatPolicyPeriod } from '@pages/package/utils/getPolicyPeriod';
 import { getTermExplanationErrorMessage } from '@pages/package/utils/getTermExplanationErrorMessage';
@@ -361,20 +364,19 @@ const PolicyDetailModal = ({ policyId, onClose }: PolicyDetailModalProps) => {
                 </TextBlock>
               </DetailSection>
 
-              <DetailSection title="지원 내용">
-                {detail.benefitDescription?.trim() ? (
+              {detail.benefitDescription?.trim() && (
+                <DetailSection title="지원 내용">
                   <PolicyText text={detail.benefitDescription} />
-                ) : (
-                  <TextBlock>
-                    {displayValue(detail.benefitDescription)}
-                  </TextBlock>
-                )}
-              </DetailSection>
+                </DetailSection>
+              )}
 
               <DetailSection title="신청 대상">
-                <BulletList
-                  items={getEligibilitySummary(detail.eligibility ?? null)}
-                />
+                {(!detail.targetDescription?.trim() ||
+                  hasStructuredEligibility(detail.eligibility ?? null)) && (
+                  <BulletList
+                    items={getEligibilitySummary(detail.eligibility ?? null)}
+                  />
+                )}
                 {detail.targetDescription?.trim() && (
                   <PolicyText
                     text={detail.targetDescription}
