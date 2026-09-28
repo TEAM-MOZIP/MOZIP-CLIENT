@@ -1,10 +1,10 @@
 import { useScrollReveal } from '@pages/home/hooks/useScrollReveal';
-// test images
-import frame from '@shared/assets/test/Frame-0.png';
-import frame1 from '@shared/assets/test/Frame-1.png';
-import frame2 from '@shared/assets/test/Frame-2.png';
-import frame3 from '@shared/assets/test/Frame-3.png';
-import frame4 from '@shared/assets/test/Frame-4.png';
+
+import content0 from '@shared/assets/images/home/carousel/content-0.png';
+import content1 from '@shared/assets/images/home/carousel/content-1.png';
+import content2 from '@shared/assets/images/home/carousel/content-2.png';
+import content3 from '@shared/assets/images/home/carousel/content-3.png';
+import content4 from '@shared/assets/images/home/carousel/content-4.png';
 
 const CARD_WIDTH_REM = 45;
 const CARD_GAP_REM = 2.4;
@@ -12,18 +12,38 @@ const CARD_STEP_REM = CARD_WIDTH_REM + CARD_GAP_REM;
 const CAROUSEL_DURATION_S = 25;
 
 const FEATURED_CARDS = [
-  { id: 'featured-0', image: frame },
-  { id: 'featured-1', image: frame1 },
-  { id: 'featured-2', image: frame2 },
-  { id: 'featured-3', image: frame3 },
-  { id: 'featured-4', image: frame4 },
+  {
+    id: 1,
+    image: content0,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=41&lan=KO',
+  },
+  {
+    id: 2,
+    image: content1,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=1066&lan=KO',
+  },
+  {
+    id: 3,
+    image: content2,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=126&lan=KO',
+  },
+  {
+    id: 4,
+    image: content3,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=112&lan=KO',
+  },
+  {
+    id: 5,
+    image: content4,
+    href: 'https://www.seoul.go.kr/policy/view.do?id=102&lan=KO',
+  },
 ] as const;
 
 const CARD_COUNT = FEATURED_CARDS.length;
 
-const CAROUSEL_TRACK = [...[4, 0, 1, 2, 3], ...[4, 0, 1, 2, 3]] as const;
+const CAROUSEL_TRACK = [...[3, 4, 0, 1, 2], ...[3, 4, 0, 1, 2]] as const;
 
-const CAROUSEL_START_INDEX = 1;
+const CAROUSEL_START_INDEX = 2;
 const CAROUSEL_LOOP_INDEX = CAROUSEL_START_INDEX + CARD_COUNT;
 const CAROUSEL_START_OFFSET_REM = CAROUSEL_START_INDEX * CARD_STEP_REM;
 const CAROUSEL_END_OFFSET_REM = CAROUSEL_LOOP_INDEX * CARD_STEP_REM;
@@ -46,6 +66,14 @@ const HomeContentSection = () => {
             transform: ${getCarouselTransform(CAROUSEL_END_OFFSET_REM)};
           }
         }
+
+        .mozip-featured-carousel-track {
+          animation: mozip-featured-carousel ${CAROUSEL_DURATION_S}s linear infinite;
+        }
+
+        .mozip-featured-carousel-viewport:hover .mozip-featured-carousel-track {
+          animation-play-state: paused;
+        }
       `}</style>
 
       <div ref={ref} className={reveal.className} style={reveal.style}>
@@ -56,23 +84,24 @@ const HomeContentSection = () => {
           </p>
         </div>
 
-        <div className="mt-[6rem] w-full overflow-hidden [container-type:inline-size]">
+        <div className="mozip-featured-carousel-viewport mt-[6rem] w-full overflow-hidden [container-type:inline-size]">
           <div
-            className="flex w-max gap-[2.6rem]"
+            className="mozip-featured-carousel-track flex w-max gap-[2.6rem]"
             style={{
               transform: getCarouselTransform(CAROUSEL_START_OFFSET_REM),
-              animation: `mozip-featured-carousel ${CAROUSEL_DURATION_S}s linear infinite`,
               willChange: 'transform',
             }}
-            aria-hidden
           >
             {CAROUSEL_TRACK.map((cardIndex, index) => {
               const card = FEATURED_CARDS[cardIndex];
 
               return (
-                <div
+                <a
                   key={`${card.id}-${index}`}
-                  className="shrink-0 overflow-hidden rounded-[2rem] border-[2px] border-primary"
+                  href={card.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 overflow-hidden rounded-[1.6rem] border-[1.5px] border-primary"
                   style={{ width: `${CARD_WIDTH_REM}rem` }}
                 >
                   <img
@@ -81,7 +110,7 @@ const HomeContentSection = () => {
                     className="h-auto w-full"
                     draggable={false}
                   />
-                </div>
+                </a>
               );
             })}
           </div>
