@@ -84,3 +84,19 @@ export const getEligibilitySummary = (
 
   return lines.length > 0 ? lines : ['별도 자격 제한이 없어요.'];
 };
+
+// targetDescription이 있을 때 폴백("별도 자격 제한이 없어요.")을 숨길지 판단하는 헬퍼.
+// 구조화된 조건이 하나라도 있으면 true — targetDescription과 함께 표시할 가치가 있다.
+export const hasStructuredEligibility = (
+  eligibility: PolicyEligibilityResponse | null
+): boolean => {
+  if (!eligibility) return false;
+  return (
+    eligibility.minimumAge != null ||
+    eligibility.maximumAge != null ||
+    !!eligibility.genderCondition ||
+    !!eligibility.incomeType ||
+    (eligibility.allowedEmploymentStatuses?.length ?? 0) > 0 ||
+    (eligibility.allowedHouseholdTypes?.length ?? 0) > 0
+  );
+};
